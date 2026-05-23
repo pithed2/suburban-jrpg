@@ -5,6 +5,8 @@ import { DialogueRunner } from "../game/DialogueRunner";
 import { isNear } from "../game/interaction";
 import { getQuestStepLabel } from "../game/quests";
 import { getGameState } from "../game/session";
+import { addWorldSprite, spriteFrames } from "../game/sprites";
+import { addPixelText, setPixelText } from "../game/uiText";
 import {
   completeQuestStep,
   setActiveQuestStep,
@@ -20,13 +22,17 @@ export class BasementScene extends Phaser.Scene {
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private interactKey!: Phaser.Input.Keyboard.Key;
   private player!: Phaser.GameObjects.Rectangle;
+  private playerSprite!: Phaser.GameObjects.Sprite;
   private exit!: Phaser.GameObjects.Rectangle;
   private dustBunny!: Phaser.GameObjects.Rectangle;
+  private dustBunnySprite!: Phaser.GameObjects.Sprite;
   private dustLabel!: Phaser.GameObjects.Text;
   private coil!: Phaser.GameObjects.Rectangle;
+  private coilSprite!: Phaser.GameObjects.Sprite;
   private questText!: Phaser.GameObjects.Text;
   private messageBox!: Phaser.GameObjects.Rectangle;
   private messageText!: Phaser.GameObjects.Text;
+  private commandBox!: Phaser.GameObjects.Rectangle;
   private commandText!: Phaser.GameObjects.Text;
   private mode: BasementMode = "explore";
   private selectedCommandIndex = 0;
@@ -89,6 +95,7 @@ export class BasementScene extends Phaser.Scene {
 
     this.player.x = Phaser.Math.Clamp(this.player.x + dx, 18, 302);
     this.player.y = Phaser.Math.Clamp(this.player.y + dy, 40, 160);
+    this.playerSprite.setPosition(this.player.x, this.player.y);
   }
 
   private createWorld(): void {
@@ -98,48 +105,39 @@ export class BasementScene extends Phaser.Scene {
     this.add.rectangle(238, 70, 42, 22, 0x6b7280).setStrokeStyle(2, 0x111827);
     this.add.rectangle(248, 98, 12, 52, 0x64748b);
 
-    this.exit = this.add.rectangle(34, 146, 28, 18, 0x854d0e).setStrokeStyle(2, 0x431407);
-    this.dustBunny = this.add.rectangle(148, 126, 18, 12, 0xcbd5e1).setStrokeStyle(2, 0x64748b);
-    this.coil = this.add.rectangle(244, 118, 24, 20, 0xef4444).setStrokeStyle(2, 0x7f1d1d);
-    this.player = this.add.rectangle(62, 142, 12, 18, 0x2563eb).setStrokeStyle(1, 0x172554);
+    this.exit = this.add.rectangle(34, 146, 28, 18, 0xffffff, 0);
+    this.dustBunny = this.add.rectangle(148, 126, 18, 12, 0xffffff, 0);
+    this.coil = this.add.rectangle(244, 118, 24, 20, 0xffffff, 0);
+    this.player = this.add.rectangle(62, 142, 14, 18, 0xffffff, 0);
+    addWorldSprite(this, 34, 146, spriteFrames.stairs);
+    this.dustBunnySprite = addWorldSprite(this, 148, 126, spriteFrames.dustBunny);
+    this.coilSprite = addWorldSprite(this, 244, 118, spriteFrames.heatingCoil);
+    this.playerSprite = addWorldSprite(this, this.player.x, this.player.y, spriteFrames.dad);
 
-    this.add.text(24, 157, "STAIRS", this.labelStyle());
-    this.dustLabel = this.add.text(132, 137, "DUST", this.labelStyle());
-    this.add.text(229, 132, "COIL", this.labelStyle());
-    this.add.text(53, 127, "DAD", this.labelStyle());
+    addPixelText(this, 24, 157, "STAIRS", 6);
+    this.dustLabel = addPixelText(this, 132, 137, "DUST", 6);
+    addPixelText(this, 229, 132, "COIL", 6);
+    addPixelText(this, 53, 127, "DAD", 6);
 
     this.updateDustBunnyVisibility();
   }
 
   private createUi(): void {
-    this.questText = this.add.text(8, 8, "", {
-      color: "#111827",
-      fontFamily: "monospace",
-      fontSize: "8px",
-      backgroundColor: "#facc15",
-      padding: { x: 4, y: 2 },
-    });
+    this.add.rectangle(8, 8, 236, 16, 0xfacc15).setOrigin(0, 0);
+    this.questText = addPixelText(this, 12, 11, "", 8).setTint(0x111827);
 
     this.messageBox = this.add.rectangle(160, 150, 304, 50, 0x111827, 0.94)
       .setStrokeStyle(2, 0xf8fafc)
       .setVisible(false);
 
-    this.messageText = this.add.text(16, 130, "", {
-      color: "#f8fafc",
-      fontFamily: "monospace",
-      fontSize: "7px",
-      lineSpacing: 2,
-      wordWrap: { width: 288 },
-    }).setVisible(false);
+    this.messageText = addPixelText(this, 16, 132, "", 7)
+      .setWordWrapWidth(288)
+      .setVisible(false);
 
-    this.commandText = this.add.text(212, 110, "", {
-      color: "#f8fafc",
-      fontFamily: "monospace",
-      fontSize: "7px",
-      lineSpacing: 2,
-      backgroundColor: "#111827",
-      padding: { x: 4, y: 4 },
-    }).setVisible(false);
+    this.commandBox = this.add.rectangle(208, 106, 96, 42, 0x111827, 0.94)
+      .setStrokeStyle(2, 0xf8fafc)
+      .setVisible(false);
+    this.commandText = addPixelText(this, 212, 110, "", 7).setVisible(false);
   }
 
   private handleInteract(): void {
@@ -293,16 +291,20 @@ export class BasementScene extends Phaser.Scene {
       .map((command, index) => `${index === this.selectedCommandIndex ? ">" : " "} ${command}`)
       .join("\n");
 
-    this.commandText.setText(menu).setVisible(true);
+    this.commandBox.setVisible(true);
+    setPixelText(this.commandText, menu);
+    this.commandText.setVisible(true);
   }
 
   private hideBattleMenu(): void {
+    this.commandBox.setVisible(false);
     this.commandText.setVisible(false);
   }
 
   private updateDustBunnyVisibility(): void {
     const visible = !this.state.flags.basementDustCleared;
     this.dustBunny.setVisible(visible);
+    this.dustBunnySprite.setVisible(visible);
     this.dustLabel.setVisible(visible);
   }
 
@@ -317,14 +319,16 @@ export class BasementScene extends Phaser.Scene {
   }
 
   private updateQuestText(prefix: string): void {
-    this.questText.setText(
+    setPixelText(
+      this.questText,
       `${prefix} - ${getQuestStepLabel(this.state.quest.questId, this.state.quest.activeStepId)}`,
     );
   }
 
   private showMessage(message: string): void {
     this.messageBox.setVisible(true);
-    this.messageText.setText(message).setVisible(true);
+    setPixelText(this.messageText, message);
+    this.messageText.setVisible(true);
   }
 
   private hideMessage(): void {
@@ -333,11 +337,4 @@ export class BasementScene extends Phaser.Scene {
     this.messageText.setVisible(false);
   }
 
-  private labelStyle(): Phaser.Types.GameObjects.Text.TextStyle {
-    return {
-      color: "#f8fafc",
-      fontFamily: "monospace",
-      fontSize: "6px",
-    };
-  }
 }

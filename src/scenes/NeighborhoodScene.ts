@@ -4,6 +4,8 @@ import { DialogueRunner } from "../game/DialogueRunner";
 import { isNear } from "../game/interaction";
 import { getQuest, getQuestStepLabel } from "../game/quests";
 import { getGameState, resetGameState } from "../game/session";
+import { addWorldSprite, spriteFrames } from "../game/sprites";
+import { addPixelText, setPixelText } from "../game/uiText";
 import {
   completeQuestStep,
   setActiveQuestStep,
@@ -16,6 +18,7 @@ export class NeighborhoodScene extends Phaser.Scene {
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private interactKey!: Phaser.Input.Keyboard.Key;
   private player!: Phaser.GameObjects.Rectangle;
+  private playerSprite!: Phaser.GameObjects.Sprite;
   private wife!: Phaser.GameObjects.Rectangle;
   private dryer!: Phaser.GameObjects.Rectangle;
   private mode: SceneMode = "explore";
@@ -61,6 +64,7 @@ export class NeighborhoodScene extends Phaser.Scene {
 
     this.player.x = Phaser.Math.Clamp(this.player.x + dx, 12, 308);
     this.player.y = Phaser.Math.Clamp(this.player.y + dy, 42, 162);
+    this.playerSprite.setPosition(this.player.x, this.player.y);
   }
 
   private createTextures(): void {
@@ -87,41 +91,31 @@ export class NeighborhoodScene extends Phaser.Scene {
     this.add.image(78, 82, "house");
 
     this.add.rectangle(246, 76, 44, 30, 0x4b5563).setStrokeStyle(2, 0x111827);
-    this.add.text(225, 70, "BASEMENT", {
-      color: "#f8fafc",
-      fontFamily: "monospace",
-      fontSize: "6px",
-    });
+    addPixelText(this, 225, 70, "BASEMENT", 6);
 
-    this.dryer = this.add.rectangle(247, 98, 22, 18, 0xd1d5db).setStrokeStyle(2, 0x374151);
-    this.wife = this.add.rectangle(132, 104, 12, 18, 0xf97316).setStrokeStyle(1, 0x7c2d12);
-    this.player = this.add.rectangle(160, 136, 12, 18, 0x2563eb).setStrokeStyle(1, 0x172554);
+    this.dryer = this.add.rectangle(247, 98, 22, 18, 0xffffff, 0);
+    this.wife = this.add.rectangle(132, 104, 14, 18, 0xffffff, 0);
+    this.player = this.add.rectangle(160, 136, 14, 18, 0xffffff, 0);
+    addWorldSprite(this, 247, 98, spriteFrames.dryer);
+    addWorldSprite(this, 132, 104, spriteFrames.wife);
+    this.playerSprite = addWorldSprite(this, this.player.x, this.player.y, spriteFrames.dad);
 
-    this.add.text(154, 121, "DAD", this.labelStyle());
-    this.add.text(122, 89, "WIFE", this.labelStyle());
-    this.add.text(238, 111, "DRYER", this.labelStyle());
+    addPixelText(this, 154, 121, "DAD", 6);
+    addPixelText(this, 122, 89, "WIFE", 6);
+    addPixelText(this, 238, 111, "DRYER", 6);
   }
 
   private createUi(): void {
-    this.questText = this.add.text(8, 8, "", {
-      color: "#111827",
-      fontFamily: "monospace",
-      fontSize: "8px",
-      backgroundColor: "#facc15",
-      padding: { x: 4, y: 2 },
-    });
+    this.add.rectangle(8, 8, 236, 16, 0xfacc15).setOrigin(0, 0);
+    this.questText = addPixelText(this, 12, 11, "", 8).setTint(0x111827);
 
     this.messageBox = this.add.rectangle(160, 150, 304, 50, 0x111827, 0.94)
       .setStrokeStyle(2, 0xf8fafc)
       .setVisible(false);
 
-    this.messageText = this.add.text(16, 130, "", {
-      color: "#f8fafc",
-      fontFamily: "monospace",
-      fontSize: "7px",
-      lineSpacing: 2,
-      wordWrap: { width: 288 },
-    }).setVisible(false);
+    this.messageText = addPixelText(this, 16, 132, "", 7)
+      .setWordWrapWidth(288)
+      .setVisible(false);
   }
 
   private handleInteract(): void {
@@ -217,12 +211,13 @@ export class NeighborhoodScene extends Phaser.Scene {
       this.state.quest.activeStepId,
     );
     const label = prefix ? `${prefix} - ${activeStepLabel}` : `${quest.countdownLabel} - ${activeStepLabel}`;
-    this.questText.setText(label);
+    setPixelText(this.questText, label);
   }
 
   private showMessage(message: string): void {
     this.messageBox.setVisible(true);
-    this.messageText.setText(message).setVisible(true);
+    setPixelText(this.messageText, message);
+    this.messageText.setVisible(true);
   }
 
   private hideMessage(): void {
@@ -231,11 +226,4 @@ export class NeighborhoodScene extends Phaser.Scene {
     this.messageText.setVisible(false);
   }
 
-  private labelStyle(): Phaser.Types.GameObjects.Text.TextStyle {
-    return {
-      color: "#111827",
-      fontFamily: "monospace",
-      fontSize: "6px",
-    };
-  }
 }
