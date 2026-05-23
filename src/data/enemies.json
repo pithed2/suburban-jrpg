@@ -1,0 +1,15 @@
+[
+  {
+    "id": "evil-heating-coil",
+    "name": "Evil Heating Coil",
+    "hp": 18,
+    "attack": 3,
+    "emotionalMeaning": "Appliance dread",
+    "moves": [
+      "Radiates warranty anxiety",
+      "Snaps with static judgment",
+      "Whispers about installation fees"
+    ]
+  }
+]
+

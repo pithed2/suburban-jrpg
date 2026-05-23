@@ -1,0 +1,17 @@
+[
+  {
+    "id": "ibuprofen",
+    "name": "Ibuprofen",
+    "kind": "consumable",
+    "heal": 10,
+    "description": "Restores enough resolve to continue dealing with the house."
+  },
+  {
+    "id": "adjustable-wrench",
+    "name": "Adjustable Wrench",
+    "kind": "weapon",
+    "power": 4,
+    "description": "A practical tool and, in desperate times, a statement."
+  }
+]
+

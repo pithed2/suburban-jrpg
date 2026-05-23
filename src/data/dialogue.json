@@ -1,0 +1,26 @@
+{
+  "wife": [
+    "The towels are still damp.",
+    "I checked the lint trap. It looked... historical.",
+    "Your mother-in-law texted a thumbs-up. I don't like the confidence in it."
+  ],
+  "dryer": [
+    "The dryer hums with the quiet menace of a household appliance outside warranty.",
+    "A warm draft slips through the vent like a prophecy."
+  ],
+  "battleIntro": [
+    "The basement light flickers.",
+    "The Evil Heating Coil emerges from behind the dryer."
+  ],
+  "basementIntro": [
+    "You descend into the basement.",
+    "Somewhere in the utility gloom, the dryer vent rattles like a cursed kazoo."
+  ],
+  "basementExit": [
+    "You climb back toward the living room and its many unresolved expectations."
+  ],
+  "victory": [
+    "The dryer coughs once, then resumes its sacred duty.",
+    "Temporary suburban order has been restored."
+  ]
+}

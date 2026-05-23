@@ -1,0 +1,26 @@
+[
+  {
+    "id": "fix-dryer",
+    "title": "Fix the Dryer",
+    "countdownLabel": "12 DAYS UNTIL ARRIVAL",
+    "steps": [
+      {
+        "id": "talk-to-wife",
+        "label": "Talk to wife"
+      },
+      {
+        "id": "inspect-dryer",
+        "label": "Inspect dryer"
+      },
+      {
+        "id": "defeat-heating-coil",
+        "label": "Defeat Evil Heating Coil"
+      },
+      {
+        "id": "return-to-wife",
+        "label": "Return to wife"
+      }
+    ]
+  }
+]
+
