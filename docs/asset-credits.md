@@ -1,18 +1,8 @@
 # Asset Credits
 
-## Kenney 1-Bit Pack
+## 16Pixel
 
-- Source: https://kenney.nl/assets/1-bit-pack
-- Creator: Kenney
-- License: Creative Commons Zero, CC0
-- Local path: `public/assets/vendor/kenney-1-bit`
+- Local path: `public/assets/vendor/16Pixel`
+- Use: temporary 16x16 character/object sprites for the prototype.
 
-Credit is appreciated by Kenney but not required by the license.
-
-## DotGothic16
-
-- Source: https://github.com/fontworks-fonts/DotGothic16
-- Creator: Fontworks Inc.
-- License: SIL Open Font License 1.1
-- Local path: `public/assets/fonts/dotgothic16`
-
+Confirm and expand license/source notes before wider distribution.

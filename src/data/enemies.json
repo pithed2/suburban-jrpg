@@ -2,25 +2,89 @@
   {
     "id": "dust-bunny",
     "name": "Dust Bunny",
+    "level": 1,
     "hp": 10,
     "attack": 2,
     "emotionalMeaning": "Neglected chores",
-    "moves": [
-      "Scatters under the utility shelf",
-      "Triggers a suspicious sneeze",
-      "Rolls with silent accusation"
-    ]
+    "attackPattern": [
+      {
+        "message": "Scatters under the utility shelf",
+        "damage": 1
+      },
+      {
+        "message": "Triggers a suspicious sneeze",
+        "damage": 2
+      },
+      {
+        "message": "Rolls with silent accusation",
+        "damage": 1
+      }
+    ],
+    "actionResponses": {
+      "fight": {
+        "damage": 6,
+        "damageByWeapon": {
+          "percussive-maintenance": 6,
+          "adjustable-wrench": 7
+        },
+        "message": "You swat it with grim domestic purpose.",
+        "effectLabel": "super effective"
+      },
+      "dadSkill": {
+        "damage": 3,
+        "message": "You take a Deep Sigh. The dust is unmoved by maturity.",
+        "effectLabel": "resisted"
+      }
+    },
+    "initiative": {
+      "baseAmbushChance": 0.05,
+      "levelAdvantageBonus": 0.02,
+      "maxAmbushChance": 0.15,
+      "ambushMessage": "Dust Bunny erupts from beneath the utility shelf."
+    }
   },
   {
     "id": "evil-heating-coil",
     "name": "Evil Heating Coil",
+    "level": 2,
     "hp": 18,
     "attack": 3,
     "emotionalMeaning": "Appliance dread",
-    "moves": [
-      "Radiates warranty anxiety",
-      "Snaps with static judgment",
-      "Whispers about installation fees"
-    ]
+    "attackPattern": [
+      {
+        "message": "Radiates warranty anxiety",
+        "damage": 3
+      },
+      {
+        "message": "Snaps with static judgment",
+        "damage": 4
+      },
+      {
+        "message": "Whispers about installation fees",
+        "damage": 2
+      }
+    ],
+    "actionResponses": {
+      "fight": {
+        "damage": 3,
+        "damageByWeapon": {
+          "percussive-maintenance": 2,
+          "adjustable-wrench": 8
+        },
+        "message": "You strike the coil. It flexes like a warranty exclusion.",
+        "effectLabel": "resisted"
+      },
+      "dadSkill": {
+        "damage": 8,
+        "message": "You take a Deep Sigh. The coil briefly remembers it was manufactured to serve.",
+        "effectLabel": "vulnerable"
+      }
+    },
+    "initiative": {
+      "baseAmbushChance": 0.02,
+      "levelAdvantageBonus": 0.03,
+      "maxAmbushChance": 0.12,
+      "ambushMessage": "The Evil Heating Coil glows before you can brace yourself."
+    }
   }
 ]

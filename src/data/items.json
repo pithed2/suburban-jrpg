@@ -1,5 +1,13 @@
 [
   {
+    "id": "percussive-maintenance",
+    "name": "Percussive Maintenance",
+    "kind": "weapon",
+    "power": 2,
+    "battleMessage": "Dad pounds on it like he's adjusting a 1980's TV reception.",
+    "description": "The oldest repair technique known to fathers."
+  },
+  {
     "id": "ibuprofen",
     "name": "Ibuprofen",
     "kind": "consumable",
@@ -10,8 +18,8 @@
     "id": "adjustable-wrench",
     "name": "Adjustable Wrench",
     "kind": "weapon",
-    "power": 4,
+    "power": 6,
+    "battleMessage": "Dad applies the Adjustable Wrench with hard-earned driveway confidence.",
     "description": "A practical tool and, in desperate times, a statement."
   }
 ]
-

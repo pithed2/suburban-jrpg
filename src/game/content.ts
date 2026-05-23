@@ -7,10 +7,37 @@ export type DialogueKey = keyof typeof dialogueData;
 export interface EnemyDefinition {
   id: string;
   name: string;
+  level: number;
   hp: number;
   attack: number;
   emotionalMeaning: string;
-  moves: string[];
+  attackPattern: EnemyAttack[];
+  actionResponses: EnemyActionResponses;
+  initiative: EnemyInitiative;
+}
+
+export interface EnemyAttack {
+  message: string;
+  damage: number;
+}
+
+export interface EnemyActionResponse {
+  damage: number;
+  damageByWeapon?: Record<string, number>;
+  message: string;
+  effectLabel?: string;
+}
+
+export interface EnemyActionResponses {
+  fight: EnemyActionResponse;
+  dadSkill: EnemyActionResponse;
+}
+
+export interface EnemyInitiative {
+  baseAmbushChance: number;
+  levelAdvantageBonus: number;
+  maxAmbushChance: number;
+  ambushMessage: string;
 }
 
 export interface ItemDefinition {
@@ -19,6 +46,7 @@ export interface ItemDefinition {
   kind: string;
   heal?: number;
   power?: number;
+  battleMessage?: string;
   description: string;
 }
 

@@ -1,6 +1,7 @@
 export type QuestStepId =
   | "talk-to-wife"
   | "inspect-dryer"
+  | "find-wrench"
   | "defeat-heating-coil"
   | "return-to-wife";
 
@@ -11,15 +12,20 @@ export interface QuestProgress {
 }
 
 export interface PlayerState {
+  level: number;
   hp: number;
   maxHp: number;
   inventory: string[];
+  equipment: {
+    weaponId: string;
+  };
 }
 
 export interface GameFlags {
   talkedToWife: boolean;
   inspectedDryer: boolean;
   basementDustCleared: boolean;
+  foundWrench: boolean;
   bossDefeated: boolean;
   dryerFixed: boolean;
 }
@@ -33,9 +39,13 @@ export interface GameState {
 export function createInitialGameState(): GameState {
   return {
     player: {
+      level: 1,
       hp: 24,
       maxHp: 24,
       inventory: ["ibuprofen"],
+      equipment: {
+        weaponId: "percussive-maintenance",
+      },
     },
     quest: {
       questId: "fix-dryer",
@@ -46,6 +56,7 @@ export function createInitialGameState(): GameState {
       talkedToWife: false,
       inspectedDryer: false,
       basementDustCleared: false,
+      foundWrench: false,
       bossDefeated: false,
       dryerFixed: false,
     },

@@ -15,6 +15,7 @@ import {
 
 type BasementMode = "explore" | "dialogue" | "battle";
 type BattleCommand = "Fight" | "Dad Skills" | "Items" | "Run";
+type BattlePhase = "command" | "playerResult" | "enemyResult";
 
 const battleCommands: BattleCommand[] = ["Fight", "Dad Skills", "Items", "Run"];
 
@@ -35,6 +36,7 @@ export class BasementScene extends Phaser.Scene {
   private commandBox!: Phaser.GameObjects.Rectangle;
   private commandText!: Phaser.GameObjects.Text;
   private mode: BasementMode = "explore";
+  private battlePhase: BattlePhase = "command";
   private selectedCommandIndex = 0;
   private state!: GameState;
   private readonly dialogueRunner = new DialogueRunner();
@@ -75,7 +77,7 @@ export class BasementScene extends Phaser.Scene {
       this.handleInteract();
     }
 
-    if (this.mode === "battle") {
+    if (this.mode === "battle" && this.battlePhase === "command") {
       this.updateBattleMenuSelection();
       return;
     }
@@ -179,6 +181,17 @@ export class BasementScene extends Phaser.Scene {
         return;
       }
 
+      if (!this.state.flags.foundWrench) {
+        setActiveQuestStep(this.state, "find-wrench");
+        this.updateQuestText("BASEMENT");
+        this.startDialogue([
+          "Dad sizes up the coil with his bare hands.",
+          "Nope. This is a wrench problem.",
+          "The garage waits. Unfortunately.",
+        ], () => this.scene.start("NeighborhoodScene"));
+        return;
+      }
+
       this.startDialogue(dialogue.battleIntro, () => this.startBattle("evil-heating-coil"));
       return;
     }
@@ -208,15 +221,37 @@ export class BasementScene extends Phaser.Scene {
   private startBattle(enemyId: "dust-bunny" | "evil-heating-coil"): void {
     this.activeEnemyId = enemyId;
     const enemy = enemyId === "dust-bunny" ? this.dustBunnyEnemy! : this.coilEnemy!;
-    const snapshot = this.battle.start(enemy);
+    const snapshot = this.battle.start(enemy, this.state);
     this.mode = "battle";
+    this.battlePhase = "command";
     this.selectedCommandIndex = 0;
     this.updateQuestText("BATTLE");
+
+    if (snapshot.ambushed && snapshot.message) {
+      this.battlePhase = "enemyResult";
+      this.showMessage(`${snapshot.message}\nDad HP ${snapshot.heroHp}/${snapshot.heroMaxHp}`);
+      return;
+    }
+
     this.showMessage(this.formatBattleSnapshot(snapshot));
     this.showBattleMenu();
   }
 
   private handleBattleTurn(): void {
+    if (this.battlePhase === "enemyResult") {
+      this.battlePhase = "command";
+      this.showMessage(this.formatBattleSnapshot(this.battle.getSnapshot(this.state)));
+      this.showBattleMenu();
+      return;
+    }
+
+    if (this.battlePhase === "playerResult") {
+      const enemyResult = this.battle.useEnemyTurn(this.state);
+      this.battlePhase = "enemyResult";
+      this.showMessage(`${enemyResult.message}\nDad HP ${enemyResult.heroHp}/${enemyResult.heroMaxHp}`);
+      return;
+    }
+
     const command = battleCommands[this.selectedCommandIndex];
     const result = this.resolveBattleCommand(command);
 
@@ -226,7 +261,9 @@ export class BasementScene extends Phaser.Scene {
       return;
     }
 
-    this.showMessage(`${result.message}\n${this.formatBattleSnapshot(result)}`);
+    this.battlePhase = "playerResult";
+    this.hideBattleMenu();
+    this.showMessage(`${result.message}\n${result.enemy.name} HP ${result.enemyHp}/${result.enemyMaxHp}`);
   }
 
   private handleBattleVictory(resultMessage: string): void {
@@ -241,13 +278,13 @@ export class BasementScene extends Phaser.Scene {
       return;
     }
 
-      this.state.flags.bossDefeated = true;
-      completeQuestStep(this.state, "defeat-heating-coil");
-      setActiveQuestStep(this.state, "return-to-wife");
-      this.updateQuestText("VICTORY");
-      this.startDialogue([resultMessage, "The vent stops rattling. Upstairs, a towel may yet become dry."], () => {
-        this.scene.start("NeighborhoodScene");
-      });
+    this.state.flags.bossDefeated = true;
+    completeQuestStep(this.state, "defeat-heating-coil");
+    setActiveQuestStep(this.state, "return-to-wife");
+    this.updateQuestText("VICTORY");
+    this.startDialogue([resultMessage, "The vent stops rattling. Upstairs, a towel may yet become dry."], () => {
+      this.scene.start("NeighborhoodScene");
+    });
   }
 
   private resolveBattleCommand(command: BattleCommand) {

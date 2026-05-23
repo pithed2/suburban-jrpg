@@ -16,14 +16,6 @@ export class BootScene extends Phaser.Scene {
       },
     );
 
-    this.load.spritesheet(
-      "kenney-1bit",
-      "/assets/vendor/kenney-1-bit/Tilesheet/colored-transparent_packed.png",
-      {
-        frameWidth: 16,
-        frameHeight: 16,
-      },
-    );
   }
 
   create(): void {

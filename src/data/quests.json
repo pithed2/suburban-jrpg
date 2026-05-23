@@ -13,6 +13,10 @@
         "label": "Inspect dryer"
       },
       {
+        "id": "find-wrench",
+        "label": "Find the wrench"
+      },
+      {
         "id": "defeat-heating-coil",
         "label": "Defeat Evil Heating Coil"
       },
@@ -23,4 +27,3 @@
     ]
   }
 ]
-

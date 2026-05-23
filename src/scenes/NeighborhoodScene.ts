@@ -21,6 +21,7 @@ export class NeighborhoodScene extends Phaser.Scene {
   private playerSprite!: Phaser.GameObjects.Sprite;
   private wife!: Phaser.GameObjects.Rectangle;
   private dryer!: Phaser.GameObjects.Rectangle;
+  private garage!: Phaser.GameObjects.Rectangle;
   private mode: SceneMode = "explore";
   private messageBox!: Phaser.GameObjects.Rectangle;
   private messageText!: Phaser.GameObjects.Text;
@@ -94,6 +95,7 @@ export class NeighborhoodScene extends Phaser.Scene {
     addPixelText(this, 225, 70, "BASEMENT", 6);
 
     this.dryer = this.add.rectangle(247, 98, 22, 18, 0xffffff, 0);
+    this.garage = this.add.rectangle(78, 104, 44, 22, 0x6b7280).setStrokeStyle(2, 0x374151);
     this.wife = this.add.rectangle(132, 104, 14, 18, 0xffffff, 0);
     this.player = this.add.rectangle(160, 136, 14, 18, 0xffffff, 0);
     addWorldSprite(this, 247, 98, spriteFrames.dryer);
@@ -101,6 +103,7 @@ export class NeighborhoodScene extends Phaser.Scene {
     this.playerSprite = addWorldSprite(this, this.player.x, this.player.y, spriteFrames.dad);
 
     addPixelText(this, 154, 121, "DAD", 6);
+    addPixelText(this, 60, 119, "GARAGE", 6);
     addPixelText(this, 122, 89, "WIFE", 6);
     addPixelText(this, 238, 111, "DRYER", 6);
   }
@@ -139,6 +142,11 @@ export class NeighborhoodScene extends Phaser.Scene {
 
     if (isNear(playerPosition, new Phaser.Math.Vector2(this.dryer.x, this.dryer.y), 26)) {
       this.interactWithDryer();
+      return;
+    }
+
+    if (isNear(playerPosition, new Phaser.Math.Vector2(this.garage.x, this.garage.y), 28)) {
+      this.scene.start("GarageScene");
       return;
     }
 

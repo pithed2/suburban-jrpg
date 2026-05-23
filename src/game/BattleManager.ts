@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import type { EnemyDefinition } from "./content";
+import { items, type EnemyActionResponse, type EnemyAttack, type EnemyDefinition } from "./content";
 import type { GameState } from "./state";
 
 export interface BattleSnapshot {
@@ -15,22 +15,46 @@ export interface BattleTurnResult extends BattleSnapshot {
   victory: boolean;
 }
 
+export interface EnemyTurnResult extends BattleSnapshot {
+  message: string;
+}
+
+export interface BattleStartResult extends BattleSnapshot {
+  ambushed: boolean;
+  message?: string;
+}
+
 export class BattleManager {
   private enemy?: EnemyDefinition;
   private enemyHp = 0;
 
-  start(enemy: EnemyDefinition): BattleSnapshot {
+  start(enemy: EnemyDefinition, state: GameState): BattleStartResult {
     this.enemy = enemy;
     this.enemyHp = enemy.hp;
-    return this.getSnapshot();
+    const ambushChance = this.getAmbushChance(enemy, state);
+
+    if (Math.random() < ambushChance) {
+      const enemyTurn = this.useEnemyTurn(state);
+
+      return {
+        ...enemyTurn,
+        ambushed: true,
+        message: `${enemy.initiative.ambushMessage}\n${enemyTurn.message}`,
+      };
+    }
+
+    return {
+      ...this.getSnapshot(state),
+      ambushed: false,
+    };
   }
 
   useFight(state: GameState): BattleTurnResult {
-    return this.resolveHeroAction(state, 5, "You use Percussive Maintenance.");
+    return this.resolveHeroAction(state, "fight");
   }
 
   useDadSkill(state: GameState): BattleTurnResult {
-    return this.resolveHeroAction(state, 7, "You take a Deep Sigh. The basement respects it.");
+    return this.resolveHeroAction(state, "dadSkill");
   }
 
   useItem(state: GameState, itemId: string): BattleTurnResult {
@@ -48,25 +72,29 @@ export class BattleManager {
     state.player.inventory.splice(itemIndex, 1);
     state.player.hp = Math.min(state.player.maxHp, state.player.hp + 10);
 
-    const move = Phaser.Utils.Array.GetRandom(enemy.moves);
-    state.player.hp = Math.max(1, state.player.hp - enemy.attack);
-
     return {
       ...this.getSnapshot(state),
-      message: `You use Ibuprofen.\n${enemy.name} ${move}.`,
+      message: "You use Ibuprofen.\nThe pain retreats to a more manageable zip code.",
       victory: false,
     };
   }
 
   useRun(state: GameState): BattleTurnResult {
+    return {
+      ...this.getSnapshot(state),
+      message: "You consider retreat.\nThe basement door feels very far away.",
+      victory: false,
+    };
+  }
+
+  useEnemyTurn(state: GameState): EnemyTurnResult {
     const enemy = this.requireEnemy();
-    const move = Phaser.Utils.Array.GetRandom(enemy.moves);
-    state.player.hp = Math.max(1, state.player.hp - enemy.attack);
+    const attack = this.getEnemyAttack(enemy);
+    this.applyEnemyAttack(state, attack);
 
     return {
       ...this.getSnapshot(state),
-      message: `You consider retreat.\nThe basement door feels very far away.\n${enemy.name} ${move}.`,
-      victory: false,
+      message: `${enemy.name} ${attack.message}.\n${attack.damage} damage.`,
     };
   }
 
@@ -82,9 +110,15 @@ export class BattleManager {
     };
   }
 
-  private resolveHeroAction(state: GameState, damage: number, actionMessage: string): BattleTurnResult {
+  private resolveHeroAction(
+    state: GameState,
+    action: keyof EnemyDefinition["actionResponses"],
+  ): BattleTurnResult {
     const enemy = this.requireEnemy();
+    const response = enemy.actionResponses[action];
+    const damage = this.getActionDamage(response, action, state);
     this.enemyHp = Math.max(0, this.enemyHp - damage);
+    const actionMessage = this.formatActionMessage(response, action, state, damage);
 
     if (this.enemyHp <= 0) {
       return {
@@ -94,14 +128,51 @@ export class BattleManager {
       };
     }
 
-    const move = Phaser.Utils.Array.GetRandom(enemy.moves);
-    state.player.hp = Math.max(1, state.player.hp - enemy.attack);
-
     return {
       ...this.getSnapshot(state),
-      message: `${actionMessage}\n${enemy.name} ${move}.`,
+      message: actionMessage,
       victory: false,
     };
+  }
+
+  private formatActionMessage(
+    response: EnemyActionResponse,
+    action: keyof EnemyDefinition["actionResponses"],
+    state: GameState,
+    damage: number,
+  ): string {
+    const weapon = items.find((item) => item.id === state.player.equipment.weaponId);
+    const message = action === "fight" && weapon?.battleMessage ? weapon.battleMessage : response.message;
+    const effect = response.effectLabel ? ` (${response.effectLabel})` : "";
+    return `${message}\n${damage} damage${effect}.`;
+  }
+
+  private getActionDamage(
+    response: EnemyActionResponse,
+    action: keyof EnemyDefinition["actionResponses"],
+    state: GameState,
+  ): number {
+    if (action === "fight") {
+      return response.damageByWeapon?.[state.player.equipment.weaponId] ?? response.damage;
+    }
+
+    return response.damage;
+  }
+
+  private getEnemyAttack(enemy: EnemyDefinition): EnemyAttack {
+    return Phaser.Utils.Array.GetRandom(enemy.attackPattern);
+  }
+
+  private applyEnemyAttack(state: GameState, attack: EnemyAttack): void {
+    state.player.hp = Math.max(1, state.player.hp - attack.damage);
+  }
+
+  private getAmbushChance(enemy: EnemyDefinition, state: GameState): number {
+    const levelAdvantage = Math.max(0, enemy.level - state.player.level);
+    const rawChance = enemy.initiative.baseAmbushChance +
+      levelAdvantage * enemy.initiative.levelAdvantageBonus;
+
+    return Phaser.Math.Clamp(rawChance, 0, enemy.initiative.maxAmbushChance);
   }
 
   private requireEnemy(): EnemyDefinition {

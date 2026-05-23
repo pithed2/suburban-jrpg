@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import { BasementScene } from "./scenes/BasementScene";
 import { BootScene } from "./scenes/BootScene";
+import { GarageScene } from "./scenes/GarageScene";
 import { NeighborhoodScene } from "./scenes/NeighborhoodScene";
 import "./styles.css";
 
@@ -16,7 +17,7 @@ const config: Phaser.Types.Core.GameConfig = {
     width: 320,
     height: 180,
   },
-  scene: [BootScene, NeighborhoodScene, BasementScene],
+  scene: [BootScene, NeighborhoodScene, BasementScene, GarageScene],
 };
 
 new Phaser.Game(config);
