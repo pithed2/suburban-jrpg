@@ -2,10 +2,12 @@ import Phaser from "phaser";
 import { BattleManager } from "../game/BattleManager";
 import { dialogue, enemies } from "../game/content";
 import { DialogueRunner } from "../game/DialogueRunner";
+import { RandomEncounterTracker } from "../game/EncounterManager";
 import { isNear } from "../game/interaction";
 import { getQuestStepLabel } from "../game/quests";
 import { getGameState } from "../game/session";
 import { addWorldSprite, spriteFrames } from "../game/sprites";
+import { getMapObjectCenter } from "../game/tilemapObjects";
 import { addPixelText, setPixelText } from "../game/uiText";
 import {
   completeQuestStep,
@@ -41,7 +43,8 @@ export class BasementScene extends Phaser.Scene {
   private state!: GameState;
   private readonly dialogueRunner = new DialogueRunner();
   private readonly battle = new BattleManager();
-  private activeEnemyId: "dust-bunny" | "evil-heating-coil" = "evil-heating-coil";
+  private readonly randomEncounters = new RandomEncounterTracker("basement");
+  private activeEnemyId = "evil-heating-coil";
   private readonly dustBunnyEnemy = enemies.find((candidate) => candidate.id === "dust-bunny");
   private readonly coilEnemy = enemies.find((candidate) => candidate.id === "evil-heating-coil");
 
@@ -98,30 +101,43 @@ export class BasementScene extends Phaser.Scene {
     this.player.x = Phaser.Math.Clamp(this.player.x + dx, 18, 302);
     this.player.y = Phaser.Math.Clamp(this.player.y + dy, 40, 160);
     this.playerSprite.setPosition(this.player.x, this.player.y);
+
+    if (dx !== 0 || dy !== 0) {
+      this.checkRandomEncounter();
+    }
   }
 
   private createWorld(): void {
-    this.add.rectangle(160, 90, 320, 180, 0x26212c);
-    this.add.rectangle(160, 112, 272, 76, 0x3b3442).setStrokeStyle(2, 0x17131d);
-    this.add.rectangle(66, 84, 54, 24, 0x4b5563).setStrokeStyle(2, 0x111827);
-    this.add.rectangle(238, 70, 42, 22, 0x6b7280).setStrokeStyle(2, 0x111827);
-    this.add.rectangle(248, 98, 12, 52, 0x64748b);
+    const map = this.make.tilemap({ key: "basement-map" });
+    const tileset = map.addTilesetImage("suburban-placeholder", "suburban-placeholder");
 
-    this.exit = this.add.rectangle(34, 146, 28, 18, 0xffffff, 0);
+    if (!tileset) {
+      throw new Error("Missing tileset for basement map.");
+    }
+
+    map.createLayer("Ground", tileset, 0, 0);
+    map.createLayer("Props", tileset, 0, 0);
+
+    const spawn = getMapObjectCenter(map, "Objects", "player-spawn");
+    const exit = getMapObjectCenter(map, "Objects", "basement-exit");
+    const coil = getMapObjectCenter(map, "Objects", "heating-coil");
+
+    this.exit = this.add.rectangle(exit.x, exit.y, 28, 18, 0xffffff, 0);
     this.dustBunny = this.add.rectangle(148, 126, 18, 12, 0xffffff, 0);
-    this.coil = this.add.rectangle(244, 118, 24, 20, 0xffffff, 0);
-    this.player = this.add.rectangle(62, 142, 14, 18, 0xffffff, 0);
-    addWorldSprite(this, 34, 146, spriteFrames.stairs);
+    this.coil = this.add.rectangle(coil.x, coil.y, 24, 20, 0xffffff, 0);
+    this.player = this.add.rectangle(spawn.x, spawn.y, 14, 18, 0xffffff, 0);
+    addWorldSprite(this, exit.x, exit.y, spriteFrames.stairs);
     this.dustBunnySprite = addWorldSprite(this, 148, 126, spriteFrames.dustBunny);
-    this.coilSprite = addWorldSprite(this, 244, 118, spriteFrames.heatingCoil);
+    this.coilSprite = addWorldSprite(this, coil.x, coil.y, spriteFrames.heatingCoil);
     this.playerSprite = addWorldSprite(this, this.player.x, this.player.y, spriteFrames.dad);
 
-    addPixelText(this, 24, 157, "STAIRS", 6);
+    addPixelText(this, exit.x - 10, exit.y + 11, "STAIRS", 6);
     this.dustLabel = addPixelText(this, 132, 137, "DUST", 6);
-    addPixelText(this, 229, 132, "COIL", 6);
-    addPixelText(this, 53, 127, "DAD", 6);
+    addPixelText(this, coil.x - 15, coil.y + 14, "COIL", 6);
+    addPixelText(this, spawn.x - 9, spawn.y - 15, "DAD", 6);
 
     this.updateDustBunnyVisibility();
+    this.randomEncounters.resetPosition(new Phaser.Math.Vector2(this.player.x, this.player.y));
   }
 
   private createUi(): void {
@@ -160,24 +176,9 @@ export class BasementScene extends Phaser.Scene {
       return;
     }
 
-    if (
-      !this.state.flags.basementDustCleared &&
-      isNear(playerPosition, new Phaser.Math.Vector2(this.dustBunny.x, this.dustBunny.y), 24)
-    ) {
-      this.startDialogue(["A Dust Bunny blocks the path with the confidence of months."], () => {
-        this.startBattle("dust-bunny");
-      });
-      return;
-    }
-
     if (isNear(playerPosition, new Phaser.Math.Vector2(this.coil.x, this.coil.y), 28)) {
       if (this.state.flags.bossDefeated) {
         this.startDialogue(["The heating coil is quiet now. Almost smugly quiet."]);
-        return;
-      }
-
-      if (!this.state.flags.basementDustCleared) {
-        this.startDialogue(["You can see the coil, but the Dust Bunny is holding the room emotionally hostage."]);
         return;
       }
 
@@ -218,9 +219,14 @@ export class BasementScene extends Phaser.Scene {
     }
   }
 
-  private startBattle(enemyId: "dust-bunny" | "evil-heating-coil"): void {
+  private startBattle(enemyId: string): void {
     this.activeEnemyId = enemyId;
-    const enemy = enemyId === "dust-bunny" ? this.dustBunnyEnemy! : this.coilEnemy!;
+    const enemy = enemies.find((candidate) => candidate.id === enemyId);
+
+    if (!enemy) {
+      throw new Error(`Missing enemy definition: ${enemyId}`);
+    }
+
     const snapshot = this.battle.start(enemy, this.state);
     this.mode = "battle";
     this.battlePhase = "command";
@@ -268,10 +274,8 @@ export class BasementScene extends Phaser.Scene {
 
   private handleBattleVictory(resultMessage: string): void {
     if (this.activeEnemyId === "dust-bunny") {
-      this.state.flags.basementDustCleared = true;
-      this.updateDustBunnyVisibility();
       this.updateQuestText("BASEMENT");
-      this.startDialogue([resultMessage, "The path to the dryer vent is marginally less embarrassing."], () => {
+      this.startDialogue([resultMessage, "The basement briefly seems less judgmental."], () => {
         this.mode = "explore";
         this.hideMessage();
       });
@@ -339,10 +343,23 @@ export class BasementScene extends Phaser.Scene {
   }
 
   private updateDustBunnyVisibility(): void {
-    const visible = !this.state.flags.basementDustCleared;
+    const visible = false;
     this.dustBunny.setVisible(visible);
     this.dustBunnySprite.setVisible(visible);
     this.dustLabel.setVisible(visible);
+  }
+
+  private checkRandomEncounter(): void {
+    const encounter = this.randomEncounters.update(
+      new Phaser.Math.Vector2(this.player.x, this.player.y),
+      this.state,
+    );
+
+    if (!encounter) {
+      return;
+    }
+
+    this.startDialogue(encounter.introMessages, () => this.startBattle(encounter.enemy.id));
   }
 
   private formatBattleSnapshot(snapshot: {

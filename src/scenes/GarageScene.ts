@@ -4,6 +4,7 @@ import { isNear } from "../game/interaction";
 import { getQuestStepLabel } from "../game/quests";
 import { getGameState } from "../game/session";
 import { addWorldSprite, spriteFrames } from "../game/sprites";
+import { getMapObjectCenter } from "../game/tilemapObjects";
 import { addPixelText, setPixelText } from "../game/uiText";
 import {
   completeQuestStep,
@@ -76,25 +77,34 @@ export class GarageScene extends Phaser.Scene {
   }
 
   private createWorld(): void {
-    this.add.rectangle(160, 90, 320, 180, 0x4b3b2f);
-    this.add.rectangle(160, 112, 284, 82, 0x69513e).setStrokeStyle(2, 0x2f2219);
-    this.add.rectangle(90, 90, 42, 34, 0x7c5f46).setStrokeStyle(2, 0x3b2a1d);
-    this.add.rectangle(164, 92, 36, 44, 0x3f3f46).setStrokeStyle(2, 0x18181b);
-    this.add.rectangle(226, 94, 48, 36, 0x854d0e).setStrokeStyle(2, 0x431407);
+    const map = this.make.tilemap({ key: "garage-map" });
+    const tileset = map.addTilesetImage("suburban-placeholder", "suburban-placeholder");
 
-    this.exit = this.add.rectangle(34, 146, 28, 18, 0xffffff, 0);
-    this.clutter = this.add.rectangle(166, 126, 34, 24, 0xffffff, 0);
-    this.wrench = this.add.rectangle(226, 130, 22, 16, 0xffffff, 0);
-    this.player = this.add.rectangle(62, 142, 14, 18, 0xffffff, 0);
+    if (!tileset) {
+      throw new Error("Missing tileset for garage map.");
+    }
 
-    addWorldSprite(this, 34, 146, spriteFrames.stairs);
+    map.createLayer("Ground", tileset, 0, 0);
+    map.createLayer("Props", tileset, 0, 0);
+
+    const spawn = getMapObjectCenter(map, "Objects", "player-spawn");
+    const exit = getMapObjectCenter(map, "Objects", "house-exit");
+    const clutter = getMapObjectCenter(map, "Objects", "clutter");
+    const wrench = getMapObjectCenter(map, "Objects", "wrench");
+
+    this.exit = this.add.rectangle(exit.x, exit.y, 28, 18, 0xffffff, 0);
+    this.clutter = this.add.rectangle(clutter.x, clutter.y, 34, 24, 0xffffff, 0);
+    this.wrench = this.add.rectangle(wrench.x, wrench.y, 22, 16, 0xffffff, 0);
+    this.player = this.add.rectangle(spawn.x, spawn.y, 14, 18, 0xffffff, 0);
+
+    addWorldSprite(this, exit.x, exit.y, spriteFrames.stairs);
     this.playerSprite = addWorldSprite(this, this.player.x, this.player.y, spriteFrames.dad);
-    this.wrenchVisual = this.add.rectangle(226, 130, 18, 4, 0xd1d5db).setStrokeStyle(1, 0x111827);
+    this.wrenchVisual = this.add.rectangle(wrench.x, wrench.y, 18, 4, 0xd1d5db).setStrokeStyle(1, 0x111827);
 
-    addPixelText(this, 24, 157, "HOUSE", 6);
-    addPixelText(this, 148, 142, "CLUTTER", 6);
-    this.wrenchLabel = addPixelText(this, 210, 142, "WRENCH", 6);
-    addPixelText(this, 53, 127, "DAD", 6);
+    addPixelText(this, exit.x - 10, exit.y + 11, "HOUSE", 6);
+    addPixelText(this, clutter.x - 18, clutter.y + 16, "CLUTTER", 6);
+    this.wrenchLabel = addPixelText(this, wrench.x - 16, wrench.y + 12, "WRENCH", 6);
+    addPixelText(this, spawn.x - 9, spawn.y - 15, "DAD", 6);
 
     this.updateWrenchVisibility();
   }

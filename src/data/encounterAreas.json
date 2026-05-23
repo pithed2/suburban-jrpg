@@ -1,0 +1,53 @@
+[
+  {
+    "id": "basement",
+    "label": "Basement",
+    "randomEncounters": {
+      "enabled": true,
+      "stepDistance": 42,
+      "baseChance": 0.18,
+      "cooldownRolls": 2,
+      "disabledWhenFlags": ["bossDefeated"],
+      "introMessages": [
+        "Something shifts in the basement dark.",
+        "Dad pauses. The house has chosen violence."
+      ],
+      "entries": [
+        {
+          "enemyId": "dust-bunny",
+          "weight": 1
+        }
+      ]
+    },
+    "fixedEncounters": [
+      {
+        "enemyId": "evil-heating-coil",
+        "kind": "boss",
+        "x": 244,
+        "y": 118,
+        "requiredQuestStepId": "defeat-heating-coil"
+      }
+    ]
+  },
+  {
+    "id": "garage",
+    "label": "Garage",
+    "randomEncounters": {
+      "enabled": false,
+      "stepDistance": 48,
+      "baseChance": 0.12,
+      "cooldownRolls": 2,
+      "disabledWhenFlags": ["foundWrench"],
+      "introMessages": [
+        "A box settles in a way boxes should not."
+      ],
+      "entries": [
+        {
+          "enemyId": "dust-bunny",
+          "weight": 1
+        }
+      ]
+    },
+    "fixedEncounters": []
+  }
+]

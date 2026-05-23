@@ -5,6 +5,7 @@ import { isNear } from "../game/interaction";
 import { getQuest, getQuestStepLabel } from "../game/quests";
 import { getGameState, resetGameState } from "../game/session";
 import { addWorldSprite, spriteFrames } from "../game/sprites";
+import { getMapObjectCenter } from "../game/tilemapObjects";
 import { addPixelText, setPixelText } from "../game/uiText";
 import {
   completeQuestStep,
@@ -39,7 +40,6 @@ export class NeighborhoodScene extends Phaser.Scene {
     this.cursors = this.input.keyboard!.createCursorKeys();
     this.interactKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
-    this.createTextures();
     this.createWorld();
     this.createUi();
     this.updateQuestText();
@@ -68,44 +68,35 @@ export class NeighborhoodScene extends Phaser.Scene {
     this.playerSprite.setPosition(this.player.x, this.player.y);
   }
 
-  private createTextures(): void {
-    const graphics = this.add.graphics();
-
-    graphics.fillStyle(0x92c98f);
-    graphics.fillRect(0, 0, 320, 180);
-    graphics.fillStyle(0x6b7280);
-    graphics.fillRect(0, 116, 320, 18);
-    graphics.generateTexture("neighborhood", 320, 180);
-
-    graphics.clear();
-    graphics.fillStyle(0xdec58a);
-    graphics.fillRect(0, 0, 64, 52);
-    graphics.fillStyle(0x854d0e);
-    graphics.fillTriangle(0, 0, 32, -20, 64, 0);
-    graphics.generateTexture("house", 64, 72);
-
-    graphics.destroy();
-  }
-
   private createWorld(): void {
-    this.add.image(160, 90, "neighborhood");
-    this.add.image(78, 82, "house");
+    const map = this.make.tilemap({ key: "house-map" });
+    const tileset = map.addTilesetImage("suburban-placeholder", "suburban-placeholder");
 
-    this.add.rectangle(246, 76, 44, 30, 0x4b5563).setStrokeStyle(2, 0x111827);
-    addPixelText(this, 225, 70, "BASEMENT", 6);
+    if (!tileset) {
+      throw new Error("Missing tileset for house map.");
+    }
 
-    this.dryer = this.add.rectangle(247, 98, 22, 18, 0xffffff, 0);
-    this.garage = this.add.rectangle(78, 104, 44, 22, 0x6b7280).setStrokeStyle(2, 0x374151);
-    this.wife = this.add.rectangle(132, 104, 14, 18, 0xffffff, 0);
-    this.player = this.add.rectangle(160, 136, 14, 18, 0xffffff, 0);
-    addWorldSprite(this, 247, 98, spriteFrames.dryer);
-    addWorldSprite(this, 132, 104, spriteFrames.wife);
+    map.createLayer("Ground", tileset, 0, 0);
+    map.createLayer("Props", tileset, 0, 0);
+
+    const spawn = getMapObjectCenter(map, "Objects", "player-spawn");
+    const wife = getMapObjectCenter(map, "Objects", "wife");
+    const dryer = getMapObjectCenter(map, "Objects", "dryer");
+    const garage = getMapObjectCenter(map, "Objects", "garage");
+
+    this.dryer = this.add.rectangle(dryer.x, dryer.y, 22, 18, 0xffffff, 0);
+    this.garage = this.add.rectangle(garage.x, garage.y, 44, 22, 0xffffff, 0);
+    this.wife = this.add.rectangle(wife.x, wife.y, 14, 18, 0xffffff, 0);
+    this.player = this.add.rectangle(spawn.x, spawn.y, 14, 18, 0xffffff, 0);
+    addWorldSprite(this, dryer.x, dryer.y, spriteFrames.dryer);
+    addWorldSprite(this, wife.x, wife.y, spriteFrames.wife);
     this.playerSprite = addWorldSprite(this, this.player.x, this.player.y, spriteFrames.dad);
 
-    addPixelText(this, 154, 121, "DAD", 6);
-    addPixelText(this, 60, 119, "GARAGE", 6);
-    addPixelText(this, 122, 89, "WIFE", 6);
-    addPixelText(this, 238, 111, "DRYER", 6);
+    addPixelText(this, spawn.x - 6, spawn.y - 15, "DAD", 6);
+    addPixelText(this, garage.x - 18, garage.y + 15, "GARAGE", 6);
+    addPixelText(this, wife.x - 10, wife.y - 15, "WIFE", 6);
+    addPixelText(this, dryer.x - 9, dryer.y + 13, "DRYER", 6);
+    addPixelText(this, dryer.x - 22, dryer.y - 28, "BASEMENT", 6);
   }
 
   private createUi(): void {

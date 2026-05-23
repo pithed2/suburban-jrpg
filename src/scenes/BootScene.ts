@@ -7,6 +7,11 @@ export class BootScene extends Phaser.Scene {
   }
 
   preload(): void {
+    this.load.image("suburban-placeholder", "/assets/tilesets/suburban-placeholder.png");
+    this.load.tilemapTiledJSON("house-map", "/assets/maps/house.json");
+    this.load.tilemapTiledJSON("basement-map", "/assets/maps/basement.json");
+    this.load.tilemapTiledJSON("garage-map", "/assets/maps/garage.json");
+
     this.load.spritesheet(
       "sixteen-pixel",
       "/assets/vendor/16Pixel/16%20Pixel%20Assets.png",
@@ -15,7 +20,6 @@ export class BootScene extends Phaser.Scene {
         frameHeight: 16,
       },
     );
-
   }
 
   create(): void {
