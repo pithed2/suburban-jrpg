@@ -19,6 +19,7 @@ export interface PlayerState {
 export interface GameFlags {
   talkedToWife: boolean;
   inspectedDryer: boolean;
+  basementDustCleared: boolean;
   bossDefeated: boolean;
   dryerFixed: boolean;
 }
@@ -44,6 +45,7 @@ export function createInitialGameState(): GameState {
     flags: {
       talkedToWife: false,
       inspectedDryer: false,
+      basementDustCleared: false,
       bossDefeated: false,
       dryerFixed: false,
     },
@@ -59,4 +61,3 @@ export function completeQuestStep(state: GameState, stepId: QuestStepId): void {
 export function setActiveQuestStep(state: GameState, stepId: QuestStepId): void {
   state.quest.activeStepId = stepId;
 }
-

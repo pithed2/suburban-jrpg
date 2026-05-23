@@ -21,6 +21,8 @@ export class BasementScene extends Phaser.Scene {
   private interactKey!: Phaser.Input.Keyboard.Key;
   private player!: Phaser.GameObjects.Rectangle;
   private exit!: Phaser.GameObjects.Rectangle;
+  private dustBunny!: Phaser.GameObjects.Rectangle;
+  private dustLabel!: Phaser.GameObjects.Text;
   private coil!: Phaser.GameObjects.Rectangle;
   private questText!: Phaser.GameObjects.Text;
   private messageBox!: Phaser.GameObjects.Rectangle;
@@ -31,14 +33,20 @@ export class BasementScene extends Phaser.Scene {
   private state!: GameState;
   private readonly dialogueRunner = new DialogueRunner();
   private readonly battle = new BattleManager();
-  private readonly enemy = enemies.find((candidate) => candidate.id === "evil-heating-coil");
+  private activeEnemyId: "dust-bunny" | "evil-heating-coil" = "evil-heating-coil";
+  private readonly dustBunnyEnemy = enemies.find((candidate) => candidate.id === "dust-bunny");
+  private readonly coilEnemy = enemies.find((candidate) => candidate.id === "evil-heating-coil");
 
   constructor() {
     super("BasementScene");
   }
 
   create(): void {
-    if (!this.enemy) {
+    if (!this.dustBunnyEnemy) {
+      throw new Error("Missing enemy definition: dust-bunny");
+    }
+
+    if (!this.coilEnemy) {
       throw new Error("Missing enemy definition: evil-heating-coil");
     }
 
@@ -91,12 +99,16 @@ export class BasementScene extends Phaser.Scene {
     this.add.rectangle(248, 98, 12, 52, 0x64748b);
 
     this.exit = this.add.rectangle(34, 146, 28, 18, 0x854d0e).setStrokeStyle(2, 0x431407);
+    this.dustBunny = this.add.rectangle(148, 126, 18, 12, 0xcbd5e1).setStrokeStyle(2, 0x64748b);
     this.coil = this.add.rectangle(244, 118, 24, 20, 0xef4444).setStrokeStyle(2, 0x7f1d1d);
     this.player = this.add.rectangle(62, 142, 12, 18, 0x2563eb).setStrokeStyle(1, 0x172554);
 
     this.add.text(24, 157, "STAIRS", this.labelStyle());
+    this.dustLabel = this.add.text(132, 137, "DUST", this.labelStyle());
     this.add.text(229, 132, "COIL", this.labelStyle());
     this.add.text(53, 127, "DAD", this.labelStyle());
+
+    this.updateDustBunnyVisibility();
   }
 
   private createUi(): void {
@@ -148,13 +160,28 @@ export class BasementScene extends Phaser.Scene {
       return;
     }
 
+    if (
+      !this.state.flags.basementDustCleared &&
+      isNear(playerPosition, new Phaser.Math.Vector2(this.dustBunny.x, this.dustBunny.y), 24)
+    ) {
+      this.startDialogue(["A Dust Bunny blocks the path with the confidence of months."], () => {
+        this.startBattle("dust-bunny");
+      });
+      return;
+    }
+
     if (isNear(playerPosition, new Phaser.Math.Vector2(this.coil.x, this.coil.y), 28)) {
       if (this.state.flags.bossDefeated) {
         this.startDialogue(["The heating coil is quiet now. Almost smugly quiet."]);
         return;
       }
 
-      this.startDialogue(dialogue.battleIntro, () => this.startBattle());
+      if (!this.state.flags.basementDustCleared) {
+        this.startDialogue(["You can see the coil, but the Dust Bunny is holding the room emotionally hostage."]);
+        return;
+      }
+
+      this.startDialogue(dialogue.battleIntro, () => this.startBattle("evil-heating-coil"));
       return;
     }
 
@@ -180,8 +207,10 @@ export class BasementScene extends Phaser.Scene {
     }
   }
 
-  private startBattle(): void {
-    const snapshot = this.battle.start(this.enemy!);
+  private startBattle(enemyId: "dust-bunny" | "evil-heating-coil"): void {
+    this.activeEnemyId = enemyId;
+    const enemy = enemyId === "dust-bunny" ? this.dustBunnyEnemy! : this.coilEnemy!;
+    const snapshot = this.battle.start(enemy);
     this.mode = "battle";
     this.selectedCommandIndex = 0;
     this.updateQuestText("BATTLE");
@@ -195,17 +224,32 @@ export class BasementScene extends Phaser.Scene {
 
     if (result.victory) {
       this.hideBattleMenu();
-      this.state.flags.bossDefeated = true;
-      completeQuestStep(this.state, "defeat-heating-coil");
-      setActiveQuestStep(this.state, "return-to-wife");
-      this.updateQuestText("VICTORY");
-      this.startDialogue([result.message, "The vent stops rattling. Upstairs, a towel may yet become dry."], () => {
-        this.scene.start("NeighborhoodScene");
-      });
+      this.handleBattleVictory(result.message);
       return;
     }
 
     this.showMessage(`${result.message}\n${this.formatBattleSnapshot(result)}`);
+  }
+
+  private handleBattleVictory(resultMessage: string): void {
+    if (this.activeEnemyId === "dust-bunny") {
+      this.state.flags.basementDustCleared = true;
+      this.updateDustBunnyVisibility();
+      this.updateQuestText("BASEMENT");
+      this.startDialogue([resultMessage, "The path to the dryer vent is marginally less embarrassing."], () => {
+        this.mode = "explore";
+        this.hideMessage();
+      });
+      return;
+    }
+
+      this.state.flags.bossDefeated = true;
+      completeQuestStep(this.state, "defeat-heating-coil");
+      setActiveQuestStep(this.state, "return-to-wife");
+      this.updateQuestText("VICTORY");
+      this.startDialogue([resultMessage, "The vent stops rattling. Upstairs, a towel may yet become dry."], () => {
+        this.scene.start("NeighborhoodScene");
+      });
   }
 
   private resolveBattleCommand(command: BattleCommand) {
@@ -254,6 +298,12 @@ export class BasementScene extends Phaser.Scene {
 
   private hideBattleMenu(): void {
     this.commandText.setVisible(false);
+  }
+
+  private updateDustBunnyVisibility(): void {
+    const visible = !this.state.flags.basementDustCleared;
+    this.dustBunny.setVisible(visible);
+    this.dustLabel.setVisible(visible);
   }
 
   private formatBattleSnapshot(snapshot: {

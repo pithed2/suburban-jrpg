@@ -1,5 +1,17 @@
 [
   {
+    "id": "dust-bunny",
+    "name": "Dust Bunny",
+    "hp": 10,
+    "attack": 2,
+    "emotionalMeaning": "Neglected chores",
+    "moves": [
+      "Scatters under the utility shelf",
+      "Triggers a suspicious sneeze",
+      "Rolls with silent accusation"
+    ]
+  },
+  {
     "id": "evil-heating-coil",
     "name": "Evil Heating Coil",
     "hp": 18,
@@ -12,4 +24,3 @@
     ]
   }
 ]
-
