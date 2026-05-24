@@ -12,6 +12,8 @@ export interface EnemyDefinition {
   level: number;
   hp: number;
   attack: number;
+  xpReward: number;
+  cashReward: number;
   emotionalMeaning: string;
   attackPattern: EnemyAttack[];
   actionResponses: EnemyActionResponses;

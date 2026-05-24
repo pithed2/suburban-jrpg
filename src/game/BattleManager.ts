@@ -13,6 +13,9 @@ export interface BattleSnapshot {
 export interface BattleTurnResult extends BattleSnapshot {
   message: string;
   victory: boolean;
+  escaped?: boolean;
+  xpReward?: number;
+  cashReward?: number;
 }
 
 export interface EnemyTurnResult extends BattleSnapshot {
@@ -54,6 +57,17 @@ export class BattleManager {
   }
 
   useDadSkill(state: GameState): BattleTurnResult {
+    const skillCost = 3;
+
+    if (state.player.dadPoints < skillCost) {
+      return {
+        ...this.getSnapshot(state),
+        message: "Dad reaches for inner calm.\nNot enough Dad Points.",
+        victory: false,
+      };
+    }
+
+    state.player.dadPoints -= skillCost;
     return this.resolveHeroAction(state, "dadSkill");
   }
 
@@ -80,10 +94,21 @@ export class BattleManager {
   }
 
   useRun(state: GameState): BattleTurnResult {
+    const enemy = this.requireEnemy();
+
+    if (enemy.id === "evil-heating-coil") {
+      return {
+        ...this.getSnapshot(state),
+        message: "Dad looks for an exit.\nThe coil blocks the only responsible path.",
+        victory: false,
+      };
+    }
+
     return {
       ...this.getSnapshot(state),
-      message: "You consider retreat.\nThe basement door feels very far away.",
+      message: "Dad backs away with heroic caution.\nThe dust bunny loses interest.",
       victory: false,
+      escaped: true,
     };
   }
 
@@ -121,10 +146,15 @@ export class BattleManager {
     const actionMessage = this.formatActionMessage(response, action, state, damage);
 
     if (this.enemyHp <= 0) {
+      state.player.xp += enemy.xpReward;
+      state.player.cash += enemy.cashReward;
+
       return {
         ...this.getSnapshot(state),
-        message: `${actionMessage}\n${enemy.name} gives one last ominous click.`,
+        message: `${actionMessage}\n${enemy.name} gives one last ominous click.\n${enemy.xpReward} XP. $${enemy.cashReward}.`,
         victory: true,
+        xpReward: enemy.xpReward,
+        cashReward: enemy.cashReward,
       };
     }
 

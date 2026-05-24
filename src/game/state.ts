@@ -15,6 +15,10 @@ export interface PlayerState {
   level: number;
   hp: number;
   maxHp: number;
+  dadPoints: number;
+  maxDadPoints: number;
+  cash: number;
+  xp: number;
   inventory: string[];
   equipment: {
     weaponId: string;
@@ -24,7 +28,6 @@ export interface PlayerState {
 export interface GameFlags {
   talkedToWife: boolean;
   inspectedDryer: boolean;
-  basementDustCleared: boolean;
   foundWrench: boolean;
   bossDefeated: boolean;
   dryerFixed: boolean;
@@ -42,6 +45,10 @@ export function createInitialGameState(): GameState {
       level: 1,
       hp: 24,
       maxHp: 24,
+      dadPoints: 8,
+      maxDadPoints: 8,
+      cash: 12,
+      xp: 0,
       inventory: ["ibuprofen"],
       equipment: {
         weaponId: "percussive-maintenance",
@@ -55,7 +62,6 @@ export function createInitialGameState(): GameState {
     flags: {
       talkedToWife: false,
       inspectedDryer: false,
-      basementDustCleared: false,
       foundWrench: false,
       bossDefeated: false,
       dryerFixed: false,

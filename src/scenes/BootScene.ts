@@ -9,6 +9,7 @@ export class BootScene extends Phaser.Scene {
   preload(): void {
     this.load.image("suburban-placeholder", "/assets/tilesets/suburban-placeholder.png");
     this.load.image("floor-options", "/assets/tilesets/floor-options.png");
+    this.load.image("dryer-boss", "/assets/enemies/dryer_boss.png");
     this.load.bitmapFont(
       "dialogue-8x8",
       "/assets/fonts/round_6x6.png",
@@ -31,6 +32,9 @@ export class BootScene extends Phaser.Scene {
   create(): void {
     this.textures
       .get("dialogue-8x8")
+      .setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures
+      .get("dryer-boss")
       .setFilter(Phaser.Textures.FilterMode.NEAREST);
     resetGameState();
     this.scene.start("NeighborhoodScene");

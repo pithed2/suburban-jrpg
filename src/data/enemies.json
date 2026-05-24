@@ -5,6 +5,8 @@
     "level": 1,
     "hp": 10,
     "attack": 2,
+    "xpReward": 3,
+    "cashReward": 2,
     "emotionalMeaning": "Neglected chores",
     "attackPattern": [
       {
@@ -49,6 +51,8 @@
     "level": 2,
     "hp": 18,
     "attack": 3,
+    "xpReward": 14,
+    "cashReward": 9,
     "emotionalMeaning": "Appliance dread",
     "attackPattern": [
       {
