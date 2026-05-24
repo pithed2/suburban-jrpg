@@ -11,11 +11,18 @@ const config: Phaser.Types.Core.GameConfig = {
   backgroundColor: "#1f2933",
   pixelArt: true,
   roundPixels: true,
+  render: {
+    antialias: false,
+    antialiasGL: false,
+    pixelArt: true,
+    roundPixels: true,
+  },
   scale: {
-    mode: Phaser.Scale.FIT,
+    mode: Phaser.Scale.NONE,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     width: 320,
     height: 180,
+    zoom: 3,
   },
   scene: [BootScene, NeighborhoodScene, BasementScene, GarageScene],
 };

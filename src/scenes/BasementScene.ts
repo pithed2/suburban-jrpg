@@ -29,14 +29,14 @@ export class BasementScene extends Phaser.Scene {
   private exit!: Phaser.GameObjects.Rectangle;
   private dustBunny!: Phaser.GameObjects.Rectangle;
   private dustBunnySprite!: Phaser.GameObjects.Sprite;
-  private dustLabel!: Phaser.GameObjects.Text;
+  private dustLabel!: Phaser.GameObjects.BitmapText;
   private coil!: Phaser.GameObjects.Rectangle;
   private coilSprite!: Phaser.GameObjects.Sprite;
-  private questText!: Phaser.GameObjects.Text;
+  private questText!: Phaser.GameObjects.BitmapText;
   private messageBox!: Phaser.GameObjects.Rectangle;
-  private messageText!: Phaser.GameObjects.Text;
+  private messageText!: Phaser.GameObjects.BitmapText;
   private commandBox!: Phaser.GameObjects.Rectangle;
-  private commandText!: Phaser.GameObjects.Text;
+  private commandText!: Phaser.GameObjects.BitmapText;
   private mode: BasementMode = "explore";
   private battlePhase: BattlePhase = "command";
   private selectedCommandIndex = 0;
@@ -109,14 +109,15 @@ export class BasementScene extends Phaser.Scene {
 
   private createWorld(): void {
     const map = this.make.tilemap({ key: "basement-map" });
-    const tileset = map.addTilesetImage("suburban-placeholder", "suburban-placeholder");
+    const placeholderTileset = map.addTilesetImage("suburban-placeholder", "suburban-placeholder");
+    const floorTileset = map.addTilesetImage("floor-options", "floor-options");
 
-    if (!tileset) {
+    if (!placeholderTileset || !floorTileset) {
       throw new Error("Missing tileset for basement map.");
     }
 
-    map.createLayer("Ground", tileset, 0, 0);
-    map.createLayer("Props", tileset, 0, 0);
+    map.createLayer("Ground", [placeholderTileset, floorTileset], 0, 0);
+    map.createLayer("Props", placeholderTileset, 0, 0);
 
     const spawn = getMapObjectCenter(map, "Objects", "player-spawn");
     const exit = getMapObjectCenter(map, "Objects", "basement-exit");
@@ -149,7 +150,7 @@ export class BasementScene extends Phaser.Scene {
       .setVisible(false);
 
     this.messageText = addPixelText(this, 16, 132, "", 7)
-      .setWordWrapWidth(288)
+      .setMaxWidth(288)
       .setVisible(false);
 
     this.commandBox = this.add.rectangle(208, 106, 96, 42, 0x111827, 0.94)

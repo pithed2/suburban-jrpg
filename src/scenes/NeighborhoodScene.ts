@@ -25,8 +25,8 @@ export class NeighborhoodScene extends Phaser.Scene {
   private garage!: Phaser.GameObjects.Rectangle;
   private mode: SceneMode = "explore";
   private messageBox!: Phaser.GameObjects.Rectangle;
-  private messageText!: Phaser.GameObjects.Text;
-  private questText!: Phaser.GameObjects.Text;
+  private messageText!: Phaser.GameObjects.BitmapText;
+  private questText!: Phaser.GameObjects.BitmapText;
   private state!: GameState;
   private readonly dialogueRunner = new DialogueRunner();
 
@@ -108,7 +108,7 @@ export class NeighborhoodScene extends Phaser.Scene {
       .setVisible(false);
 
     this.messageText = addPixelText(this, 16, 132, "", 7)
-      .setWordWrapWidth(288)
+      .setMaxWidth(288)
       .setVisible(false);
   }
 

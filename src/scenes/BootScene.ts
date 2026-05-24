@@ -8,6 +8,12 @@ export class BootScene extends Phaser.Scene {
 
   preload(): void {
     this.load.image("suburban-placeholder", "/assets/tilesets/suburban-placeholder.png");
+    this.load.image("floor-options", "/assets/tilesets/floor-options.png");
+    this.load.bitmapFont(
+      "dialogue-8x8",
+      "/assets/fonts/round_6x6.png",
+      "/assets/fonts/round_6x6-native.xml",
+    );
     this.load.tilemapTiledJSON("house-map", "/assets/maps/house.json");
     this.load.tilemapTiledJSON("basement-map", "/assets/maps/basement.json");
     this.load.tilemapTiledJSON("garage-map", "/assets/maps/garage.json");
@@ -23,6 +29,9 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
+    this.textures
+      .get("dialogue-8x8")
+      .setFilter(Phaser.Textures.FilterMode.NEAREST);
     resetGameState();
     this.scene.start("NeighborhoodScene");
   }

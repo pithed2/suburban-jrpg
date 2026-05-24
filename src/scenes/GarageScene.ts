@@ -23,10 +23,10 @@ export class GarageScene extends Phaser.Scene {
   private clutter!: Phaser.GameObjects.Rectangle;
   private wrench!: Phaser.GameObjects.Rectangle;
   private wrenchVisual!: Phaser.GameObjects.Rectangle;
-  private wrenchLabel!: Phaser.GameObjects.Text;
-  private questText!: Phaser.GameObjects.Text;
+  private wrenchLabel!: Phaser.GameObjects.BitmapText;
+  private questText!: Phaser.GameObjects.BitmapText;
   private messageBox!: Phaser.GameObjects.Rectangle;
-  private messageText!: Phaser.GameObjects.Text;
+  private messageText!: Phaser.GameObjects.BitmapText;
   private mode: GarageMode = "explore";
   private state!: GameState;
   private readonly dialogueRunner = new DialogueRunner();
@@ -118,7 +118,7 @@ export class GarageScene extends Phaser.Scene {
       .setVisible(false);
 
     this.messageText = addPixelText(this, 16, 132, "", 7)
-      .setWordWrapWidth(288)
+      .setMaxWidth(288)
       .setVisible(false);
   }
 

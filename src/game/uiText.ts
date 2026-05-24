@@ -5,19 +5,17 @@ export function addPixelText(
   x: number,
   y: number,
   text: string,
-  size = 8,
-): Phaser.GameObjects.Text {
-  const readableSize = Math.max(size, 8);
+  size = 6,
+): Phaser.GameObjects.BitmapText {
+  const readableSize = Math.max(Math.round(size / 6) * 6, 6);
 
-  return scene.add.text(x, y, text, {
-    color: "#f8fafc",
-    fontFamily: "monospace",
-    fontSize: `${readableSize}px`,
-  });
+  return scene.add
+    .bitmapText(x, y, "dialogue-8x8", text, readableSize)
+    .setTint(0xf8fafc);
 }
 
 export function setPixelText(
-  textObject: Phaser.GameObjects.Text,
+  textObject: Phaser.GameObjects.BitmapText,
   value: string,
 ): void {
   textObject.setText(value);
