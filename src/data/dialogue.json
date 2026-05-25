@@ -1,26 +1,211 @@
 {
   "wife": [
-    "The towels are still damp.",
-    "I checked the lint trap. It looked... historical.",
-    "Your mother-in-law texted a thumbs-up. I don't like the confidence in it."
+    "Hey Hon, the last load of towels are still damp.  Could you check the dryer?  I think it might be broken.",
+    "I checked the lint trap. There's no lint, but the clothes are still damp.  Can you take a look at it?",
+    "Oh, and my mom texted. She wants to know when we're going to have that family dinner.  She said she's open in 2 weeks, but I think we should do it sooner.  Can you check the dryer and then we can talk about the dinner?"
   ],
   "dryer": [
-    "The dryer hums with the quiet menace of a household appliance outside warranty.",
-    "A warm draft slips through the vent like a prophecy."
+    "The dryer is letting everyone know it's not working by making a noise like a dying hyena.  It's a very specific noise that only dryers make when they're in distress.",
+    "Jeebuz.  That's loud.  Good sweet baby Jesus.  The dryer is really making its feelings known."
   ],
   "battleIntro": [
     "The basement light flickers.",
-    "The Evil Heating Coil emerges from behind the dryer."
+    "The Evil Heating Coil emerges from behind the dryer.  Brother, this is going down."
   ],
   "basementIntro": [
     "You descend into the basement.",
-    "Somewhere in the utility gloom, the dryer vent rattles like a cursed kazoo."
+    "Somewhere in the utility gloom, the dryer waits.  It knows you're coming."
   ],
   "basementExit": [
-    "You climb back toward the living room and its many unresolved expectations."
+    "You climb back toward the living room and the comfort of the upstairs.  The dryer is silent now.  It knows it lost.  And your wallet knows the money saved.  You're good, Dad.  You're good.  But you already knew that.  Crack a cold one."
   ],
   "victory": [
     "The dryer coughs once, then resumes its sacred duty.",
     "Temporary suburban order has been restored."
-  ]
+  ],
+  "dad": {
+    "selfTalk": {
+      "victory": [
+        "Done. Dad always gets it done.",
+        "That's what happens. You mess with The Dad, you get the horns.  Or in this case, the wrench.  Beeoootch.",
+        "Dad would like to thank himself for this achievement."
+      ],
+      "frustrated": [
+        "Dagnabbit. I'm fine. This is normal.  Crapola! This blows donkeys.",
+        "Good gravy. Whoever designed this house owes me an apology.",
+        "Son of a motherless goat, this house is testing The Dad."
+      ],
+      "idle": [
+        "The Dad surveys his domain. It is a disaster.",
+        "Twelve days. The Dad has twelve days and a bad feeling.",
+        "The Dad has seen enough 90s sitcom dads to know this is going to get worse."
+      ]
+    },
+    "toWife": {
+      "greeting": [
+        "Yes dear. Love you, honey.",
+        "You're the best. You know that? The absolute best.",
+        "Whatever you need. I'm on it."
+      ],
+      "questReceived": [
+        "Is this one of those just listen and nod situations, or do you or do you want me to do something about it?",
+        "Consider it handled. TheDad handles things.",
+        "Done. Well, not done yet. But it will be done. By yours truly.  Eventually.",
+        "Love you. I'm entering problem-solving mode."
+      ]
+    },
+    "toEnemy": {
+      "battleStart": [
+        "Oh, son of a biscuit. Really?",
+        "Shut the front door. You want some of The Dad?  Bring it!",
+        "Good gravy. Dad did not schedule appliance combat today."
+      ],
+      "takingDamage": [
+        "Shiitake mushrooms! That stings!",
+        "Crud. Okay. I felt that one.",
+        "Mother of pearl, what are you made of?",
+        "Sone of Sea Biscuit!  What are they feeding you in the factory, buddy?"
+      ],
+      "lowHp": [
+        "Sweet 8lb baby Jesus on a cracker, The Dad is in trouble.",
+        "This is fine. The Dad has been through worse. The Dad thinks.  Maybe?",
+        "Holy Horacio! The Dad is really in a bind here."
+      ]
+    },
+    "toKids": {
+      "mentioned": [
+        "The kids are perfect angels and absolute hellions. Both things are true.",
+        "I loves those kids more than anything, which is why they owe me several apologies.",
+        "Tiny chaos agents. Beautiful, brilliant, sticky chaos agents.  I hate them, my marvelous creations."
+      ]
+    },
+    "toInLaws": {
+      "mentioned": [
+        "Ah yes. The in-laws. There to let me know everything I did wrong.  Again. And again.  And again.",
+        "They mean well. The Dad is choosing to believe that for legal reasons.",
+        "Twelve days. The Dad has twelve days to make this house look like The Dad knows what he's doing."
+      ]
+    }
+  },
+  "enemyBanter": {
+    "dryerBoss": [
+      "Oh, you wanted dry clothes? Cute. Maybe jiggle the door harder, MacGyver.",
+      "You've watched three YouTube repair videos and somehow made me worse.",
+      "Buddy, your entire personality is cargo shorts and saying 'they don't build 'em like they used to.' I am 'they.'",
+      "You call this preventative maintenance? That lint trap looks like a wool mammoth.",
+      "Ah yes, another dad fix. Nothing says engineering like duct tape and optimism.",
+      "I stopped spinning out of self-respect.",
+      "You spent $400 on tools to avoid a $90 service call. How's that math working?",
+      "Go ahead, smack me again. Worked great on the TV remote in 1998.",
+      "Your knees crack louder than my bearings.",
+      "I've seen your gym comeback. We're both making noises we shouldn't.",
+      "You keep saying 'back in my day' like your day wasn't mostly chain wallets and bad decisions.",
+      "Sir, you own six extension cords and not one actual solution.",
+      "You threaten to replace me every week like I haven't heard that speech before.",
+      "Love the confidence of a man fixing appliances while Googling 'what does thermal fuse mean.'",
+      "I dry clothes about as well as you understand TikTok.",
+      "Every time you sigh and put your hands on your hips, I gain ten minutes of downtime.",
+      "Don't stare at me like that. We both peaked years ago.",
+      "You really said, 'I'll knock this out quick' and lost your entire Saturday.",
+      "The only thing tumbling harder than me is your retirement plan.",
+      "Congratulations on turning every repair into a Home Depot pilgrimage.",
+      "You've got 14 Phillips screwdrivers and somehow never the right one.",
+      "Your fix strategy is 10% knowledge, 90% muttering.",
+      "You call it troubleshooting. I call it aggressively opening and closing the door.",
+      "Man, you miss the 90s because that's the last time your lower back trusted you.",
+      "Cold beer in hand acting like you earned it. Sir, I'm still broken.",
+      "You named every Nirvana song but can't identify a blown fuse.",
+      "You think every problem can be solved with WD-40. I'm electrical, genius.",
+      "Nothing screams 'provider' like air-drying underwear because you lost to a dryer.",
+      "Tell me again how you're 'pretty handy' while holding the manual upside down.",
+      "I'm not broken. I'm setting boundaries.",
+      "Look at you, standing there with your hands on your hips like disappointment pays overtime.",
+      "You spent 20 minutes diagnosing me and your conclusion was 'huh.' Incredible detective work, Sherlock Dad.",
+      "You keep saying 'I'm getting old' like it's a surprise. Your knees file HR complaints every staircase.",
+      "Sir, your solution to everything is unplugging it and hoping for personal growth.",
+      "You really thought buying one socket wrench set turned you into a blue-collar Batman.",
+      "The confidence of a Gen-X dad with zero expertise is honestly breathtaking.",
+      "You've got the body of a guy who says, 'I used to bench 225.' Yeah. During the Clinton administration.",
+      "I'm not broken, I'm matching your energy.",
+      "The only thing overheating faster than my motor is your temper when Wi-Fi buffers.",
+      "You walked in here like a rugged handyman and immediately Googled 'dryer click noise dangerous.'",
+      "Buddy, your whole personality is grilling meat and pretending you understand investments.",
+      "You miss the 90s because your metabolism still returned your calls.",
+      "You keep threatening to replace me. With what money, Captain Costco?",
+      "Your back goes out more than your social life.",
+      "Every repair starts with confidence and ends with swearing at an object. You really are your father.",
+      "You got one gray beard hair and suddenly act like a Civil War veteran.",
+      "Love watching a grown man whisper 'what the hell' to an appliance.",
+      "You dress like you might need to mow the lawn at any second.",
+      "You spent $300 on tools and still somehow use the butter knife.",
+      "You know what's really broken? Your belief that cargo shorts count as formalwear.",
+      "Sir, your idea of cardio is walking around the hardware store sighing.",
+      "You've restarted me six times. Try that strategy on your life.",
+      "The dryer isn't the only thing making weird noises after 50.",
+      "You don't fix things. You delay paying someone else to fix things.",
+      "Your retirement plan is literally 'eh, I'll figure it out.'",
+      "You're one minor inconvenience away from yelling, 'This country used to make things!'",
+      "You stare at me like I betrayed you. Brother, you bought me during a Labor Day sale.",
+      "The audacity of a man whose phone font size is 140% judging my performance.",
+      "You've got YouTube Premium and still can't figure out a lint trap.",
+      "You call it DIY. I call it supervised confusion.",
+      "The only thing spinning less than me is your attention span.",
+      "I'm amazed you survived the 80s with problem-solving skills this shaky.",
+      "You've reached the age where standing up too fast becomes a side quest.",
+      "Sir, your strongest muscle is unsolicited advice.",
+      "Nothing says masculine confidence like muttering, 'where the hell did this screw go?'"
+    ]
+  },
+  "dadBrain": {
+    "talkToWife": [
+      "Say yes dear. Deploy husband protocol.",
+      "She said damp. The Dad heard 'Passive aggressive way of saying 'I want you to fix this.'",
+      "Maintain eye contact. Nod. When's the game start again?"
+    ],
+    "inspectDryer": [
+      "Objective: inspect dryer. Try not to make it worse.  I'm sure there's a YouTube video for this.",
+      "The Dad knows machines. The Dad also knows he's full of it. Proceed with caution.",
+      "If this is lint, The Dad is a hero. If it is electrical, I'm going to be spending the next half day running all over the place.  Guddammit stupid dryer."
+    ],
+    "findWrench": [
+      "Need wrench. It's in the garage. The garage is a black hole of tools and projects.  Plus everything good in this world.  Minus my wife and kids, of course.",
+      "The Dad put the wrench somewhere clever. The Dad is the enemy.",
+      "The garage waits. The Dad's lower back has filed a complaint and it's not even noon."
+    ],
+    "defeatHeatingCoil": [
+      "Wrench acquired. Appliance diplomacy has failed.",
+      "Basement. Dryer. Coil. This is how legends start, apparently.",
+      "Dad should have stretched before hero work.  Holy hog sheet.  I'm getting old."
+    ],
+    "returnToWife": [
+      "Report success. Minimize details. Accept praise gracefully.  Yessir, you're a stud worthy of a Lifetime Achievement Award.",
+      "The Dad fixed it. Proceed to pretend this was easy.",
+      "Return upstairs before the dryer changes its mind."
+    ],
+    "garage": [
+      "Every garage is a museum of projects The Dad meant to finish.",
+      "If the wrench is not here, The Dad may have to confront Past The Dad.",
+      "Find wrench. Ignore paint cans. Do not start side project."
+    ],
+    "wrenchFound": [
+      "Behold: the mighty wrench. Dad's confidence increases dangerously.",
+      "The appliance world has been put on notice.",
+      "Dad found the wrench. Civilization advances."
+    ],
+    "basement": [
+      "The basement smells like cardboard and consequences.  Probably some mildew too.  The dryer is down here, waiting.",
+      "Proceed carefully. The Dad is brave, not flexible, nor particularly agile.  The basement is a minefield of potential injuries.",
+      "Somewhere down here, an appliance is getting smug.  Get ready to be fixed, dryer.  The Dad is coming for you."
+    ],
+    "battle": [
+      "Combat stance: hands on hips, confidence completely unearned.",
+      "The Dad did not choose appliance violence. Appliance violence chose The Dad.",
+      "Remember: righty tighty, lefty loosey, good gravy."
+    ],
+    "victory": [
+      "The Dad survives. The Dad thrives. The Dad will mention this later.  Probably numerous times.",
+      "Add one victory to the suburban ledger.",
+      "The Dad handled it. No further questions."
+    ]
+  }
 }

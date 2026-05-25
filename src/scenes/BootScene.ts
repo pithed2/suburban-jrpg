@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { logger } from "../game/logger";
 import { resetGameState } from "../game/session";
 
 export class BootScene extends Phaser.Scene {
@@ -7,6 +8,16 @@ export class BootScene extends Phaser.Scene {
   }
 
   preload(): void {
+    logger.info("boot preload");
+
+    this.load.on("loaderror", (file: Phaser.Loader.File) => {
+      logger.error("asset load failed", {
+        key: file.key,
+        type: file.type,
+        url: file.url,
+      });
+    });
+
     this.load.image("suburban-placeholder", "/assets/tilesets/suburban-placeholder.png");
     this.load.image("floor-options", "/assets/tilesets/floor-options.png");
     this.load.image("dryer-boss", "/assets/enemies/dryer_boss.png");
@@ -30,6 +41,8 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
+    logger.info("boot create");
+
     this.textures
       .get("dialogue-8x8")
       .setFilter(Phaser.Textures.FilterMode.NEAREST);
@@ -37,6 +50,6 @@ export class BootScene extends Phaser.Scene {
       .get("dryer-boss")
       .setFilter(Phaser.Textures.FilterMode.NEAREST);
     resetGameState();
-    this.scene.start("NeighborhoodScene");
+    this.scene.start("StoryIntroScene");
   }
 }

@@ -1,16 +1,22 @@
 export type DialogueCompleteHandler = () => void;
+export interface DialogueLine {
+  speaker: string;
+  text: string;
+}
+
+export type DialogueInput = string | DialogueLine;
 
 export class DialogueRunner {
-  private queue: string[] = [];
+  private queue: DialogueLine[] = [];
   private onComplete?: DialogueCompleteHandler;
 
-  start(lines: string[], onComplete?: DialogueCompleteHandler): string {
-    this.queue = [...lines];
+  start(lines: DialogueInput[], onComplete?: DialogueCompleteHandler): DialogueLine {
+    this.queue = lines.map(normalizeDialogueLine);
     this.onComplete = onComplete;
-    return this.queue.shift() ?? "";
+    return this.queue.shift() ?? { speaker: "DAD", text: "" };
   }
 
-  advance(): string | undefined {
+  advance(): DialogueLine | undefined {
     const next = this.queue.shift();
 
     if (next) {
@@ -29,3 +35,8 @@ export class DialogueRunner {
   }
 }
 
+function normalizeDialogueLine(line: DialogueInput): DialogueLine {
+  return typeof line === "string"
+    ? { speaker: "DAD", text: line }
+    : line;
+}

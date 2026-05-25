@@ -1,7 +1,11 @@
 import Phaser from "phaser";
 import { BattleManager } from "../game/BattleManager";
 import { dialogue, enemies } from "../game/content";
-import { DialogueRunner } from "../game/DialogueRunner";
+import { DialogueBox } from "../game/DialogueBox";
+import { getDadBrainLine, getDadLine } from "../game/dadVoice";
+import { DialogueRunner, type DialogueInput, type DialogueLine } from "../game/DialogueRunner";
+import { GameMenu } from "../game/GameMenu";
+import { PlayerStatsPanel } from "../game/PlayerStatsPanel";
 import { RandomEncounterTracker } from "../game/EncounterManager";
 import { isNear } from "../game/interaction";
 import { getQuestStepLabel } from "../game/quests";
@@ -30,8 +34,9 @@ export class BasementScene extends Phaser.Scene {
   private coil!: Phaser.GameObjects.Rectangle;
   private coilSprite!: Phaser.GameObjects.Sprite;
   private questText!: Phaser.GameObjects.BitmapText;
-  private messageBox!: Phaser.GameObjects.Rectangle;
-  private messageText!: Phaser.GameObjects.BitmapText;
+  private dialogueBox!: DialogueBox;
+  private statsPanel!: PlayerStatsPanel;
+  private menu!: GameMenu;
   private battleStatusBox!: Phaser.GameObjects.Rectangle;
   private battleStatusText!: Phaser.GameObjects.BitmapText;
   private battleEnemyBox!: Phaser.GameObjects.Rectangle;
@@ -70,14 +75,29 @@ export class BasementScene extends Phaser.Scene {
 
     this.createWorld();
     this.createUi();
+    this.menu = new GameMenu(this, () => this.state);
     this.updateQuestText("BASEMENT");
 
     if (!this.state.flags.bossDefeated) {
-      this.startDialogue(dialogue.basementIntro);
+      this.startDialogue([
+        { speaker: "DAD'S BRAIN", text: getDadBrainLine("basement") },
+        ...dialogue.basementIntro.map((text) => ({ speaker: "NARRATOR", text })),
+      ]);
     }
   }
 
-  update(): void {
+  update(_time: number, delta: number): void {
+    this.dialogueBox.update(delta);
+
+    if (this.mode !== "battle") {
+      this.menu.update();
+
+      if (this.menu.isOpen()) {
+        this.statsPanel.hide();
+        return;
+      }
+    }
+
     if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
       this.handleInteract();
     }
@@ -88,6 +108,7 @@ export class BasementScene extends Phaser.Scene {
     }
 
     if (this.mode !== "explore") {
+      this.statsPanel.hide();
       return;
     }
 
@@ -99,6 +120,7 @@ export class BasementScene extends Phaser.Scene {
     if (this.cursors.right.isDown) dx += speed;
     if (this.cursors.up.isDown) dy -= speed;
     if (this.cursors.down.isDown) dy += speed;
+    const isMoving = dx !== 0 || dy !== 0;
 
     const nextX = Phaser.Math.Clamp(this.player.x + dx, 18, 302);
     const nextY = Phaser.Math.Clamp(this.player.y + dy, 40, 160);
@@ -106,7 +128,9 @@ export class BasementScene extends Phaser.Scene {
     this.player.y = nextY;
     this.playerSprite.setPosition(this.player.x, this.player.y);
 
-    if (dx !== 0 || dy !== 0) {
+    this.statsPanel.update(delta, !isMoving, this.state);
+
+    if (isMoving) {
       this.checkRandomEncounter();
     }
   }
@@ -145,13 +169,8 @@ export class BasementScene extends Phaser.Scene {
     this.add.rectangle(8, 8, 236, 16, 0xfacc15).setOrigin(0, 0);
     this.questText = addPixelText(this, 12, 11, "", 8).setTint(0x111827);
 
-    this.messageBox = this.add.rectangle(160, 150, 304, 50, 0x111827, 0.94)
-      .setStrokeStyle(2, 0xf8fafc)
-      .setVisible(false);
-
-    this.messageText = addPixelText(this, 16, 132, "", 7)
-      .setMaxWidth(288)
-      .setVisible(false);
+    this.dialogueBox = new DialogueBox(this);
+    this.statsPanel = new PlayerStatsPanel(this);
 
     this.battleStatusBox = this.add.rectangle(48, 78, 76, 92, 0x111827, 0.94)
       .setStrokeStyle(2, 0xf8fafc)
@@ -188,13 +207,18 @@ export class BasementScene extends Phaser.Scene {
     const playerPosition = new Phaser.Math.Vector2(this.player.x, this.player.y);
 
     if (isNear(playerPosition, new Phaser.Math.Vector2(this.exit.x, this.exit.y), 24)) {
-      this.startDialogue(dialogue.basementExit, () => this.scene.start("NeighborhoodScene"));
+      this.startDialogue(
+        dialogue.basementExit.map((text) => ({ speaker: "NARRATOR", text })),
+        () => this.scene.start("NeighborhoodScene"),
+      );
       return;
     }
 
     if (isNear(playerPosition, new Phaser.Math.Vector2(this.coil.x, this.coil.y), 28)) {
       if (this.state.flags.bossDefeated) {
-        this.startDialogue(["The heating coil is quiet now. Almost smugly quiet."]);
+        this.startDialogue([
+          { speaker: "NARRATOR", text: "The heating coil is quiet now. Almost smugly quiet." },
+        ]);
         return;
       }
 
@@ -202,26 +226,38 @@ export class BasementScene extends Phaser.Scene {
         setActiveQuestStep(this.state, "find-wrench");
         this.updateQuestText("BASEMENT");
         this.startDialogue([
-          "Dad sizes up the coil with his bare hands.",
-          "Nope. This is a wrench problem.",
-          "The garage waits. Unfortunately.",
+          { speaker: "DAD'S BRAIN", text: getDadBrainLine("findWrench") },
+          { speaker: "NARRATOR", text: "Dad sizes up the coil with his bare hands." },
+          { speaker: "DAD", text: "Nope. This is a wrench problem." },
+          { speaker: "DAD", text: getDadLine("selfTalk", "frustrated") },
+          { speaker: "NARRATOR", text: "The garage waits. Unfortunately." },
         ], () => this.scene.start("NeighborhoodScene"));
         return;
       }
 
-      this.startDialogue(dialogue.battleIntro, () => this.startBattle("evil-heating-coil"));
+      this.startDialogue([
+        ...dialogue.battleIntro.map((text) => ({ speaker: "NARRATOR", text })),
+        { speaker: "DAD'S BRAIN", text: getDadBrainLine("battle") },
+        { speaker: "DAD", text: getDadLine("toEnemy", "battleStart") },
+      ], () => this.startBattle("evil-heating-coil"));
       return;
     }
 
-    this.startDialogue(["The basement smells like cardboard, old paint, and obligation."]);
+    this.startDialogue([
+      { speaker: "NARRATOR", text: "The basement smells like cardboard, old paint, and obligation." },
+    ]);
   }
 
-  private startDialogue(lines: string[], onComplete?: () => void): void {
+  private startDialogue(lines: DialogueInput[], onComplete?: () => void): void {
     this.mode = "dialogue";
     this.showMessage(this.dialogueRunner.start(lines, onComplete));
   }
 
   private advanceDialogue(): void {
+    if (this.dialogueBox.advance() !== "done") {
+      return;
+    }
+
     const next = this.dialogueRunner.advance();
 
     if (next) {
@@ -252,20 +288,24 @@ export class BasementScene extends Phaser.Scene {
 
     if (snapshot.ambushed && snapshot.message) {
       this.battlePhase = "enemyResult";
-      this.showMessage(snapshot.message);
+      this.showMessage(snapshot.message, "AMBUSH");
       return;
     }
 
-    this.showMessage(this.formatBattleSnapshot(snapshot));
+    this.showMessage(this.formatBattleSnapshot(snapshot), "BATTLE");
     this.showBattleMenu();
   }
 
   private handleBattleTurn(): void {
+    if (this.dialogueBox.advance() !== "done") {
+      return;
+    }
+
     if (this.battlePhase === "enemyResult") {
       this.battlePhase = "command";
       const snapshot = this.battle.getSnapshot(this.state);
       this.updateBattlePanels(snapshot);
-      this.showMessage(this.formatBattleSnapshot(snapshot));
+      this.showMessage(this.formatBattleSnapshot(snapshot), "BATTLE");
       this.showBattleMenu();
       return;
     }
@@ -274,7 +314,10 @@ export class BasementScene extends Phaser.Scene {
       const enemyResult = this.battle.useEnemyTurn(this.state);
       this.battlePhase = "enemyResult";
       this.updateBattlePanels(enemyResult);
-      this.showMessage(enemyResult.message);
+      this.showMessage([
+        enemyResult.message,
+        getDadLine("toEnemy", this.isHeroLowHp(enemyResult) ? "lowHp" : "takingDamage"),
+      ].join("\n"), "BATTLE");
       return;
     }
 
@@ -296,13 +339,18 @@ export class BasementScene extends Phaser.Scene {
 
     this.battlePhase = "playerResult";
     this.hideBattleMenu();
-    this.showMessage(result.message);
+    this.showMessage(result.message, "BATTLE");
   }
 
   private handleBattleVictory(resultMessage: string): void {
     if (this.activeEnemyId === "dust-bunny") {
       this.updateQuestText("BASEMENT");
-      this.startDialogue([resultMessage, "The basement briefly seems less judgmental."], () => {
+      this.startDialogue([
+        { speaker: "BATTLE", text: resultMessage },
+        { speaker: "DAD'S BRAIN", text: getDadBrainLine("victory") },
+        { speaker: "DAD", text: getDadLine("selfTalk", "victory") },
+        { speaker: "NARRATOR", text: "The basement briefly seems less judgmental." },
+      ], () => {
         this.hideBattleUi();
         this.mode = "explore";
         this.hideMessage();
@@ -314,7 +362,12 @@ export class BasementScene extends Phaser.Scene {
     completeQuestStep(this.state, "defeat-heating-coil");
     setActiveQuestStep(this.state, "return-to-wife");
     this.updateQuestText("VICTORY");
-    this.startDialogue([resultMessage, "The vent stops rattling. Upstairs, a towel may yet become dry."], () => {
+    this.startDialogue([
+      { speaker: "BATTLE", text: resultMessage },
+      { speaker: "DAD'S BRAIN", text: getDadBrainLine("victory") },
+      { speaker: "DAD", text: getDadLine("selfTalk", "victory") },
+      { speaker: "NARRATOR", text: "The vent stops rattling. Upstairs, a towel may yet become dry." },
+    ], () => {
       this.hideBattleUi();
       this.scene.start("NeighborhoodScene");
     });
@@ -323,7 +376,10 @@ export class BasementScene extends Phaser.Scene {
   private handleBattleEscape(resultMessage: string): void {
     this.updateQuestText("BASEMENT");
     this.randomEncounters.resetPosition(new Phaser.Math.Vector2(this.player.x, this.player.y));
-    this.startDialogue([resultMessage], () => {
+    this.startDialogue([
+      { speaker: "BATTLE", text: resultMessage },
+      { speaker: "DAD'S BRAIN", text: getDadBrainLine("basement") },
+    ], () => {
       this.hideBattleUi();
       this.mode = "explore";
       this.hideMessage();
@@ -400,7 +456,7 @@ export class BasementScene extends Phaser.Scene {
   }
 
   private showBattleUi(snapshot: {
-    enemy: { id: string; name: string };
+    enemy: { id: string; name: string; battleTexture?: string };
     enemyHp: number;
     enemyMaxHp: number;
     heroHp: number;
@@ -424,7 +480,7 @@ export class BasementScene extends Phaser.Scene {
   }
 
   private updateBattlePanels(snapshot: {
-    enemy: { id: string; name: string };
+    enemy: { id: string; name: string; battleTexture?: string };
     enemyHp: number;
     enemyMaxHp: number;
     heroHp: number;
@@ -437,16 +493,16 @@ export class BasementScene extends Phaser.Scene {
     );
     setPixelText(this.battleEnemyText, `${snapshot.enemy.name}\nHP ${snapshot.enemyHp}/${snapshot.enemyMaxHp}`);
 
-    if (snapshot.enemy.id === "evil-heating-coil") {
+    if (snapshot.enemy.battleTexture) {
       this.battleEnemySprite
-        .setTexture("dryer-boss")
+        .setTexture(snapshot.enemy.battleTexture)
         .setDisplaySize(48, 48);
       return;
     }
 
     this.battleEnemySprite
       .setTexture(spriteFrames.dustBunny.texture, spriteFrames.dustBunny.frame)
-      .setScale(2);
+      .setDisplaySize(32, 32);
   }
 
   private getCommandLabel(command: BattleCommand): string {
@@ -467,7 +523,15 @@ export class BasementScene extends Phaser.Scene {
       return;
     }
 
-    this.startDialogue(encounter.introMessages, () => this.startBattle(encounter.enemy.id));
+    this.startDialogue([
+      ...encounter.introMessages.map((text) => ({ speaker: "NARRATOR", text })),
+      { speaker: "DAD'S BRAIN", text: getDadBrainLine("battle") },
+      { speaker: "DAD", text: getDadLine("toEnemy", "battleStart") },
+    ], () => this.startBattle(encounter.enemy.id));
+  }
+
+  private isHeroLowHp(snapshot: { heroHp: number; heroMaxHp: number }): boolean {
+    return snapshot.heroHp <= snapshot.heroMaxHp * 0.3;
   }
 
   private formatBattleSnapshot(snapshot: {
@@ -487,16 +551,14 @@ export class BasementScene extends Phaser.Scene {
     );
   }
 
-  private showMessage(message: string): void {
-    this.messageBox.setVisible(true);
-    setPixelText(this.messageText, message);
-    this.messageText.setVisible(true);
+  private showMessage(message: DialogueLine | string, speaker = "DAD"): void {
+    const line = typeof message === "string" ? { speaker, text: message } : message;
+    this.dialogueBox.show(line.text, line.speaker);
   }
 
   private hideMessage(): void {
     this.dialogueRunner.clear();
-    this.messageBox.setVisible(false);
-    this.messageText.setVisible(false);
+    this.dialogueBox.hide();
   }
 
 }

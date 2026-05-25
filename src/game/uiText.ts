@@ -1,5 +1,9 @@
 import Phaser from "phaser";
 
+function formatPixelText(value: unknown): string {
+  return String(value ?? "").toUpperCase();
+}
+
 export function addPixelText(
   scene: Phaser.Scene,
   x: number,
@@ -10,7 +14,7 @@ export function addPixelText(
   const readableSize = Math.max(Math.round(size / 6) * 6, 6);
 
   return scene.add
-    .bitmapText(x, y, "dialogue-8x8", text, readableSize)
+    .bitmapText(x, y, "dialogue-8x8", formatPixelText(text), readableSize)
     .setTint(0xf8fafc);
 }
 
@@ -18,5 +22,5 @@ export function setPixelText(
   textObject: Phaser.GameObjects.BitmapText,
   value: string,
 ): void {
-  textObject.setText(value);
+  textObject.setText(formatPixelText(value));
 }

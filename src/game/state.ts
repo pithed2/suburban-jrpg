@@ -17,6 +17,9 @@ export interface PlayerState {
   maxHp: number;
   dadPoints: number;
   maxDadPoints: number;
+  strength: number;
+  agility: number;
+  defense: number;
   cash: number;
   xp: number;
   inventory: string[];
@@ -47,6 +50,9 @@ export function createInitialGameState(): GameState {
       maxHp: 24,
       dadPoints: 8,
       maxDadPoints: 8,
+      strength: 8,
+      agility: 5,
+      defense: 2,
       cash: 12,
       xp: 0,
       inventory: ["ibuprofen"],

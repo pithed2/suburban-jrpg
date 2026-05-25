@@ -1,6 +1,10 @@
 import Phaser from "phaser";
-import { DialogueRunner } from "../game/DialogueRunner";
+import { DialogueBox } from "../game/DialogueBox";
+import { getDadBrainLine } from "../game/dadVoice";
+import { DialogueRunner, type DialogueInput, type DialogueLine } from "../game/DialogueRunner";
+import { GameMenu } from "../game/GameMenu";
 import { isNear } from "../game/interaction";
+import { PlayerStatsPanel } from "../game/PlayerStatsPanel";
 import { getQuestStepLabel } from "../game/quests";
 import { getGameState } from "../game/session";
 import { addWorldSprite, spriteFrames } from "../game/sprites";
@@ -25,8 +29,9 @@ export class GarageScene extends Phaser.Scene {
   private wrenchVisual!: Phaser.GameObjects.Rectangle;
   private wrenchLabel!: Phaser.GameObjects.BitmapText;
   private questText!: Phaser.GameObjects.BitmapText;
-  private messageBox!: Phaser.GameObjects.Rectangle;
-  private messageText!: Phaser.GameObjects.BitmapText;
+  private dialogueBox!: DialogueBox;
+  private menu!: GameMenu;
+  private statsPanel!: PlayerStatsPanel;
   private mode: GarageMode = "explore";
   private state!: GameState;
   private readonly dialogueRunner = new DialogueRunner();
@@ -43,22 +48,33 @@ export class GarageScene extends Phaser.Scene {
 
     this.createWorld();
     this.createUi();
+    this.menu = new GameMenu(this, () => this.state);
     this.updateQuestText();
 
     if (!this.state.flags.foundWrench) {
       this.startDialogue([
-        "The garage receives Dad with the quiet hostility of unfinished projects.",
-        "The wrench is not where he definitely, absolutely, probably left it.",
+        { speaker: "DAD'S BRAIN", text: getDadBrainLine("garage") },
+        { speaker: "NARRATOR", text: "The garage receives Dad with the quiet hostility of unfinished projects." },
+        { speaker: "DAD", text: "The wrench is not where he definitely, absolutely, probably left it." },
       ]);
     }
   }
 
-  update(): void {
+  update(_time: number, delta: number): void {
+    this.dialogueBox.update(delta);
+    this.menu.update();
+
+    if (this.menu.isOpen()) {
+      this.statsPanel.hide();
+      return;
+    }
+
     if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
       this.handleInteract();
     }
 
     if (this.mode !== "explore") {
+      this.statsPanel.hide();
       return;
     }
 
@@ -70,10 +86,12 @@ export class GarageScene extends Phaser.Scene {
     if (this.cursors.right.isDown) dx += speed;
     if (this.cursors.up.isDown) dy -= speed;
     if (this.cursors.down.isDown) dy += speed;
+    const isMoving = dx !== 0 || dy !== 0;
 
     this.player.x = Phaser.Math.Clamp(this.player.x + dx, 18, 302);
     this.player.y = Phaser.Math.Clamp(this.player.y + dy, 40, 160);
     this.playerSprite.setPosition(this.player.x, this.player.y);
+    this.statsPanel.update(delta, !isMoving, this.state);
   }
 
   private createWorld(): void {
@@ -113,13 +131,8 @@ export class GarageScene extends Phaser.Scene {
     this.add.rectangle(8, 8, 236, 16, 0xfacc15).setOrigin(0, 0);
     this.questText = addPixelText(this, 12, 11, "", 8).setTint(0x111827);
 
-    this.messageBox = this.add.rectangle(160, 150, 304, 50, 0x111827, 0.94)
-      .setStrokeStyle(2, 0xf8fafc)
-      .setVisible(false);
-
-    this.messageText = addPixelText(this, 16, 132, "", 7)
-      .setMaxWidth(288)
-      .setVisible(false);
+    this.dialogueBox = new DialogueBox(this);
+    this.statsPanel = new PlayerStatsPanel(this);
   }
 
   private handleInteract(): void {
@@ -136,7 +149,10 @@ export class GarageScene extends Phaser.Scene {
     }
 
     if (isNear(playerPosition, new Phaser.Math.Vector2(this.clutter.x, this.clutter.y), 26)) {
-      this.startDialogue(["Old paint cans. A snow shovel. Three extension cords, none of them the good one."]);
+      this.startDialogue([
+        { speaker: "DAD'S BRAIN", text: getDadBrainLine("garage") },
+        { speaker: "NARRATOR", text: "Old paint cans. A snow shovel. Three extension cords, none of them the good one." },
+      ]);
       return;
     }
 
@@ -148,7 +164,9 @@ export class GarageScene extends Phaser.Scene {
       return;
     }
 
-    this.startDialogue(["Somewhere in here is every tool Dad has ever needed, except the one he needs now."]);
+    this.startDialogue([
+      { speaker: "DAD", text: "Somewhere in here is every tool Dad has ever needed, except the one he needs now." },
+    ]);
   }
 
   private collectWrench(): void {
@@ -160,17 +178,22 @@ export class GarageScene extends Phaser.Scene {
     this.updateWrenchVisibility();
     this.updateQuestText();
     this.startDialogue([
-      "Dad finds the Adjustable Wrench behind a box labeled TAXES 2017.",
-      "The appliance world has been put on notice.",
+      { speaker: "DAD'S BRAIN", text: getDadBrainLine("wrenchFound") },
+      { speaker: "NARRATOR", text: "Dad finds the Adjustable Wrench behind a box labeled TAXES 2017." },
+      { speaker: "DAD", text: "The appliance world has been put on notice." },
     ]);
   }
 
-  private startDialogue(lines: string[], onComplete?: () => void): void {
+  private startDialogue(lines: DialogueInput[], onComplete?: () => void): void {
     this.mode = "dialogue";
     this.showMessage(this.dialogueRunner.start(lines, onComplete));
   }
 
   private advanceDialogue(): void {
+    if (this.dialogueBox.advance() !== "done") {
+      return;
+    }
+
     const next = this.dialogueRunner.advance();
 
     if (next) {
@@ -198,15 +221,13 @@ export class GarageScene extends Phaser.Scene {
     this.wrenchLabel.setVisible(visible);
   }
 
-  private showMessage(message: string): void {
-    this.messageBox.setVisible(true);
-    setPixelText(this.messageText, message);
-    this.messageText.setVisible(true);
+  private showMessage(message: DialogueLine | string): void {
+    const line = typeof message === "string" ? { speaker: "DAD", text: message } : message;
+    this.dialogueBox.show(line.text, line.speaker);
   }
 
   private hideMessage(): void {
     this.dialogueRunner.clear();
-    this.messageBox.setVisible(false);
-    this.messageText.setVisible(false);
+    this.dialogueBox.hide();
   }
 }

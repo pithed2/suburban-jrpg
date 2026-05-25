@@ -1,5 +1,13 @@
 import Phaser from "phaser";
 import { items, type EnemyActionResponse, type EnemyAttack, type EnemyDefinition } from "./content";
+import {
+  applyExperienceAndLevelUps,
+  rollDadSkillDamage,
+  rollEnemyDamage,
+  rollHealing,
+  rollHeroDamage,
+  rollRunSuccess,
+} from "./dragonWarriorMath";
 import type { GameState } from "./state";
 
 export interface BattleSnapshot {
@@ -16,6 +24,7 @@ export interface BattleTurnResult extends BattleSnapshot {
   escaped?: boolean;
   xpReward?: number;
   cashReward?: number;
+  leveledUp?: boolean;
 }
 
 export interface EnemyTurnResult extends BattleSnapshot {
@@ -72,7 +81,6 @@ export class BattleManager {
   }
 
   useItem(state: GameState, itemId: string): BattleTurnResult {
-    const enemy = this.requireEnemy();
     const itemIndex = state.player.inventory.indexOf(itemId);
 
     if (itemIndex === -1) {
@@ -84,11 +92,13 @@ export class BattleManager {
     }
 
     state.player.inventory.splice(itemIndex, 1);
-    state.player.hp = Math.min(state.player.maxHp, state.player.hp + 10);
+    const item = items.find((candidate) => candidate.id === itemId);
+    const healing = item?.heal ? rollHealing(Math.max(1, item.heal - 3), item.heal + 4) : rollHealing();
+    state.player.hp = Math.min(state.player.maxHp, state.player.hp + healing);
 
     return {
       ...this.getSnapshot(state),
-      message: "You use Ibuprofen.\nThe pain retreats to a more manageable zip code.",
+      message: `You use Ibuprofen.\nHP recovers by ${healing}.`,
       victory: false,
     };
   }
@@ -104,22 +114,30 @@ export class BattleManager {
       };
     }
 
+    if (rollRunSuccess(state, enemy)) {
+      return {
+        ...this.getSnapshot(state),
+        message: "Dad backs away with heroic caution.\nThe threat loses interest.",
+        victory: false,
+        escaped: true,
+      };
+    }
+
     return {
       ...this.getSnapshot(state),
-      message: "Dad backs away with heroic caution.\nThe dust bunny loses interest.",
+      message: "Dad looks for a clean exit.\nNo dice.",
       victory: false,
-      escaped: true,
     };
   }
 
   useEnemyTurn(state: GameState): EnemyTurnResult {
     const enemy = this.requireEnemy();
     const attack = this.getEnemyAttack(enemy);
-    this.applyEnemyAttack(state, attack);
+    const damage = this.applyEnemyAttack(state, enemy, attack);
 
     return {
       ...this.getSnapshot(state),
-      message: `${enemy.name} ${attack.message}.\n${attack.damage} damage.`,
+      message: `${enemy.name} ${attack.message}.\n${damage} damage.`,
     };
   }
 
@@ -141,20 +159,25 @@ export class BattleManager {
   ): BattleTurnResult {
     const enemy = this.requireEnemy();
     const response = enemy.actionResponses[action];
-    const damage = this.getActionDamage(response, action, state);
+    const damageRoll = this.getActionDamage(response, action, state, enemy);
+    const damage = damageRoll.amount;
     this.enemyHp = Math.max(0, this.enemyHp - damage);
-    const actionMessage = this.formatActionMessage(response, action, state, damage);
+    const actionMessage = damageRoll.dodged
+      ? `${enemy.name} dodges the attack.`
+      : this.formatActionMessage(response, action, state, damage);
 
     if (this.enemyHp <= 0) {
-      state.player.xp += enemy.xpReward;
       state.player.cash += enemy.cashReward;
+      const levelUp = applyExperienceAndLevelUps(state, enemy.xpReward);
+      const levelUpMessage = levelUp.message ? `\n${levelUp.message}` : "";
 
       return {
         ...this.getSnapshot(state),
-        message: `${actionMessage}\n${enemy.name} gives one last ominous click.\n${enemy.xpReward} XP. $${enemy.cashReward}.`,
+        message: `${actionMessage}\n${enemy.name} gives one last ominous click.\n${enemy.xpReward} XP. $${enemy.cashReward}.${levelUpMessage}`,
         victory: true,
         xpReward: enemy.xpReward,
         cashReward: enemy.cashReward,
+        leveledUp: levelUp.leveledUp,
       };
     }
 
@@ -181,20 +204,31 @@ export class BattleManager {
     response: EnemyActionResponse,
     action: keyof EnemyDefinition["actionResponses"],
     state: GameState,
-  ): number {
+    enemy: EnemyDefinition,
+  ): { amount: number; dodged: boolean } {
     if (action === "fight") {
-      return response.damageByWeapon?.[state.player.equipment.weaponId] ?? response.damage;
+      const roll = rollHeroDamage(state, enemy);
+      const tunedDamage = response.damageByWeapon?.[state.player.equipment.weaponId] ?? response.damage;
+      return {
+        amount: roll.dodged ? 0 : Math.max(1, Math.round((roll.amount + tunedDamage) / 2)),
+        dodged: roll.dodged,
+      };
     }
 
-    return response.damage;
+    return {
+      amount: Math.max(response.damage, rollDadSkillDamage(state, enemy)),
+      dodged: false,
+    };
   }
 
   private getEnemyAttack(enemy: EnemyDefinition): EnemyAttack {
     return Phaser.Utils.Array.GetRandom(enemy.attackPattern);
   }
 
-  private applyEnemyAttack(state: GameState, attack: EnemyAttack): void {
-    state.player.hp = Math.max(1, state.player.hp - attack.damage);
+  private applyEnemyAttack(state: GameState, enemy: EnemyDefinition, attack: EnemyAttack): number {
+    const damage = rollEnemyDamage(state, enemy, attack.damage);
+    state.player.hp = Math.max(1, state.player.hp - damage);
+    return damage;
   }
 
   private getAmbushChance(enemy: EnemyDefinition, state: GameState): number {

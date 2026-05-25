@@ -9,9 +9,12 @@ export type DialogueKey = keyof typeof dialogueData;
 export interface EnemyDefinition {
   id: string;
   name: string;
+  battleTexture?: string;
   level: number;
   hp: number;
   attack: number;
+  agility?: number;
+  dodgeChance?: number;
   xpReward: number;
   cashReward: number;
   emotionalMeaning: string;

@@ -1,6 +1,9 @@
 import Phaser from "phaser";
 import { dialogue } from "../game/content";
-import { DialogueRunner } from "../game/DialogueRunner";
+import { DialogueBox } from "../game/DialogueBox";
+import { getDadBrainLine, getDadLine } from "../game/dadVoice";
+import { DialogueRunner, type DialogueInput, type DialogueLine } from "../game/DialogueRunner";
+import { GameMenu } from "../game/GameMenu";
 import { isNear } from "../game/interaction";
 import { getQuest, getQuestStepLabel } from "../game/quests";
 import { getGameState, resetGameState } from "../game/session";
@@ -24,8 +27,8 @@ export class NeighborhoodScene extends Phaser.Scene {
   private dryer!: Phaser.GameObjects.Rectangle;
   private garage!: Phaser.GameObjects.Rectangle;
   private mode: SceneMode = "explore";
-  private messageBox!: Phaser.GameObjects.Rectangle;
-  private messageText!: Phaser.GameObjects.BitmapText;
+  private dialogueBox!: DialogueBox;
+  private menu!: GameMenu;
   private questText!: Phaser.GameObjects.BitmapText;
   private state!: GameState;
   private readonly dialogueRunner = new DialogueRunner();
@@ -42,10 +45,18 @@ export class NeighborhoodScene extends Phaser.Scene {
 
     this.createWorld();
     this.createUi();
+    this.menu = new GameMenu(this, () => this.state);
     this.updateQuestText();
   }
 
-  update(): void {
+  update(_time: number, delta: number): void {
+    this.dialogueBox.update(delta);
+    this.menu.update();
+
+    if (this.menu.isOpen()) {
+      return;
+    }
+
     if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
       this.handleInteract();
     }
@@ -103,13 +114,8 @@ export class NeighborhoodScene extends Phaser.Scene {
     this.add.rectangle(8, 8, 236, 16, 0xfacc15).setOrigin(0, 0);
     this.questText = addPixelText(this, 12, 11, "", 8).setTint(0x111827);
 
-    this.messageBox = this.add.rectangle(160, 150, 304, 50, 0x111827, 0.94)
-      .setStrokeStyle(2, 0xf8fafc)
-      .setVisible(false);
+    this.dialogueBox = new DialogueBox(this);
 
-    this.messageText = addPixelText(this, 16, 132, "", 7)
-      .setMaxWidth(288)
-      .setVisible(false);
   }
 
   private handleInteract(): void {
@@ -119,6 +125,10 @@ export class NeighborhoodScene extends Phaser.Scene {
     }
 
     if (this.mode === "complete") {
+      if (this.dialogueBox.advance() !== "done") {
+        return;
+      }
+
       resetGameState();
       this.scene.restart();
       return;
@@ -149,9 +159,13 @@ export class NeighborhoodScene extends Phaser.Scene {
       completeQuestStep(this.state, "return-to-wife");
       this.state.flags.dryerFixed = true;
       this.updateQuestText("DRYER FIXED");
-      this.startDialogue(dialogue.victory, () => {
+      this.startDialogue([
+        { speaker: "DAD", text: getDadLine("toWife", "greeting") },
+        ...dialogue.victory.map((text) => ({ speaker: "NARRATOR", text })),
+        { speaker: "DAD", text: getDadLine("selfTalk", "victory") },
+      ], () => {
         this.mode = "complete";
-        this.showMessage("Quest complete! Press Space to restart the vertical slice.");
+        this.showMessage({ speaker: "SYSTEM", text: "Quest complete! Press Space to restart the vertical slice." });
       });
       return;
     }
@@ -163,7 +177,13 @@ export class NeighborhoodScene extends Phaser.Scene {
       this.updateQuestText();
     }
 
-    this.startDialogue(dialogue.wife);
+    this.startDialogue([
+      { speaker: "DAD'S BRAIN", text: getDadBrainLine("talkToWife") },
+      { speaker: "DAD", text: getDadLine("toWife", "greeting") },
+      ...dialogue.wife.map((text) => ({ speaker: "WIFE", text })),
+      { speaker: "DAD", text: getDadLine("toWife", "questReceived") },
+      { speaker: "DAD", text: getDadLine("toInLaws", "mentioned") },
+    ]);
   }
 
   private interactWithDryer(): void {
@@ -175,21 +195,33 @@ export class NeighborhoodScene extends Phaser.Scene {
     }
 
     if (this.state.flags.bossDefeated) {
-      this.startDialogue(["The dryer radiates the calm authority of a repaired appliance."]);
+      this.startDialogue([
+        { speaker: "NARRATOR", text: "The dryer radiates the calm authority of a repaired appliance." },
+        { speaker: "DAD", text: getDadLine("selfTalk", "victory") },
+      ]);
       return;
     }
 
-    this.startDialogue([...dialogue.dryer, "The stairs to the basement await."], () => {
+    this.startDialogue([
+      { speaker: "DAD'S BRAIN", text: getDadBrainLine("inspectDryer") },
+      ...dialogue.dryer.map((text) => ({ speaker: "NARRATOR", text })),
+      { speaker: "DAD", text: getDadLine("selfTalk", "frustrated") },
+      { speaker: "NARRATOR", text: "The stairs to the basement await." },
+    ], () => {
       this.scene.start("BasementScene");
     });
   }
 
-  private startDialogue(lines: string[], onComplete?: () => void): void {
+  private startDialogue(lines: DialogueInput[], onComplete?: () => void): void {
     this.mode = "dialogue";
     this.showMessage(this.dialogueRunner.start(lines, onComplete));
   }
 
   private advanceDialogue(): void {
+    if (this.dialogueBox.advance() !== "done") {
+      return;
+    }
+
     const next = this.dialogueRunner.advance();
 
     if (next) {
@@ -213,16 +245,14 @@ export class NeighborhoodScene extends Phaser.Scene {
     setPixelText(this.questText, label);
   }
 
-  private showMessage(message: string): void {
-    this.messageBox.setVisible(true);
-    setPixelText(this.messageText, message);
-    this.messageText.setVisible(true);
+  private showMessage(message: DialogueLine | string): void {
+    const line = typeof message === "string" ? { speaker: "DAD", text: message } : message;
+    this.dialogueBox.show(line.text, line.speaker);
   }
 
   private hideMessage(): void {
     this.dialogueRunner.clear();
-    this.messageBox.setVisible(false);
-    this.messageText.setVisible(false);
+    this.dialogueBox.hide();
   }
 
 }
