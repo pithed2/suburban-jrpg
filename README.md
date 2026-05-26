@@ -1,4 +1,4 @@
-# Suburban JRPG
+# The In-Laws Are Coming - A Suburban RPG
 
 A retro-inspired, 16-bit style JRPG where ordinary suburban homeowner problems are treated with mythic seriousness.
 
@@ -23,4 +23,4 @@ See [docs/foundation.md](docs/foundation.md) for the core concept and scope rule
 - JSON-driven content
 - Cloudflare Pages, Workers, and D1 later
 
-# suburban-jrpg
+# The In-Laws Are Coming - A Suburban RPG

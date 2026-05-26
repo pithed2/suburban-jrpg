@@ -1,8 +1,8 @@
 import Phaser from "phaser";
 
 export const spriteFrames = {
-  dad: { texture: "sixteen-pixel", frame: 3 },
-  wife: { texture: "sixteen-pixel", frame: 7 },
+  dad: { texture: "dad-bob-idle", frame: 0 },
+  wife: { texture: "wife-amelia-idle", frame: 0 },
   dustBunny: { texture: "sixteen-pixel", frame: 22 },
   heatingCoil: { texture: "sixteen-pixel", frame: 64 },
   dryer: { texture: "sixteen-pixel", frame: 63 },
@@ -18,5 +18,5 @@ export function addWorldSprite(
 ): Phaser.GameObjects.Sprite {
   return scene.add.sprite(x, y, sprite.texture, sprite.frame)
     .setScale(scale)
-    .setOrigin(0.5, 0.5);
+    .setOrigin(0.5, 0.75);
 }

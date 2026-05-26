@@ -1,6 +1,7 @@
 import { createInitialGameState, type GameState } from "./state";
 
-const saveKey = "suburban-jrpg-save";
+const saveKey = "the-in-laws-are-coming-save";
+const legacySaveKey = "suburban-jrpg-save";
 let currentState = createInitialGameState();
 
 export function getGameState(): GameState {
@@ -8,7 +9,9 @@ export function getGameState(): GameState {
 }
 
 export function resetGameState(): GameState {
+  const playerName = currentState.player.name;
   currentState = createInitialGameState();
+  currentState.player.name = playerName;
   return currentState;
 }
 
@@ -17,7 +20,7 @@ export function saveGameState(state: GameState = currentState): void {
 }
 
 export function loadSavedGameState(): GameState | undefined {
-  const saved = localStorage.getItem(saveKey);
+  const saved = localStorage.getItem(saveKey) ?? localStorage.getItem(legacySaveKey);
 
   if (!saved) {
     return undefined;
@@ -30,6 +33,7 @@ export function loadSavedGameState(): GameState | undefined {
 function normalizeGameState(state: GameState): GameState {
   const fallback = createInitialGameState();
 
+  state.player.name ??= fallback.player.name;
   state.player.strength ??= fallback.player.strength;
   state.player.agility ??= fallback.player.agility;
   state.player.defense ??= fallback.player.defense;

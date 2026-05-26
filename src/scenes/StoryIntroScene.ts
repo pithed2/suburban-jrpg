@@ -23,8 +23,9 @@ export class StoryIntroScene extends Phaser.Scene {
     this.add.rectangle(160, 90, 320, 180, 0x1f2933);
     this.add.rectangle(160, 66, 248, 80, 0x050505, 0.96)
       .setStrokeStyle(2, 0xf8fafc);
-    addPixelText(this, 73, 30, "SUBURBAN ERRANDS", 8).setTint(0xfacc15);
-    addPixelText(this, 91, 44, "A DAD RPG", 6).setTint(0xfb923c);
+    addPixelText(this, 55, 28, "THE IN-LAWS", 8).setTint(0xfacc15);
+    addPixelText(this, 54, 42, "ARE COMING", 8).setTint(0xfacc15);
+    addPixelText(this, 84, 56, "A SUBURBAN RPG", 6).setTint(0xfb923c);
 
     this.add.rectangle(160, 142, 304, 56, 0x050505, 0.96)
       .setStrokeStyle(2, 0xf8fafc);

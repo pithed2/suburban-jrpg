@@ -12,6 +12,7 @@ export interface QuestProgress {
 }
 
 export interface PlayerState {
+  name: string;
   level: number;
   hp: number;
   maxHp: number;
@@ -45,6 +46,7 @@ export interface GameState {
 export function createInitialGameState(): GameState {
   return {
     player: {
+      name: "",
       level: 1,
       hp: 24,
       maxHp: 24,

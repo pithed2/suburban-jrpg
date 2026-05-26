@@ -489,7 +489,7 @@ export class BasementScene extends Phaser.Scene {
     const player = this.state.player;
     setPixelText(
       this.battleStatusText,
-      `DAD\nLV ${player.level}\nHP ${snapshot.heroHp}/${snapshot.heroMaxHp}\nDP ${player.dadPoints}/${player.maxDadPoints}\n$  ${player.cash}\nXP ${player.xp}`,
+      `${player.name || "DAD"}\nLV ${player.level}\nHP ${snapshot.heroHp}/${snapshot.heroMaxHp}\nDP ${player.dadPoints}/${player.maxDadPoints}\n$  ${player.cash}\nXP ${player.xp}`,
     );
     setPixelText(this.battleEnemyText, `${snapshot.enemy.name}\nHP ${snapshot.enemyHp}/${snapshot.enemyMaxHp}`);
 
@@ -553,12 +553,16 @@ export class BasementScene extends Phaser.Scene {
 
   private showMessage(message: DialogueLine | string, speaker = "DAD"): void {
     const line = typeof message === "string" ? { speaker, text: message } : message;
-    this.dialogueBox.show(line.text, line.speaker);
+    this.dialogueBox.show(line.text, this.getSpeakerLabel(line.speaker));
   }
 
   private hideMessage(): void {
     this.dialogueRunner.clear();
     this.dialogueBox.hide();
+  }
+
+  private getSpeakerLabel(speaker: string): string {
+    return speaker === "DAD" ? this.state.player.name || "DAD" : speaker;
   }
 
 }

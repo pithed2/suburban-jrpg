@@ -8,7 +8,6 @@ import { isNear } from "../game/interaction";
 import { getQuest, getQuestStepLabel } from "../game/quests";
 import { getGameState, resetGameState } from "../game/session";
 import { addWorldSprite, spriteFrames } from "../game/sprites";
-import { getMapObjectCenter } from "../game/tilemapObjects";
 import { addPixelText, setPixelText } from "../game/uiText";
 import {
   completeQuestStep,
@@ -26,6 +25,8 @@ export class NeighborhoodScene extends Phaser.Scene {
   private wife!: Phaser.GameObjects.Rectangle;
   private dryer!: Phaser.GameObjects.Rectangle;
   private garage!: Phaser.GameObjects.Rectangle;
+  private basementStairs!: Phaser.GameObjects.Rectangle;
+  private blockers: Phaser.GameObjects.Rectangle[] = [];
   private mode: SceneMode = "explore";
   private dialogueBox!: DialogueBox;
   private menu!: GameMenu;
@@ -74,40 +75,59 @@ export class NeighborhoodScene extends Phaser.Scene {
     if (this.cursors.up.isDown) dy -= speed;
     if (this.cursors.down.isDown) dy += speed;
 
-    this.player.x = Phaser.Math.Clamp(this.player.x + dx, 12, 308);
-    this.player.y = Phaser.Math.Clamp(this.player.y + dy, 42, 162);
+    this.movePlayer(dx, dy);
     this.playerSprite.setPosition(this.player.x, this.player.y);
   }
 
   private createWorld(): void {
-    const map = this.make.tilemap({ key: "house-map" });
-    const tileset = map.addTilesetImage("suburban-placeholder", "suburban-placeholder");
+    this.add.rectangle(160, 90, 320, 180, 0x0f172a);
+    this.addFloor(24, 32, 136, 116, 0xcdbb82);
+    this.addFloor(160, 32, 88, 116, 0xd5c790);
+    this.addFloor(248, 32, 48, 76, 0xbfc7c9);
+    this.addFloor(104, 132, 64, 28, 0x737373);
 
-    if (!tileset) {
-      throw new Error("Missing tileset for house map.");
-    }
+    this.addWall(22, 30, 276, 5);
+    this.addWall(22, 148, 76, 5);
+    this.addWall(158, 148, 140, 5);
+    this.addWall(20, 32, 5, 118);
+    this.addWall(296, 32, 5, 118);
+    this.addWall(158, 32, 5, 45);
+    this.addWall(158, 111, 5, 37);
+    this.addWall(246, 32, 5, 36);
+    this.addWall(246, 102, 5, 46);
+    this.addWall(90, 148, 5, 27);
+    this.addWall(154, 148, 5, 27);
 
-    map.createLayer("Ground", tileset, 0, 0);
-    map.createLayer("Props", tileset, 0, 0);
+    this.addSlidingDoor(159, 94, 5, 34);
+    this.addSlidingDoor(246, 84, 5, 34);
+    this.addEntryway(122, 153);
+    this.addGarageDoor(58, 148);
 
-    const spawn = getMapObjectCenter(map, "Objects", "player-spawn");
-    const wife = getMapObjectCenter(map, "Objects", "wife");
-    const dryer = getMapObjectCenter(map, "Objects", "dryer");
-    const garage = getMapObjectCenter(map, "Objects", "garage");
+    this.addFurniture(43, 56, 46, 20, 0x8b5e3c, 0x593a27);
+    this.addFurniture(44, 112, 42, 26, 0x72523b, 0x3f2b22);
+    this.addFurniture(104, 94, 54, 32, 0x8f6f46, 0x4b3827);
+    this.addFurniture(104, 94, 36, 20, 0x2f3b50, 0x1f2937);
+    this.addFurniture(186, 54, 50, 18, 0x7b5f3c, 0x433121);
+    this.addFurniture(214, 112, 42, 26, 0x6b7280, 0x374151);
+    this.addFurniture(278, 54, 22, 28, 0x94a3b8, 0x475569);
+    this.addFurniture(270, 92, 38, 22, 0x64748b, 0x334155);
+    this.addStairs(272, 124);
+    this.addPlant(136, 52);
+    this.addPlant(36, 132);
+    this.addPlant(228, 92);
+    this.addPlant(282, 136);
+    this.addWindow(72, 34);
+    this.addWindow(202, 34);
+    this.addWindow(278, 34);
 
-    this.dryer = this.add.rectangle(dryer.x, dryer.y, 22, 18, 0xffffff, 0);
-    this.garage = this.add.rectangle(garage.x, garage.y, 44, 22, 0xffffff, 0);
-    this.wife = this.add.rectangle(wife.x, wife.y, 14, 18, 0xffffff, 0);
-    this.player = this.add.rectangle(spawn.x, spawn.y, 14, 18, 0xffffff, 0);
-    addWorldSprite(this, dryer.x, dryer.y, spriteFrames.dryer);
-    addWorldSprite(this, wife.x, wife.y, spriteFrames.wife);
+    this.dryer = this.add.rectangle(270, 92, 30, 24, 0xffffff, 0);
+    this.garage = this.add.rectangle(58, 148, 56, 32, 0xffffff, 0);
+    this.basementStairs = this.add.rectangle(272, 124, 42, 32, 0xffffff, 0);
+    this.wife = this.add.rectangle(90, 105, 14, 18, 0xffffff, 0);
+    this.player = this.add.rectangle(128, 116, 14, 18, 0xffffff, 0);
+
+    addWorldSprite(this, this.wife.x, this.wife.y, spriteFrames.wife);
     this.playerSprite = addWorldSprite(this, this.player.x, this.player.y, spriteFrames.dad);
-
-    addPixelText(this, spawn.x - 6, spawn.y - 15, "DAD", 6);
-    addPixelText(this, garage.x - 18, garage.y + 15, "GARAGE", 6);
-    addPixelText(this, wife.x - 10, wife.y - 15, "WIFE", 6);
-    addPixelText(this, dryer.x - 9, dryer.y + 13, "DRYER", 6);
-    addPixelText(this, dryer.x - 22, dryer.y - 28, "BASEMENT", 6);
   }
 
   private createUi(): void {
@@ -146,8 +166,13 @@ export class NeighborhoodScene extends Phaser.Scene {
       return;
     }
 
-    if (isNear(playerPosition, new Phaser.Math.Vector2(this.garage.x, this.garage.y), 28)) {
+    if (isNear(playerPosition, new Phaser.Math.Vector2(this.garage.x, this.garage.y), 40)) {
       this.scene.start("GarageScene");
+      return;
+    }
+
+    if (isNear(playerPosition, new Phaser.Math.Vector2(this.basementStairs.x, this.basementStairs.y), 36)) {
+      this.scene.start("BasementScene");
       return;
     }
 
@@ -206,10 +231,88 @@ export class NeighborhoodScene extends Phaser.Scene {
       { speaker: "DAD'S BRAIN", text: getDadBrainLine("inspectDryer") },
       ...dialogue.dryer.map((text) => ({ speaker: "NARRATOR", text })),
       { speaker: "DAD", text: getDadLine("selfTalk", "frustrated") },
-      { speaker: "NARRATOR", text: "The stairs to the basement await." },
-    ], () => {
-      this.scene.start("BasementScene");
-    });
+      { speaker: "NARRATOR", text: "The basement stairs wait near the kitchen." },
+    ]);
+  }
+
+  private movePlayer(dx: number, dy: number): void {
+    const nextX = Phaser.Math.Clamp(this.player.x + dx, 27, 291);
+    const nextY = Phaser.Math.Clamp(this.player.y + dy, 38, 158);
+
+    if (!this.wouldCollide(nextX, this.player.y)) {
+      this.player.x = nextX;
+    }
+
+    if (!this.wouldCollide(this.player.x, nextY)) {
+      this.player.y = nextY;
+    }
+  }
+
+  private wouldCollide(x: number, y: number): boolean {
+    const playerBounds = new Phaser.Geom.Rectangle(x - 5, y - 7, 10, 14);
+    return this.blockers.some((blocker) =>
+      Phaser.Geom.Intersects.RectangleToRectangle(playerBounds, blocker.getBounds()),
+    );
+  }
+
+  private addFloor(x: number, y: number, width: number, height: number, color: number): void {
+    this.add.rectangle(x + width / 2, y + height / 2, width, height, color);
+
+    for (let tileX = x; tileX <= x + width; tileX += 16) {
+      this.add.rectangle(tileX, y + height / 2, 1, height, 0x7a6f55, 0.25);
+    }
+
+    for (let tileY = y; tileY <= y + height; tileY += 16) {
+      this.add.rectangle(x + width / 2, tileY, width, 1, 0x7a6f55, 0.25);
+    }
+  }
+
+  private addWall(x: number, y: number, width: number, height: number): void {
+    const wall = this.add.rectangle(x + width / 2, y + height / 2, width, height, 0x1f2937)
+      .setStrokeStyle(1, 0x94a3b8);
+    this.blockers.push(wall);
+  }
+
+  private addSlidingDoor(x: number, y: number, width: number, height: number): void {
+    this.add.rectangle(x + width / 2, y + height / 2, width, height, 0xe8d7b0, 0.9);
+    for (let offset = 4; offset < height; offset += 8) {
+      this.add.rectangle(x + width / 2, y + offset, width + 8, 1, 0x7c5f38, 0.7);
+    }
+  }
+
+  private addEntryway(x: number, y: number): void {
+    this.add.rectangle(x, y + 8, 56, 16, 0x111827);
+    this.add.rectangle(x, y, 48, 8, 0x374151).setStrokeStyle(1, 0x94a3b8);
+  }
+
+  private addGarageDoor(x: number, y: number): void {
+    this.add.rectangle(x, y, 42, 24, 0x1f2937).setStrokeStyle(2, 0x94a3b8);
+    this.add.rectangle(x, y + 4, 30, 14, 0x7f5539).setStrokeStyle(1, 0x3f2a1f);
+    this.add.rectangle(x + 9, y + 4, 3, 3, 0xfacc15);
+    addPixelText(this, x - 16, y + 18, "GARAGE", 5).setTint(0xfacc15);
+  }
+
+  private addFurniture(x: number, y: number, width: number, height: number, fill: number, stroke: number): void {
+    this.add.rectangle(x, y, width, height, fill).setStrokeStyle(2, stroke);
+  }
+
+  private addPlant(x: number, y: number): void {
+    this.add.rectangle(x, y + 7, 8, 8, 0x7c4a2d).setStrokeStyle(1, 0x3f2a1f);
+    this.add.circle(x - 4, y, 6, 0x2f855a);
+    this.add.circle(x + 4, y, 6, 0x276749);
+  }
+
+  private addWindow(x: number, y: number): void {
+    this.add.rectangle(x, y, 44, 8, 0xf8fafc).setStrokeStyle(1, 0x64748b);
+    this.add.rectangle(x, y, 38, 4, 0x93c5fd, 0.75);
+  }
+
+  private addStairs(x: number, y: number): void {
+    this.add.rectangle(x, y, 32, 24, 0x475569).setStrokeStyle(2, 0x1f2937);
+    for (let offset = -8; offset <= 8; offset += 4) {
+      this.add.rectangle(x, y + offset, 26, 1, 0xcbd5e1);
+    }
+    addPixelText(this, x - 20, y + 17, "BASEMENT", 5).setTint(0xfacc15);
   }
 
   private startDialogue(lines: DialogueInput[], onComplete?: () => void): void {
@@ -247,7 +350,11 @@ export class NeighborhoodScene extends Phaser.Scene {
 
   private showMessage(message: DialogueLine | string): void {
     const line = typeof message === "string" ? { speaker: "DAD", text: message } : message;
-    this.dialogueBox.show(line.text, line.speaker);
+    this.dialogueBox.show(line.text, this.getSpeakerLabel(line.speaker));
+  }
+
+  private getSpeakerLabel(speaker: string): string {
+    return speaker === "DAD" ? this.state.player.name || "DAD" : speaker;
   }
 
   private hideMessage(): void {

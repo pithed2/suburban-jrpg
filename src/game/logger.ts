@@ -30,16 +30,16 @@ function write(level: LogLevel, message: string, data?: unknown): void {
   }
 
   if (level === "error") {
-    console.error(`[suburban-jrpg] ${message}`, data ?? "");
+    console.error(`[the-in-laws-are-coming] ${message}`, data ?? "");
     return;
   }
 
   if (level === "warn") {
-    console.warn(`[suburban-jrpg] ${message}`, data ?? "");
+    console.warn(`[the-in-laws-are-coming] ${message}`, data ?? "");
     return;
   }
 
-  console.info(`[suburban-jrpg] ${message}`, data ?? "");
+  console.info(`[the-in-laws-are-coming] ${message}`, data ?? "");
 }
 
 export const logger = {

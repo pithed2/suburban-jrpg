@@ -3,7 +3,7 @@ import { addPixelText, setPixelText } from "./uiText";
 
 type AdvanceResult = "revealed" | "page" | "done";
 
-const charsPerLine = 34;
+const charsPerLine = 45;
 const linesPerPage = 3;
 const msPerCharacter = 48;
 
@@ -22,25 +22,30 @@ export class DialogueBox {
   constructor(scene: Phaser.Scene) {
     this.box = scene.add.rectangle(160, 150, 304, 50, 0x111827, 0.94)
       .setStrokeStyle(2, 0xf8fafc)
+      .setScrollFactor(0)
       .setVisible(false);
 
     this.speakerBreak = scene.add.rectangle(53, 125, 76, 8, 0x111827, 1)
       .setDepth(71)
+      .setScrollFactor(0)
       .setVisible(false);
 
     this.speakerLabel = addPixelText(scene, 18, 121, "-- DAD --", 6)
       .setTint(0xfb923c)
       .setDepth(72)
+      .setScrollFactor(0)
       .setVisible(false);
 
     this.text = addPixelText(scene, 16, 132, "", 7)
       .setDepth(71)
+      .setScrollFactor(0)
       .setMaxWidth(288)
       .setVisible(false);
 
     this.moreMarker = addPixelText(scene, 292, 164, "▼", 6)
       .setTint(0xfacc15)
       .setDepth(72)
+      .setScrollFactor(0)
       .setVisible(false);
   }
 

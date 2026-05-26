@@ -34,17 +34,21 @@ export class GameMenu {
     this.box = scene.add.rectangle(160, 92, 292, 146, 0x050505, 0.97)
       .setStrokeStyle(2, 0xf8fafc)
       .setDepth(100)
+      .setScrollFactor(0)
       .setVisible(false);
     this.title = addPixelText(scene, 120, 19, "Command", 8)
       .setTint(0xfacc15)
       .setDepth(101)
+      .setScrollFactor(0)
       .setVisible(false);
     this.optionText = addPixelText(scene, 24, 48, "", 7)
       .setDepth(101)
+      .setScrollFactor(0)
       .setVisible(false);
     this.detailText = addPixelText(scene, 104, 48, "", 6)
       .setMaxWidth(190)
       .setDepth(101)
+      .setScrollFactor(0)
       .setVisible(false);
   }
 
@@ -146,6 +150,6 @@ export class GameMenu {
     }
 
     const player = state.player;
-    return `THE DAD\nLV ${player.level}\nHP ${player.hp}/${player.maxHp}\nDP ${player.dadPoints}/${player.maxDadPoints}\nSTR ${player.strength}\nAGI ${player.agility}\nDEF ${player.defense}\n$ ${player.cash}\nXP ${player.xp}`;
+    return `${player.name || "DAD"}\nLV ${player.level}\nHP ${player.hp}/${player.maxHp}\nDP ${player.dadPoints}/${player.maxDadPoints}\nSTR ${player.strength}\nAGI ${player.agility}\nDEF ${player.defense}\n$ ${player.cash}\nXP ${player.xp}`;
   }
 }

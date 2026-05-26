@@ -11,10 +11,12 @@ export class PlayerStatsPanel {
     this.box = scene.add.rectangle(x, y, 82, 92, 0x050505, 0.95)
       .setStrokeStyle(2, 0xf8fafc)
       .setDepth(60)
+      .setScrollFactor(0)
       .setVisible(false);
 
     this.text = addPixelText(scene, x - 31, y - 39, "", 7)
       .setDepth(61)
+      .setScrollFactor(0)
       .setVisible(false);
   }
 
@@ -34,7 +36,7 @@ export class PlayerStatsPanel {
     const player = state.player;
     setPixelText(
       this.text,
-      `DAD\nLV ${player.level}\nHP ${player.hp}\nDP ${player.dadPoints}\n$  ${player.cash}\nXP ${player.xp}`,
+      `${player.name || "DAD"}\nLV ${player.level}\nHP ${player.hp}\nDP ${player.dadPoints}\n$  ${player.cash}\nXP ${player.xp}`,
     );
     this.setVisible(true);
   }
