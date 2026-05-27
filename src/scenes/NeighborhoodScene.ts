@@ -127,6 +127,7 @@ export class NeighborhoodScene extends Phaser.Scene {
     this.player = this.add.rectangle(128, 116, 14, 18, 0xffffff, 0);
 
     addWorldSprite(this, this.wife.x, this.wife.y, spriteFrames.wife);
+    addWorldSprite(this, this.dryer.x, this.dryer.y, spriteFrames.dryer, 1.25);
     this.playerSprite = addWorldSprite(this, this.player.x, this.player.y, spriteFrames.dad);
   }
 

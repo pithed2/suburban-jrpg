@@ -51,7 +51,7 @@
   {
     "id": "evil-heating-coil",
     "name": "Evil Heating Coil",
-    "battleTexture": "dryer-boss",
+    "battleTexture": "heating-coil-battle",
     "level": 2,
     "hp": 18,
     "attack": 3,

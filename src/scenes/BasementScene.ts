@@ -160,7 +160,7 @@ export class BasementScene extends Phaser.Scene {
     this.safetySticker = this.add.rectangle(102, 64, 34, 20, 0xffffff, 0);
     this.player = this.add.rectangle(spawn.x, spawn.y, 14, 18, 0xffffff, 0);
     addWorldSprite(this, exit.x, exit.y, spriteFrames.stairs);
-    this.coilSprite = addWorldSprite(this, coil.x, coil.y, spriteFrames.heatingCoil);
+    this.coilSprite = addWorldSprite(this, coil.x, coil.y, spriteFrames.dryer, 1.4);
     this.add.rectangle(this.breaker.x, this.breaker.y, 24, 24, 0x374151)
       .setStrokeStyle(2, 0xf8fafc);
     this.breakerSwitch = this.add.rectangle(
@@ -176,7 +176,7 @@ export class BasementScene extends Phaser.Scene {
     this.playerSprite = addWorldSprite(this, this.player.x, this.player.y, spriteFrames.dad);
 
     addPixelText(this, exit.x - 10, exit.y + 11, "STAIRS", 6);
-    addPixelText(this, coil.x - 15, coil.y + 14, "COIL", 6);
+    addPixelText(this, coil.x - 16, coil.y + 14, "DRYER", 6);
     addPixelText(this, this.breaker.x - 20, this.breaker.y + 18, "BREAKER", 6);
     addPixelText(this, this.safetySticker.x - 17, this.safetySticker.y + 12, "STICKER", 6);
     addPixelText(this, spawn.x - 9, spawn.y - 15, "DAD", 6);
@@ -185,6 +185,8 @@ export class BasementScene extends Phaser.Scene {
   }
 
   private createUi(): void {
+    this.createHeatingCoilBattleTexture();
+
     this.add.rectangle(8, 8, 236, 16, 0xfacc15).setOrigin(0, 0);
     this.questText = addPixelText(this, 12, 11, "", 8).setTint(0x111827);
 
@@ -661,10 +663,67 @@ export class BasementScene extends Phaser.Scene {
 
   private getBattleEnemySpriteSize(enemyId: string): { width: number; height: number; y: number } {
     if (enemyId === "evil-heating-coil") {
-      return { width: 38, height: 34, y: 94 };
+      return { width: 42, height: 42, y: 96 };
     }
 
     return { width: 32, height: 32, y: 93 };
+  }
+
+  private createHeatingCoilBattleTexture(): void {
+    if (this.textures.exists("heating-coil-battle")) {
+      return;
+    }
+
+    const graphics = this.add.graphics();
+    const px = (x: number, y: number, width: number, height: number, color: number) => {
+      graphics.fillStyle(color, 1);
+      graphics.fillRect(x, y, width, height);
+    };
+
+    graphics.clear();
+    px(4, 7, 24, 20, 0x111827);
+    px(6, 9, 20, 16, 0x374151);
+    px(8, 11, 16, 12, 0x6b7280);
+    px(6, 5, 6, 4, 0x111827);
+    px(20, 5, 6, 4, 0x111827);
+    px(8, 6, 2, 3, 0xfacc15);
+    px(22, 6, 2, 3, 0xfacc15);
+
+    const coilRows = [
+      "OOYYYYOO",
+      "O......O",
+      "O.YYYY.O",
+      "O.Y..Y.O",
+      "O.YYYY.O",
+      "O......O",
+      "OOYYYYOO",
+    ];
+
+    coilRows.forEach((row, rowIndex) => {
+      [...row].forEach((cell, columnIndex) => {
+        if (cell === ".") {
+          return;
+        }
+
+        px(
+          8 + columnIndex * 2,
+          10 + rowIndex * 2,
+          2,
+          2,
+          cell === "Y" ? 0xfacc15 : 0xf97316,
+        );
+      });
+    });
+
+    px(2, 13, 3, 2, 0x38bdf8);
+    px(27, 13, 3, 2, 0x38bdf8);
+    px(3, 20, 2, 2, 0x93c5fd);
+    px(27, 20, 2, 2, 0x93c5fd);
+    px(12, 3, 2, 3, 0xf8fafc);
+    px(18, 3, 2, 3, 0xf8fafc);
+
+    graphics.generateTexture("heating-coil-battle", 32, 32);
+    graphics.destroy();
   }
 
   private getCommandLabel(command: BattleCommand): string {
