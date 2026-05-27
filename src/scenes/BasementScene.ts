@@ -33,6 +33,9 @@ export class BasementScene extends Phaser.Scene {
   private exit!: Phaser.GameObjects.Rectangle;
   private coil!: Phaser.GameObjects.Rectangle;
   private coilSprite!: Phaser.GameObjects.Sprite;
+  private breaker!: Phaser.GameObjects.Rectangle;
+  private breakerSwitch!: Phaser.GameObjects.Rectangle;
+  private safetySticker!: Phaser.GameObjects.Rectangle;
   private questText!: Phaser.GameObjects.BitmapText;
   private dialogueBox!: DialogueBox;
   private statsPanel!: PlayerStatsPanel;
@@ -153,13 +156,29 @@ export class BasementScene extends Phaser.Scene {
 
     this.exit = this.add.rectangle(exit.x, exit.y, 28, 18, 0xffffff, 0);
     this.coil = this.add.rectangle(coil.x, coil.y, 24, 20, 0xffffff, 0);
+    this.breaker = this.add.rectangle(58, 50, 30, 26, 0xffffff, 0);
+    this.safetySticker = this.add.rectangle(102, 64, 34, 20, 0xffffff, 0);
     this.player = this.add.rectangle(spawn.x, spawn.y, 14, 18, 0xffffff, 0);
     addWorldSprite(this, exit.x, exit.y, spriteFrames.stairs);
     this.coilSprite = addWorldSprite(this, coil.x, coil.y, spriteFrames.heatingCoil);
+    this.add.rectangle(this.breaker.x, this.breaker.y, 24, 24, 0x374151)
+      .setStrokeStyle(2, 0xf8fafc);
+    this.breakerSwitch = this.add.rectangle(
+      this.breaker.x,
+      this.breaker.y + (this.state.flags.circuitBreakerOff ? 4 : -4),
+      6,
+      14,
+      this.state.flags.circuitBreakerOff ? 0x22c55e : 0xf97316,
+    );
+    this.add.rectangle(this.safetySticker.x, this.safetySticker.y, 28, 16, 0xfacc15)
+      .setStrokeStyle(1, 0x111827);
+    addPixelText(this, this.safetySticker.x - 7, this.safetySticker.y - 3, "!", 8).setTint(0x111827);
     this.playerSprite = addWorldSprite(this, this.player.x, this.player.y, spriteFrames.dad);
 
     addPixelText(this, exit.x - 10, exit.y + 11, "STAIRS", 6);
     addPixelText(this, coil.x - 15, coil.y + 14, "COIL", 6);
+    addPixelText(this, this.breaker.x - 20, this.breaker.y + 18, "BREAKER", 6);
+    addPixelText(this, this.safetySticker.x - 17, this.safetySticker.y + 12, "STICKER", 6);
     addPixelText(this, spawn.x - 9, spawn.y - 15, "DAD", 6);
 
     this.randomEncounters.resetPosition(new Phaser.Math.Vector2(this.player.x, this.player.y));
@@ -214,6 +233,56 @@ export class BasementScene extends Phaser.Scene {
       return;
     }
 
+    if (isNear(playerPosition, new Phaser.Math.Vector2(this.safetySticker.x, this.safetySticker.y), 28)) {
+      this.startDialogue([
+        { speaker: "NARRATOR", text: "A faded sticker reads: TURN OFF POWER BEFORE SERVICING ELECTRICAL APPLIANCE." },
+        { speaker: "DAD'S BRAIN", text: "A lesser man would ignore that. Dad is occasionally not a lesser man." },
+        { speaker: "DAD", text: "Fine. Breaker first. Heroics after." },
+      ]);
+      return;
+    }
+
+    if (isNear(playerPosition, new Phaser.Math.Vector2(this.breaker.x, this.breaker.y), 30)) {
+      if (this.state.flags.circuitBreakerOff) {
+        if (this.state.flags.bossDefeated) {
+          this.state.flags.circuitBreakerOff = false;
+          completeQuestStep(this.state, "restore-power");
+          setActiveQuestStep(this.state, "return-to-wife");
+          this.breakerSwitch
+            .setY(this.breaker.y - 4)
+            .setFillStyle(0xf97316);
+          this.updateQuestText("BASEMENT");
+          this.startDialogue([
+            { speaker: "NARRATOR", text: "Dad flips the breaker back on. The house wakes up with a chorus of appliance beeps." },
+            { speaker: "DAD'S BRAIN", text: "Dude. Dryers don't work without power." },
+            { speaker: "DAD", text: "I knew that. I was creating suspense." },
+          ]);
+          return;
+        }
+
+        this.startDialogue([
+          { speaker: "NARRATOR", text: "The breaker is off. The basement hum has dropped to a suspicious mutter." },
+          { speaker: "DAD'S BRAIN", text: "Leave it off until the angry electrical appliance is done being angry." },
+          { speaker: "DAD", text: "That probably means I did something right." },
+        ]);
+        return;
+      }
+
+      this.state.flags.circuitBreakerOff = true;
+      completeQuestStep(this.state, "flip-breaker");
+      setActiveQuestStep(this.state, "defeat-heating-coil");
+      this.breakerSwitch
+        .setY(this.breaker.y + 4)
+        .setFillStyle(0x22c55e);
+      this.updateQuestText("BASEMENT");
+      this.startDialogue([
+        { speaker: "DAD'S BRAIN", text: "Kill the power before poking the angry appliance. Revolutionary." },
+        { speaker: "NARRATOR", text: "Dad flips the circuit breaker. The dryer coil loses its worst idea." },
+        { speaker: "DAD", text: "Okay. Now the wrench gets to be the bad cop." },
+      ]);
+      return;
+    }
+
     if (isNear(playerPosition, new Phaser.Math.Vector2(this.coil.x, this.coil.y), 28)) {
       if (this.state.flags.bossDefeated) {
         this.startDialogue([
@@ -235,7 +304,15 @@ export class BasementScene extends Phaser.Scene {
         return;
       }
 
+      const breakerWarning = this.state.flags.circuitBreakerOff
+        ? []
+        : [
+          { speaker: "DAD'S BRAIN", text: "The breaker is still on. Baddass Zap is still very much on the menu." },
+          { speaker: "NARRATOR", text: "The coil crackles with live current. Dad can still try, technically." },
+        ];
+
       this.startDialogue([
+        ...breakerWarning,
         ...dialogue.battleIntro.map((text) => ({ speaker: "NARRATOR", text })),
         { speaker: "DAD'S BRAIN", text: getDadBrainLine("battle") },
         { speaker: "DAD", text: getDadLine("toEnemy", "battleStart") },
@@ -289,6 +366,9 @@ export class BasementScene extends Phaser.Scene {
     if (snapshot.ambushed && snapshot.message) {
       this.battlePhase = "enemyResult";
       this.showMessage(snapshot.message, "AMBUSH");
+      if (snapshot.defeated) {
+        this.handleHeroDefeat(snapshot.message);
+      }
       return;
     }
 
@@ -314,6 +394,12 @@ export class BasementScene extends Phaser.Scene {
       const enemyResult = this.battle.useEnemyTurn(this.state);
       this.battlePhase = "enemyResult";
       this.updateBattlePanels(enemyResult);
+
+      if (enemyResult.defeated) {
+        this.handleHeroDefeat(enemyResult.message);
+        return;
+      }
+
       this.showMessage([
         enemyResult.message,
         getDadLine("toEnemy", this.isHeroLowHp(enemyResult) ? "lowHp" : "takingDamage"),
@@ -360,13 +446,21 @@ export class BasementScene extends Phaser.Scene {
 
     this.state.flags.bossDefeated = true;
     completeQuestStep(this.state, "defeat-heating-coil");
-    setActiveQuestStep(this.state, "return-to-wife");
+    setActiveQuestStep(this.state, this.state.flags.circuitBreakerOff ? "restore-power" : "return-to-wife");
     this.updateQuestText("VICTORY");
     this.startDialogue([
       { speaker: "BATTLE", text: resultMessage },
       { speaker: "DAD'S BRAIN", text: getDadBrainLine("victory") },
       { speaker: "DAD", text: getDadLine("selfTalk", "victory") },
-      { speaker: "NARRATOR", text: "The vent stops rattling. Upstairs, a towel may yet become dry." },
+      {
+        speaker: "NARRATOR",
+        text: this.state.flags.circuitBreakerOff
+          ? "The vent stops rattling. The breaker, however, is still off."
+          : "The vent stops rattling. Upstairs, a towel may yet become dry.",
+      },
+      ...(this.state.flags.circuitBreakerOff
+        ? [{ speaker: "DAD'S BRAIN", text: "One last heroic act: turn the power back on before declaring victory." }]
+        : []),
     ], () => {
       this.hideBattleUi();
       this.scene.start("NeighborhoodScene");
@@ -384,6 +478,52 @@ export class BasementScene extends Phaser.Scene {
       this.mode = "explore";
       this.hideMessage();
     });
+  }
+
+  private handleHeroDefeat(resultMessage: string): void {
+    this.hideBattleMenu();
+    this.updateQuestText("RECLINER");
+    this.startDialogue([
+      { speaker: "BATTLE", text: resultMessage },
+      { speaker: "NARRATOR", text: "Everything goes white, then beige, then suspiciously recliner-shaped." },
+      { speaker: "WIFE", text: "Why are you in the chair with a beer? The dryer is still broken." },
+      { speaker: "WIFE", text: "My parents are not getting any younger, and neither is that laundry." },
+      { speaker: "DAD'S BRAIN", text: this.getDefeatRecoveryHint() },
+    ], () => {
+      this.hideBattleUi();
+      this.recoverFromHeroDefeat();
+      this.scene.start("NeighborhoodScene");
+    });
+  }
+
+  private recoverFromHeroDefeat(): void {
+    this.state.player.hp = this.state.player.maxHp;
+    this.state.player.dadPoints = this.state.player.maxDadPoints;
+    this.state.player.cash = Math.max(0, this.state.player.cash - 2);
+
+    if (!this.state.flags.foundWrench) {
+      setActiveQuestStep(this.state, "find-wrench");
+      return;
+    }
+
+    if (!this.state.flags.circuitBreakerOff) {
+      setActiveQuestStep(this.state, "flip-breaker");
+      return;
+    }
+
+    setActiveQuestStep(this.state, "defeat-heating-coil");
+  }
+
+  private getDefeatRecoveryHint(): string {
+    if (!this.state.flags.foundWrench) {
+      return "New plan: find the wrench, then worry about appliance combat.";
+    }
+
+    if (!this.state.flags.circuitBreakerOff) {
+      return "New plan: keep the wrench, turn off the breaker, then try heroics again.";
+    }
+
+    return "New plan: breaker stayed off. Heal up, keep the wrench, and go finish this.";
   }
 
   private resolveBattleCommand(command: BattleCommand) {
@@ -489,7 +629,7 @@ export class BasementScene extends Phaser.Scene {
     const player = this.state.player;
     setPixelText(
       this.battleStatusText,
-      `${player.name || "DAD"}\nLV ${player.level}\nHP ${snapshot.heroHp}/${snapshot.heroMaxHp}\nDP ${player.dadPoints}/${player.maxDadPoints}\n$  ${player.cash}\nXP ${player.xp}`,
+      `${player.name || "DAD"}\nLV ${player.level}\nHP ${snapshot.heroHp}/${snapshot.heroMaxHp}\nDP ${player.dadPoints}/${player.maxDadPoints}\nLOVE ${player.cash}\nXP ${player.xp}`,
     );
     setPixelText(this.battleEnemyText, `${snapshot.enemy.name}\nHP ${snapshot.enemyHp}/${snapshot.enemyMaxHp}`);
 

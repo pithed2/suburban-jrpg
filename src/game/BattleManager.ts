@@ -29,11 +29,13 @@ export interface BattleTurnResult extends BattleSnapshot {
 
 export interface EnemyTurnResult extends BattleSnapshot {
   message: string;
+  defeated: boolean;
 }
 
 export interface BattleStartResult extends BattleSnapshot {
   ambushed: boolean;
   message?: string;
+  defeated?: boolean;
 }
 
 export class BattleManager {
@@ -107,9 +109,22 @@ export class BattleManager {
     const enemy = this.requireEnemy();
 
     if (enemy.id === "evil-heating-coil") {
+      const retreatChance = state.flags.circuitBreakerOff ? 0.65 : 0.38;
+
+      if (Math.random() < retreatChance) {
+        return {
+          ...this.getSnapshot(state),
+          message: state.flags.circuitBreakerOff
+            ? "Dad retreats with uncommon wisdom.\nThe powered-down coil cannot stop him."
+            : "Dad dives away from the live dryer.\nSomehow, dignity escapes too.",
+          victory: false,
+          escaped: true,
+        };
+      }
+
       return {
         ...this.getSnapshot(state),
-        message: "Dad looks for an exit.\nThe coil blocks the only responsible path.",
+        message: "Dad looks for an exit.\nThe coil blocks the retreat.",
         victory: false,
       };
     }
@@ -132,12 +147,13 @@ export class BattleManager {
 
   useEnemyTurn(state: GameState): EnemyTurnResult {
     const enemy = this.requireEnemy();
-    const attack = this.getEnemyAttack(enemy);
+    const attack = this.getEnemyAttack(enemy, state);
     const damage = this.applyEnemyAttack(state, enemy, attack);
 
     return {
       ...this.getSnapshot(state),
       message: `${enemy.name} ${attack.message}.\n${damage} damage.`,
+      defeated: state.player.hp <= 0,
     };
   }
 
@@ -170,10 +186,11 @@ export class BattleManager {
       state.player.cash += enemy.cashReward;
       const levelUp = applyExperienceAndLevelUps(state, enemy.xpReward);
       const levelUpMessage = levelUp.message ? `\n${levelUp.message}` : "";
+      const rewardLabel = enemy.cashReward === 1 ? "Love Point" : "Love Points";
 
       return {
         ...this.getSnapshot(state),
-        message: `${actionMessage}\n${enemy.name} gives one last ominous click.\n${enemy.xpReward} XP. $${enemy.cashReward}.${levelUpMessage}`,
+        message: `${actionMessage}\n${enemy.name} gives one last ominous click.\n${enemy.xpReward} XP. ${enemy.cashReward} ${rewardLabel}.${levelUpMessage}`,
         victory: true,
         xpReward: enemy.xpReward,
         cashReward: enemy.cashReward,
@@ -221,13 +238,27 @@ export class BattleManager {
     };
   }
 
-  private getEnemyAttack(enemy: EnemyDefinition): EnemyAttack {
+  private getEnemyAttack(enemy: EnemyDefinition, state: GameState): EnemyAttack {
+    if (enemy.id === "evil-heating-coil" && Math.random() < 0.45) {
+      if (state.flags.circuitBreakerOff) {
+        return {
+          message: "casts Static Shock of a Random Sock",
+          damage: Phaser.Math.Between(2, 4),
+        };
+      }
+
+      return {
+        message: "casts Baddass Zap",
+        damage: Phaser.Math.Between(10, 15),
+      };
+    }
+
     return Phaser.Utils.Array.GetRandom(enemy.attackPattern);
   }
 
   private applyEnemyAttack(state: GameState, enemy: EnemyDefinition, attack: EnemyAttack): number {
     const damage = rollEnemyDamage(state, enemy, attack.damage);
-    state.player.hp = Math.max(1, state.player.hp - damage);
+    state.player.hp = Math.max(0, state.player.hp - damage);
     return damage;
   }
 

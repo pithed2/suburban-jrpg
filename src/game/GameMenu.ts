@@ -150,6 +150,6 @@ export class GameMenu {
     }
 
     const player = state.player;
-    return `${player.name || "DAD"}\nLV ${player.level}\nHP ${player.hp}/${player.maxHp}\nDP ${player.dadPoints}/${player.maxDadPoints}\nSTR ${player.strength}\nAGI ${player.agility}\nDEF ${player.defense}\n$ ${player.cash}\nXP ${player.xp}`;
+    return `${player.name || "DAD"}\nLV ${player.level}\nHP ${player.hp}/${player.maxHp}\nDP ${player.dadPoints}/${player.maxDadPoints}\nSTR ${player.strength}\nAGI ${player.agility}\nDEF ${player.defense}\nLOVE ${player.cash}\nXP ${player.xp}`;
   }
 }

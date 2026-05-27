@@ -37,6 +37,8 @@ function normalizeGameState(state: GameState): GameState {
   state.player.strength ??= fallback.player.strength;
   state.player.agility ??= fallback.player.agility;
   state.player.defense ??= fallback.player.defense;
+  state.player.cash ??= fallback.player.cash;
+  state.flags.circuitBreakerOff ??= fallback.flags.circuitBreakerOff;
 
   return state;
 }

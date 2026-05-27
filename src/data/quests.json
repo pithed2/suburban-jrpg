@@ -17,8 +17,16 @@
         "label": "Find the wrench"
       },
       {
+        "id": "flip-breaker",
+        "label": "Flip the breaker"
+      },
+      {
         "id": "defeat-heating-coil",
         "label": "Defeat Evil Heating Coil"
+      },
+      {
+        "id": "restore-power",
+        "label": "Restore power"
       },
       {
         "id": "return-to-wife",

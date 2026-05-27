@@ -36,7 +36,7 @@ export class PlayerStatsPanel {
     const player = state.player;
     setPixelText(
       this.text,
-      `${player.name || "DAD"}\nLV ${player.level}\nHP ${player.hp}\nDP ${player.dadPoints}\n$  ${player.cash}\nXP ${player.xp}`,
+      `${player.name || "DAD"}\nLV ${player.level}\nHP ${player.hp}\nDP ${player.dadPoints}\nLOVE ${player.cash}\nXP ${player.xp}`,
     );
     this.setVisible(true);
   }

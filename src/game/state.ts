@@ -2,7 +2,9 @@ export type QuestStepId =
   | "talk-to-wife"
   | "inspect-dryer"
   | "find-wrench"
+  | "flip-breaker"
   | "defeat-heating-coil"
+  | "restore-power"
   | "return-to-wife";
 
 export interface QuestProgress {
@@ -33,6 +35,7 @@ export interface GameFlags {
   talkedToWife: boolean;
   inspectedDryer: boolean;
   foundWrench: boolean;
+  circuitBreakerOff: boolean;
   bossDefeated: boolean;
   dryerFixed: boolean;
 }
@@ -71,6 +74,7 @@ export function createInitialGameState(): GameState {
       talkedToWife: false,
       inspectedDryer: false,
       foundWrench: false,
+      circuitBreakerOff: false,
       bossDefeated: false,
       dryerFixed: false,
     },

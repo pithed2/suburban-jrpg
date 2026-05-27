@@ -4,9 +4,9 @@
     "label": "Basement",
     "randomEncounters": {
       "enabled": true,
-      "stepDistance": 42,
-      "baseChance": 0.18,
-      "cooldownRolls": 2,
+      "stepDistance": 32,
+      "baseChance": 0.28,
+      "cooldownRolls": 1,
       "disabledWhenFlags": ["bossDefeated"],
       "introMessages": [
         "Something shifts in the basement dark.",

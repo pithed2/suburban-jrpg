@@ -133,9 +133,7 @@ export class NeighborhoodScene extends Phaser.Scene {
   private createUi(): void {
     this.add.rectangle(8, 8, 236, 16, 0xfacc15).setOrigin(0, 0);
     this.questText = addPixelText(this, 12, 11, "", 8).setTint(0x111827);
-
     this.dialogueBox = new DialogueBox(this);
-
   }
 
   private handleInteract(): void {
@@ -181,6 +179,18 @@ export class NeighborhoodScene extends Phaser.Scene {
 
   private interactWithWife(): void {
     if (this.state.flags.bossDefeated) {
+      if (this.state.flags.circuitBreakerOff) {
+        setActiveQuestStep(this.state, "restore-power");
+        this.updateQuestText("POWER OUT");
+        this.startDialogue([
+          { speaker: "WIFE", text: "Now, nothing works! What did you do??" },
+          { speaker: "DAD'S BRAIN", text: "Dude. Dryers don't work without power." },
+          { speaker: "DAD", text: "Small administrative follow-up. Totally under control." },
+          { speaker: "NARRATOR", text: "The basement breaker waits for Dad's victory lap." },
+        ]);
+        return;
+      }
+
       completeQuestStep(this.state, "return-to-wife");
       this.state.flags.dryerFixed = true;
       this.updateQuestText("DRYER FIXED");
@@ -220,6 +230,17 @@ export class NeighborhoodScene extends Phaser.Scene {
     }
 
     if (this.state.flags.bossDefeated) {
+      if (this.state.flags.circuitBreakerOff) {
+        setActiveQuestStep(this.state, "restore-power");
+        this.updateQuestText("POWER OUT");
+        this.startDialogue([
+          { speaker: "NARRATOR", text: "The dryer is repaired, but completely lifeless." },
+          { speaker: "DAD'S BRAIN", text: "Dude. Dryers don't work without power." },
+          { speaker: "DAD", text: "Right. Basement. Breaker. Victory, but with paperwork." },
+        ]);
+        return;
+      }
+
       this.startDialogue([
         { speaker: "NARRATOR", text: "The dryer radiates the calm authority of a repaired appliance." },
         { speaker: "DAD", text: getDadLine("selfTalk", "victory") },
@@ -361,5 +382,4 @@ export class NeighborhoodScene extends Phaser.Scene {
     this.dialogueRunner.clear();
     this.dialogueBox.hide();
   }
-
 }

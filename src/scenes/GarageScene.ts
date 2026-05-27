@@ -193,7 +193,7 @@ export class GarageScene extends Phaser.Scene {
     this.state.player.inventory.push("adjustable-wrench");
     this.state.player.equipment.weaponId = "adjustable-wrench";
     completeQuestStep(this.state, "find-wrench");
-    setActiveQuestStep(this.state, "defeat-heating-coil");
+    setActiveQuestStep(this.state, "flip-breaker");
     this.updateWrenchVisibility();
     this.updateQuestText();
     this.startDialogue([
