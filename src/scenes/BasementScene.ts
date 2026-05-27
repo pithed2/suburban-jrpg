@@ -31,6 +31,7 @@ export class BasementScene extends Phaser.Scene {
   private player!: Phaser.GameObjects.Rectangle;
   private playerSprite!: Phaser.GameObjects.Sprite;
   private exit!: Phaser.GameObjects.Rectangle;
+  private exitSprite!: Phaser.GameObjects.Image;
   private coil!: Phaser.GameObjects.Rectangle;
   private coilSprite!: Phaser.GameObjects.Image;
   private breaker!: Phaser.GameObjects.Rectangle;
@@ -161,7 +162,9 @@ export class BasementScene extends Phaser.Scene {
     this.breaker = this.add.rectangle(58, 50, 30, 26, 0xffffff, 0);
     this.safetySticker = this.add.rectangle(102, 64, 34, 20, 0xffffff, 0);
     this.player = this.add.rectangle(spawn.x, spawn.y, 14, 18, 0xffffff, 0);
-    addWorldSprite(this, exit.x, exit.y, spriteFrames.stairs);
+    this.exitSprite = this.add.image(exit.x, exit.y, "stairs-up")
+      .setOrigin(0.5, 0.75)
+      .setDisplaySize(30, 38);
     this.coilSprite = this.add.image(coil.x, coil.y, "dryer-boss-world")
       .setOrigin(0.5, 0.75)
       .setDisplaySize(34, 34);
