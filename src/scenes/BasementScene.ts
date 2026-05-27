@@ -34,8 +34,10 @@ export class BasementScene extends Phaser.Scene {
   private coil!: Phaser.GameObjects.Rectangle;
   private coilSprite!: Phaser.GameObjects.Image;
   private breaker!: Phaser.GameObjects.Rectangle;
+  private breakerSprite!: Phaser.GameObjects.Image;
   private breakerSwitch!: Phaser.GameObjects.Rectangle;
   private safetySticker!: Phaser.GameObjects.Rectangle;
+  private safetyStickerSprite!: Phaser.GameObjects.Image;
   private questText!: Phaser.GameObjects.BitmapText;
   private dialogueBox!: DialogueBox;
   private statsPanel!: PlayerStatsPanel;
@@ -152,19 +154,20 @@ export class BasementScene extends Phaser.Scene {
 
     const spawn = getMapObjectCenter(map, "Objects", "player-spawn");
     const exit = getMapObjectCenter(map, "Objects", "basement-exit");
-    const coil = getMapObjectCenter(map, "Objects", "heating-coil");
+    const coil = { x: 284, y: 58 };
 
     this.exit = this.add.rectangle(exit.x, exit.y, 28, 18, 0xffffff, 0);
-    this.coil = this.add.rectangle(coil.x, coil.y, 24, 20, 0xffffff, 0);
+    this.coil = this.add.rectangle(coil.x, coil.y, 34, 30, 0xffffff, 0);
     this.breaker = this.add.rectangle(58, 50, 30, 26, 0xffffff, 0);
     this.safetySticker = this.add.rectangle(102, 64, 34, 20, 0xffffff, 0);
     this.player = this.add.rectangle(spawn.x, spawn.y, 14, 18, 0xffffff, 0);
     addWorldSprite(this, exit.x, exit.y, spriteFrames.stairs);
     this.coilSprite = this.add.image(coil.x, coil.y, "dryer-boss-world")
       .setOrigin(0.5, 0.75)
-      .setDisplaySize(30, 30);
-    this.add.rectangle(this.breaker.x, this.breaker.y, 24, 24, 0x374151)
-      .setStrokeStyle(2, 0xf8fafc);
+      .setDisplaySize(34, 34);
+    this.breakerSprite = this.add.image(this.breaker.x, this.breaker.y, "circuit-breaker")
+      .setOrigin(0.5, 0.5)
+      .setDisplaySize(24, 24);
     this.breakerSwitch = this.add.rectangle(
       this.breaker.x,
       this.breaker.y + (this.state.flags.circuitBreakerOff ? 4 : -4),
@@ -172,15 +175,14 @@ export class BasementScene extends Phaser.Scene {
       14,
       this.state.flags.circuitBreakerOff ? 0x22c55e : 0xf97316,
     );
-    this.add.rectangle(this.safetySticker.x, this.safetySticker.y, 28, 16, 0xfacc15)
-      .setStrokeStyle(1, 0x111827);
-    addPixelText(this, this.safetySticker.x - 7, this.safetySticker.y - 3, "!", 8).setTint(0x111827);
+    this.safetyStickerSprite = this.add.image(this.safetySticker.x, this.safetySticker.y, "safety-sticker")
+      .setOrigin(0.5, 0.5)
+      .setDisplaySize(24, 24);
     this.playerSprite = addWorldSprite(this, this.player.x, this.player.y, spriteFrames.dad);
 
     addPixelText(this, exit.x - 10, exit.y + 11, "STAIRS", 6);
     addPixelText(this, coil.x - 16, coil.y + 14, "DRYER", 6);
     addPixelText(this, this.breaker.x - 20, this.breaker.y + 18, "BREAKER", 6);
-    addPixelText(this, this.safetySticker.x - 17, this.safetySticker.y + 12, "STICKER", 6);
     addPixelText(this, spawn.x - 9, spawn.y - 15, "DAD", 6);
 
     this.randomEncounters.resetPosition(new Phaser.Math.Vector2(this.player.x, this.player.y));
