@@ -35,15 +35,24 @@ export class NameEntryScene extends Phaser.Scene {
     this.backspaceKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.BACKSPACE);
 
     this.add.rectangle(160, 90, 320, 180, 0x050505);
-    this.add.rectangle(160, 42, 128, 38, 0x050505, 1)
-      .setStrokeStyle(2, 0xf8fafc);
-    addPixelText(this, 132, 20, "-- NAME --", 8).setTint(0xf8fafc);
-    this.nameText = addPixelText(this, 104, 42, "", 8).setTint(0xfacc15);
+    addPixelText(this, 160, 8, "THE IN-LAWS ARE COMING", 6)
+      .setOrigin(0.5, 0)
+      .setTint(0xfacc15);
+    addPixelText(this, 160, 22, "ENTER THE DAD'S NAME", 6)
+      .setOrigin(0.5, 0)
+      .setTint(0x93c5fd);
 
-    this.add.rectangle(160, 111, 292, 104, 0x050505, 1)
+    this.add.rectangle(160, 54, 128, 36, 0x050505, 1)
       .setStrokeStyle(2, 0xf8fafc);
-    this.gridText = addPixelText(this, 34, 70, "", 8);
-    this.promptText = addPixelText(this, 58, 164, "ARROWS SELECT  SPACE/ENTER", 6)
+    addPixelText(this, 160, 37, "DAD NAME", 6)
+      .setOrigin(0.5, 0)
+      .setTint(0xf8fafc);
+    this.nameText = addPixelText(this, 104, 50, "", 8).setTint(0xfacc15);
+
+    this.add.rectangle(160, 122, 292, 88, 0x050505, 1)
+      .setStrokeStyle(2, 0xf8fafc);
+    this.gridText = addPixelText(this, 34, 85, "", 8);
+    this.promptText = addPixelText(this, 58, 169, "ARROWS SELECT  SPACE/ENTER", 6)
       .setTint(0x93c5fd);
 
     this.input.keyboard!.on("keydown", this.handlePhysicalKey, this);
