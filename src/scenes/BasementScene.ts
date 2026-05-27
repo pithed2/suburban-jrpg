@@ -199,7 +199,7 @@ export class BasementScene extends Phaser.Scene {
     this.battleEnemyBox = this.add.rectangle(154, 84, 108, 62, 0x65a30d, 1)
       .setStrokeStyle(2, 0xf8fafc)
       .setVisible(false);
-    this.battleEnemySprite = this.add.sprite(154, 88, spriteFrames.dustBunny.texture, spriteFrames.dustBunny.frame)
+    this.battleEnemySprite = this.add.sprite(154, 92, spriteFrames.dustBunny.texture, spriteFrames.dustBunny.frame)
       .setScale(2)
       .setVisible(false);
     this.battleEnemyText = addPixelText(this, 108, 56, "", 6)
@@ -631,18 +631,40 @@ export class BasementScene extends Phaser.Scene {
       this.battleStatusText,
       `${player.name || "DAD"}\nLV ${player.level}\nHP ${snapshot.heroHp}/${snapshot.heroMaxHp}\nDP ${player.dadPoints}/${player.maxDadPoints}\nLOVE ${player.cash}\nXP ${player.xp}`,
     );
-    setPixelText(this.battleEnemyText, `${snapshot.enemy.name}\nHP ${snapshot.enemyHp}/${snapshot.enemyMaxHp}`);
+    setPixelText(
+      this.battleEnemyText,
+      `${this.getBattleEnemyLabel(snapshot.enemy.id, snapshot.enemy.name)}\nHP ${snapshot.enemyHp}/${snapshot.enemyMaxHp}`,
+    );
 
     if (snapshot.enemy.battleTexture) {
+      const spriteSize = this.getBattleEnemySpriteSize(snapshot.enemy.id);
       this.battleEnemySprite
         .setTexture(snapshot.enemy.battleTexture)
-        .setDisplaySize(48, 48);
+        .setPosition(154, spriteSize.y)
+        .setDisplaySize(spriteSize.width, spriteSize.height);
       return;
     }
 
     this.battleEnemySprite
       .setTexture(spriteFrames.dustBunny.texture, spriteFrames.dustBunny.frame)
+      .setPosition(154, 92)
       .setDisplaySize(32, 32);
+  }
+
+  private getBattleEnemyLabel(enemyId: string, fallbackName: string): string {
+    if (enemyId === "evil-heating-coil") {
+      return "HEATING COIL";
+    }
+
+    return fallbackName;
+  }
+
+  private getBattleEnemySpriteSize(enemyId: string): { width: number; height: number; y: number } {
+    if (enemyId === "evil-heating-coil") {
+      return { width: 38, height: 34, y: 94 };
+    }
+
+    return { width: 32, height: 32, y: 93 };
   }
 
   private getCommandLabel(command: BattleCommand): string {
