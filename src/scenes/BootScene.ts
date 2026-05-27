@@ -29,6 +29,7 @@ export class BootScene extends Phaser.Scene {
       },
     );
     this.load.image("dryer-boss", "/assets-active/enemies/dryer_boss.png");
+    this.load.image("dust-bunny", "/assets-active/enemies/Dust_Bunny.png");
     this.load.bitmapFont(
       "dialogue-8x8",
       "/assets-active/fonts/round_6x6.png",
@@ -83,6 +84,9 @@ export class BootScene extends Phaser.Scene {
       .setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures
       .get("dryer-boss")
+      .setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures
+      .get("dust-bunny")
       .setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures
       .get("dungeon-16")

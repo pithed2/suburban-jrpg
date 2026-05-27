@@ -2,6 +2,7 @@
   {
     "id": "dust-bunny",
     "name": "Dust Bunny",
+    "battleTexture": "dust-bunny",
     "level": 1,
     "hp": 10,
     "attack": 2,
