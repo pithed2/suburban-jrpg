@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import {
   clearSavedGameState,
   getGameState,
+  saveGameState,
   startFirstQuestGameState,
 } from "./session";
 
@@ -30,6 +31,19 @@ export function installDevShortcuts(scene: Phaser.Scene): void {
       event.stopImmediatePropagation();
       clearSavedGameState();
       scene.scene.start("NameEntryScene");
+      return;
+    }
+
+    if (event.code === "KeyE") {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      const state = getGameState();
+      state.flags.devRandomEncountersDisabled = !state.flags.devRandomEncountersDisabled;
+      saveGameState(state);
+      // eslint-disable-next-line no-console
+      console.info(
+        `Dev shortcut: random encounters ${state.flags.devRandomEncountersDisabled ? "disabled" : "enabled"}`,
+      );
     }
   });
 }

@@ -38,6 +38,7 @@ export interface GameFlags {
   circuitBreakerOff: boolean;
   bossDefeated: boolean;
   dryerFixed: boolean;
+  devRandomEncountersDisabled: boolean;
 }
 
 export interface GameState {
@@ -77,6 +78,7 @@ export function createInitialGameState(): GameState {
       circuitBreakerOff: false,
       bossDefeated: false,
       dryerFixed: false,
+      devRandomEncountersDisabled: false,
     },
   };
 }

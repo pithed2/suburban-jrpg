@@ -56,6 +56,7 @@ function normalizeGameState(state: GameState): GameState {
   state.player.defense ??= fallback.player.defense;
   state.player.cash ??= fallback.player.cash;
   state.flags.circuitBreakerOff ??= fallback.flags.circuitBreakerOff;
+  state.flags.devRandomEncountersDisabled ??= fallback.flags.devRandomEncountersDisabled;
 
   return state;
 }

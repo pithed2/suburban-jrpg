@@ -92,6 +92,10 @@ export class RandomEncounterTracker {
       return false;
     }
 
+    if (state.flags.devRandomEncountersDisabled) {
+      return false;
+    }
+
     return !randomEncounters.disabledWhenFlags?.some((flag) => state.flags[flag]);
   }
 
