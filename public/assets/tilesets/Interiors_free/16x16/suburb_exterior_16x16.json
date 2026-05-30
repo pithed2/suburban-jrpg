@@ -1,0 +1,15 @@
+{
+  "columns": 64,
+  "image": "suburb_exterior_16x16.png",
+  "imageheight": 1536,
+  "imagewidth": 1024,
+  "margin": 0,
+  "name": "suburb_exterior_16x16",
+  "spacing": 0,
+  "tilecount": 6144,
+  "tiledversion": "1.11.2",
+  "tileheight": 16,
+  "tilewidth": 16,
+  "type": "tileset",
+  "version": "1.10"
+}

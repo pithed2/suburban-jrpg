@@ -4,9 +4,9 @@
     "label": "Basement",
     "randomEncounters": {
       "enabled": true,
-      "stepDistance": 32,
-      "baseChance": 0.28,
-      "cooldownRolls": 1,
+      "stepDistance": 80,
+      "baseChance": 0.18,
+      "cooldownRolls": 3,
       "disabledWhenFlags": ["bossDefeated"],
       "introMessages": [
         "Something shifts in the basement dark.",
@@ -15,7 +15,16 @@
       "entries": [
         {
           "enemyId": "dust-bunny",
-          "weight": 1
+          "weight": 2
+        },
+        {
+          "enemyId": "icky-spider",
+          "weight": 1,
+          "introMessages": [
+            "A Freaky Icky Spider descends from the ceiling on a thread of web.",
+            "Something brushes Dad's shoulder in the dark. It has too many legs.",
+            "A Freaky Icky Spider emerges from behind the water heater."
+          ]
         }
       ]
     },
@@ -33,18 +42,29 @@
     "id": "garage",
     "label": "Garage",
     "randomEncounters": {
-      "enabled": false,
-      "stepDistance": 48,
-      "baseChance": 0.12,
-      "cooldownRolls": 2,
+      "enabled": true,
+      "stepDistance": 80,
+      "baseChance": 0.15,
+      "cooldownRolls": 4,
       "disabledWhenFlags": ["foundWrench"],
       "introMessages": [
-        "A box settles in a way boxes should not."
+        "Something shifts behind a cardboard box.",
+        "A box labeled TAXES 2017 begins to vibrate.",
+        "Dad pauses. The garage has chosen violence."
       ],
       "entries": [
         {
           "enemyId": "dust-bunny",
-          "weight": 1
+          "weight": 2
+        },
+        {
+          "enemyId": "icky-spider",
+          "weight": 3,
+          "introMessages": [
+            "A Freaky Icky Spider drops from the garage shelf!",
+            "A Freaky Icky Spider skitters out from behind the paint cans!",
+            "Something moves on the wall. It has too many legs. It knows."
+          ]
         }
       ]
     },

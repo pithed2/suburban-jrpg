@@ -49,6 +49,59 @@
     }
   },
   {
+    "id": "icky-spider",
+    "name": "Freaky Icky Spider",
+    "battleTexture": "icky-spider",
+    "level": 1,
+    "hp": 6,
+    "attack": 2,
+    "agility": 5,
+    "dodgeChance": 0.25,
+    "xpReward": 2,
+    "cashReward": 1,
+    "emotionalMeaning": "Primal fear of things with too many legs",
+    "attackPattern": [
+      {
+        "message": "Skitters directly toward Dad's shoe",
+        "damage": 1
+      },
+      {
+        "message": "Deploys Too Many Legs in a distressing configuration",
+        "damage": 2
+      },
+      {
+        "message": "Drops from the ceiling at approximately face height",
+        "damage": 2
+      },
+      {
+        "message": "Freezes and stares. Dad stares back. Damage is mostly emotional.",
+        "damage": 1
+      }
+    ],
+    "actionResponses": {
+      "fight": {
+        "damage": 3,
+        "damageByWeapon": {
+          "percussive-maintenance": 7,
+          "adjustable-wrench": 3
+        },
+        "message": "Dad strikes with the authority of a man who has seen enough legs.",
+        "effectLabel": "shoe energy"
+      },
+      "dadSkill": {
+        "damage": 2,
+        "message": "Dad takes a Deep Sigh. The spider uses this opportunity to move closer.",
+        "effectLabel": "resisted"
+      }
+    },
+    "initiative": {
+      "baseAmbushChance": 0.25,
+      "levelAdvantageBonus": 0.03,
+      "maxAmbushChance": 0.40,
+      "ambushMessage": "The Freaky Icky Spider drops from the ceiling directly above Dad."
+    }
+  },
+  {
     "id": "evil-heating-coil",
     "name": "Evil Heating Coil",
     "battleTexture": "heating-coil-battle",

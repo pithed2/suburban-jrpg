@@ -5,6 +5,7 @@ import { GarageScene } from "./scenes/GarageScene";
 import { NameEntryScene } from "./scenes/NameEntryScene";
 import { NeighborhoodScene } from "./scenes/NeighborhoodScene";
 import { StoryIntroScene } from "./scenes/StoryIntroScene";
+import { TileRoomScene } from "./scenes/TileRoomScene";
 import { installGlobalErrorLogging, logger } from "./game/logger";
 import "./styles.css";
 
@@ -29,7 +30,7 @@ const config: Phaser.Types.Core.GameConfig = {
     height: 180,
     zoom: 3,
   },
-  scene: [BootScene, NameEntryScene, StoryIntroScene, NeighborhoodScene, BasementScene, GarageScene],
+  scene: [BootScene, NameEntryScene, StoryIntroScene, NeighborhoodScene, BasementScene, GarageScene, TileRoomScene],
 };
 
 logger.info("starting game", { width: 320, height: 180, zoom: 3 });

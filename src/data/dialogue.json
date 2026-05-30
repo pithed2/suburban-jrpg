@@ -28,48 +28,77 @@
       "victory": [
         "Done. Dad always gets it done.",
         "That's what happens. You mess with The Dad, you get the horns.  Or in this case, the wrench.  Beeoootch.",
-        "Dad would like to thank himself for this achievement."
+        "Dad would like to thank himself for this achievement.",
+        "I'll be back. Not you, though. You stay down.",
+        "It's not my fault being the biggest and the strongest. I don't even exercise.",
+        "May the Schwartz be with you. Wherever it is you're going. Away from here.",
+        "Why don't you make like a tree, and get outta here. Biff said that. Or close to it.",
+        "I'm going to make him an offer he can't refuse. Already have. The offer was the wrench."
       ],
       "frustrated": [
         "Dagnabbit. I'm fine. This is normal.  Crapola! This blows donkeys.",
         "Good gravy. Whoever designed this house owes me an apology.",
-        "Son of a motherless goat, this house is testing The Dad."
+        "Son of a motherless goat, this house is testing The Dad.",
+        "Nobody puts Baby in a corner. And yet here Dad is. In a corner. With a crescent wrench."
       ],
       "idle": [
         "The Dad surveys his domain. It is a disaster.",
         "Twelve days. The Dad has twelve days and a bad feeling.",
-        "The Dad has seen enough 90s sitcom dads to know this is going to get worse."
+        "The Dad has seen enough 90s sitcom dads to know this is going to get worse.",
+        "Life is like a box of chocolates. This particular box has a broken dryer in it."
       ]
     },
     "toWife": {
       "greeting": [
         "Yes dear. Love you, honey.",
         "You're the best. You know that? The absolute best.",
-        "Whatever you need. I'm on it."
+        "Whatever you need. I'm on it.",
+        "As you wish.",
+        "As you wish. Dad means it. Every time."
       ],
       "questReceived": [
         "Is this one of those just listen and nod situations, or do you or do you want me to do something about it?",
         "Consider it handled. The Dad handles things.",
         "Done. Well, not done yet. But it will be done. By yours truly.  Eventually.",
-        "Love you. I'm entering problem-solving mode."
+        "Love you. I'm entering problem-solving mode.",
+        "You're gonna need a bigger boat. That is not a complaint. That is a recognition of the scope of what you're describing."
       ]
     },
     "toEnemy": {
+      "spider": [
+        "Why'd it have to be spiders?",
+        "That's not a bug. That's a tiny panic machine.",
+        "I am not afraid. I am strategically relocating.",
+        "We're gonna need a bigger shoe.",
+        "Nobody move. It can sense weakness.",
+        "Okay. Okay okay okay. Dad is fine. Dad is completely fine.",
+        "I respect its right to exist. From very far away."
+      ],
       "battleStart": [
         "Oh, son of a biscuit. Really?",
         "Shut the front door. You want some of The Dad?  Bring it!",
-        "Good gravy. Dad did not schedule appliance combat today."
+        "Good gravy. Dad did not schedule appliance combat today.",
+        "Are you talking to me? Because you should not be talking to me.",
+        "I am your father. That doesn't apply here. But Dad wanted to say it.",
+        "Hello. My name is Dad Montoya. You broke my dryer. Prepare to be fixed.",
+        "You're gonna need a bigger boat. Unfortunately for you, all Dad has is this wrench.",
+        "I'll get you, my pretty, and your little dog, too! ...Actually, don't hurt the dog."
       ],
       "takingDamage": [
         "Shiitake mushrooms! That stings!",
         "Crud. Okay. I felt that one.",
         "Mother of pearl, what are you made of?",
-        "Sone of Sea Biscuit!  What are they feeding you in the factory, buddy?"
+        "Sone of Sea Biscuit!  What are they feeding you in the factory, buddy?",
+        "I'm funny how? I mean, funny like a clown, I amuse you? I make you laugh? I'm here to fckin' amuse you?",
+        "Inconceivable! Also, ow."
       ],
       "lowHp": [
         "Sweet 8lb baby Jesus on a cracker, The Dad is in trouble.",
         "This is fine. The Dad has been through worse. The Dad thinks.  Maybe?",
-        "Holy Horacio! The Dad is really in a bind here."
+        "Holy Horacio! The Dad is really in a bind here.",
+        "Houston, we have a problem. This is Dad. Houston. Problem. Over.",
+        "What we've got here... is failure to communicate. Specifically, my body failing to communicate its limits.",
+        "Frankly, my dear, I don't give a damn. Dad gives many damns. Dad gives all the damns."
       ]
     },
     "toKids": {
@@ -83,9 +112,33 @@
       "mentioned": [
         "Ah yes. The in-laws. There to let me know everything I did wrong.  Again. And again.  And again.",
         "They mean well. The Dad is choosing to believe that for legal reasons.",
-        "Twelve days. The Dad has twelve days to make this house look like The Dad knows what he's doing."
+        "Twelve days. The Dad has twelve days to make this house look like The Dad knows what he's doing.",
+        "Assume everyone else is a stupid you-know-what who wants to kill you. Someone very wise said that. Might have been Schwarzenegger. Might have been a podcast. Same energy."
       ]
     }
+  },
+  "movieQuotes": {
+    "findItem": [
+      "Life is like a box of chocolates. You never know what you're gonna get. Today Dad got a wrench. That tracks.",
+      "If you build it, he will come. Dad did not build it. Dad found it. Close enough.",
+      "I'm going to make him an offer he can't refuse. The offer is: Dad is now armed with the wrench."
+    ],
+    "deadEnd": [
+      "Nobody puts Baby in a corner. And yet every path in this garage is a corner. Ironic.",
+      "You fell victim to one of the classic blunders! The most famous is never get involved in a land war in Asia, but only slightly less well-known is this: never explore a garage without a map.",
+      "Why don't you make like a tree, and get outta here. That's what Biff said. Dad says it to himself sometimes.",
+      "Inconceivable! That this is a dead end. That Dad has made three of them in a row. Inconceivable.",
+      "What we've got here... is failure to navigate."
+    ],
+    "ambush": [
+      "I'm funny how? I mean, funny like a clown, I amuse you? I make you laugh? I'm here to fckin' amuse you? — Dad when surprised by anything",
+      "Inconceivable! Also — defend yourself immediately.",
+      "Houston, we have a problem. Specifically: something jumped Dad in the dark."
+    ],
+    "longSpeech": [
+      "You fell victim to one of the classic blunders! The most famous of which is never get involved in a land war in Asia, but only slightly less well-known is this — never go in against a Sicilian when death is on the line! Ha ha ha ha ha ha ha! ...Ha. Ha. ...Ha.",
+      "As you wish. Dad says this to his wife. His wife knows what it means. His wife has heard it approximately eight hundred times. She still likes it."
+    ]
   },
   "enemyBanter": {
     "dryerBoss": [

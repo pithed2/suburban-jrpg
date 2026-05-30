@@ -69,6 +69,8 @@ export interface RandomEncounterEntry {
   weight: number;
   minPlayerLevel?: number;
   maxPlayerLevel?: number;
+  /** Per-enemy intro lines. Falls back to the area's introMessages if absent. */
+  introMessages?: string[];
 }
 
 export interface FixedEncounterDefinition {

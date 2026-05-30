@@ -69,10 +69,14 @@ export class RandomEncounterTracker {
 
     this.cooldownRollsRemaining = randomEncounters.cooldownRolls;
 
-    return {
-      enemy,
-      introMessages: randomEncounters.introMessages,
-    };
+    // Use per-enemy intro messages if the entry defines them;
+    // otherwise fall back to the area-wide intro messages.
+    const matchedEntry = randomEncounters.entries.find(
+      (e) => e.enemyId === enemy.id,
+    );
+    const introMessages = matchedEntry?.introMessages ?? randomEncounters.introMessages;
+
+    return { enemy, introMessages };
   }
 
   resetPosition(position: Phaser.Math.Vector2): void {

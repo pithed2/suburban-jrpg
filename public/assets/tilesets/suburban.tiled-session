@@ -1,0 +1,38 @@
+{
+    "activeFile": "",
+    "expandedProjectPaths": [
+        "Interiors_free/16x16",
+        ".",
+        "Interiors_free"
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "Interiors_free/16x16/house_core_16x16.json": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Interiors_free/16x16/house_core_16x16.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "last.imagePath": "C:/Code/suburban-jrpg/public/assets/tilesets/Interiors_free/16x16",
+    "map.height": 18,
+    "map.tileHeight": 16,
+    "map.tileWidth": 16,
+    "map.width": 20,
+    "openFiles": [
+        "Interiors_free/16x16/house_core_16x16.tsx"
+    ],
+    "project": "suburban.tiled-project",
+    "recentFiles": [
+        "Interiors_free/16x16/house_core_16x16.tsx",
+        "Interiors_free/16x16/house_core_16x16.json"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 16,
+        "width": 16
+    },
+    "tileset.useTransparentColor": true
+}
