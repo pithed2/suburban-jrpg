@@ -17,6 +17,7 @@ import Phaser from "phaser";
 import { CharacterSprite } from "../game/CharacterSprite";
 import { DAD_DEF, WIFE_DEF } from "../game/characterDefs";
 import { dialogue } from "../game/content";
+import { installDevShortcuts } from "../game/devShortcuts";
 import { DialogueBox } from "../game/DialogueBox";
 import { getDadBrainLine, getDadLine } from "../game/dadVoice";
 import { DialogueRunner, type DialogueInput, type DialogueLine } from "../game/DialogueRunner";
@@ -45,20 +46,16 @@ const FLOOR_KITCHEN = 2060; // row 32 col 12 — ceramic tile        → kitchen
 const FLOOR_HALL    = 2576; // row 40 col 16 — neutral hall floor  → hallway
 const FLOOR_MUD     = 2116; // row 33 col  4 — entry/mudroom tile  → mudroom / utility
 
-// Props — house-core-16 specific frames
-const DOOR_FRAME    = 1084; // row 16 col 60 — standard interior door
-const STAIR_FRAME   = 3072; // row 48 col  0 — basement staircase tile
-
 // ── Tile-type IDs used in the MAP array ───────────────────────────────────
 const W = 1;   // wall  (solid)
 const L = 2;   // living room floor  (warm)
 const K = 3;   // kitchen floor      (cool)
 const H = 4;   // hallway floor      (neutral)
 const M = 5;   // mudroom floor      (concrete)
-const D = 6;   // garage door        (walkable exit marker)
+const D = 6;   // garage door        (solid wall bump marker)
 const S = 7;   // basement stairs    (walkable exit marker)
 
-const WALKABLE = new Set([L, K, H, M, D, S]);
+const WALKABLE = new Set([L, K, H, M, S]);
 
 // ── Four rooms, Dragon Warrior style ──────────────────────────────────────
 //
@@ -99,9 +96,9 @@ const MAP: number[][] = [
   [_,_,W,L,L,L,L,L,L,L,L,L,L,L,W,_,_,_,_,_,_,_,W,K,K,K,K,K,K,K,K,K,K,K,W,_,_], //  9
   [_,_,W,W,W,W,W,L,L,W,W,W,W,W,W,_,_,_,_,_,_,_,W,W,W,W,W,K,K,W,W,W,W,W,W,_,_], // 10  south walls + door gaps
   [_,_,_,_,_,_,_,L,L,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,K,K,_,_,_,_,_,_,_], // 11  passage tiles
-  [_,_,W,W,W,W,W,H,H,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,H,H,W,W,W,W,W,_,_], // 12  hallway top wall
-  [_,_,W,H,H,H,H,H,H,H,H,H,H,S,S,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,W,_,_], // 13
-  [_,_,W,H,H,H,H,H,H,H,H,H,H,S,S,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,W,_,_], // 14
+  [_,_,W,W,W,W,W,H,H,W,W,W,W,S,S,W,W,W,W,W,W,W,W,W,W,W,W,H,H,W,W,W,W,W,_,_], // 12  hallway top wall
+  [_,_,W,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,W,_,_], // 13
+  [_,_,W,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,W,_,_], // 14
   [_,_,W,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,W,_,_], // 15
   [_,_,W,W,W,W,W,H,H,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,_,_], // 16  hallway bottom wall
   [_,_,_,_,_,_,_,M,M,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_], // 17  passage to mudroom
@@ -128,10 +125,11 @@ function px(col: number, row: number) {
 const WIFE_PX     = px(7,  6);   // living room centre
 const DRYER_PX    = px(27, 6);   // kitchen right-of-centre
 const GARAGE_PX   = px(7,  21);  // bottom wall opening (garage)
-const STAIRS_PX   = px(14, 14);  // hallway left-centre (basement stairs)
 const TILEROOM_PX = px(28, 14);  // hallway right-centre (utility room door)
 const SPAWN_COL   = 8;
 const SPAWN_ROW   = 20;
+const BASEMENT_RETURN_COL = 13;
+const BASEMENT_RETURN_ROW = 13;
 
 const INTERACT_PX     = 36; // proximity threshold in world pixels
 
@@ -145,10 +143,12 @@ const FLOOR_FRAME: Record<number, number> = {
 
 // ── Scene ─────────────────────────────────────────────────────────────────
 type SceneMode = "explore" | "dialogue" | "complete";
+type NeighborhoodSpawn = "default" | "basement";
 
 export class NeighborhoodScene extends Phaser.Scene {
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private interactKey!: Phaser.Input.Keyboard.Key;
+  private questKey!: Phaser.Input.Keyboard.Key;
   private mover!: GridMover;
   private wifeChar!: CharacterSprite;
   // Tiles occupied by solid NPCs — player cannot walk into them
@@ -156,8 +156,10 @@ export class NeighborhoodScene extends Phaser.Scene {
   private mode: SceneMode = "explore";
   private dialogueBox!: DialogueBox;
   private menu!: GameMenu;
+  private questBox!: Phaser.GameObjects.Rectangle;
   private questText!: Phaser.GameObjects.BitmapText;
   private state!: GameState;
+  private spawn: NeighborhoodSpawn = "default";
   private readonly dialogueRunner = new DialogueRunner();
 
   constructor() {
@@ -166,11 +168,18 @@ export class NeighborhoodScene extends Phaser.Scene {
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
 
+  init(data?: { spawn?: NeighborhoodSpawn }): void {
+    this.spawn = data?.spawn ?? "default";
+  }
+
   create(): void {
+    installDevShortcuts(this);
+
     this.state   = getGameState();
     this.mode    = "explore";
     this.cursors     = this.input.keyboard!.createCursorKeys();
     this.interactKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    this.questKey    = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
 
     this.drawTiles();
     this.placeDecorations();
@@ -186,6 +195,7 @@ export class NeighborhoodScene extends Phaser.Scene {
   update(_time: number, delta: number): void {
     this.dialogueBox.update(delta);
     this.menu.update();
+    this.updateQuestPrompt();
 
     if (this.menu.isOpen()) return;
 
@@ -199,6 +209,8 @@ export class NeighborhoodScene extends Phaser.Scene {
       this.cursors,
       delta,
       (col, row) => this.canWalkTo(col, row),
+      (col, row) => this.onLand(col, row),
+      (col, row) => this.onBump(col, row),
     );
   }
 
@@ -218,21 +230,35 @@ export class NeighborhoodScene extends Phaser.Scene {
             .setFrame(WALL_FRAME)
             .setDisplaySize(TILE, TILE);
         } else if (tid === D) {
-          this.add.image(cx, cy, "house-core-16")
-            .setFrame(DOOR_FRAME)
-            .setDisplaySize(TILE, TILE * 2);
+          this.addFloorTile(cx, cy, FLOOR_MUD);
         } else if (tid === S) {
-          this.add.image(cx, cy, "house-core-16")
-            .setFrame(STAIR_FRAME)
+          this.add.image(cx, cy, "full-set-int-a4")
+            .setFrame(WALL_FRAME)
             .setDisplaySize(TILE, TILE);
         } else {
           const frame = FLOOR_FRAME[tid] ?? FLOOR_HALL;
-          this.add.image(cx, cy, "house-core-16")
-            .setFrame(frame)
-            .setDisplaySize(TILE, TILE);
+          this.addFloorTile(cx, cy, frame);
         }
       }
     }
+
+    this.addMapOverlays();
+  }
+
+  private addMapOverlays(): void {
+    this.add.image(7 * TILE, 21 * TILE, "garage-door")
+      .setDisplaySize(TILE * 2, TILE)
+      .setOrigin(0, 0);
+
+    this.add.image(13 * TILE, 12 * TILE, "stairs-down")
+      .setDisplaySize(TILE * 2, TILE)
+      .setOrigin(0, 0);
+  }
+
+  private addFloorTile(x: number, y: number, frame: number): void {
+    this.add.image(x, y, "house-core-16")
+      .setFrame(frame)
+      .setDisplaySize(TILE, TILE);
   }
 
   // ── Decorations ────────────────────────────────────────────────────────────
@@ -249,7 +275,9 @@ export class NeighborhoodScene extends Phaser.Scene {
 
   private placeCharacters(): void {
     const dadChar = new CharacterSprite(this, 0, 0, DAD_DEF);
-    this.mover = new GridMover(this, dadChar, TILE, SPAWN_COL, SPAWN_ROW);
+    const spawnCol = this.spawn === "basement" ? BASEMENT_RETURN_COL : SPAWN_COL;
+    const spawnRow = this.spawn === "basement" ? BASEMENT_RETURN_ROW : SPAWN_ROW;
+    this.mover = new GridMover(this, dadChar, TILE, spawnCol, spawnRow);
 
     this.wifeChar = new CharacterSprite(this, WIFE_PX.x, WIFE_PX.y, WIFE_DEF);
     this.wifeChar.face("down");
@@ -266,6 +294,18 @@ export class NeighborhoodScene extends Phaser.Scene {
     if (col < 0 || col >= COLS || row < 0 || row >= ROWS) return false;
     if (this.npcTiles.has(`${col},${row}`)) return false;
     return WALKABLE.has(MAP[row][col]);
+  }
+
+  private onLand(col: number, row: number): void {
+    if (MAP[row]?.[col] === S) {
+      this.scene.start("BasementScene");
+    }
+  }
+
+  private onBump(col: number, row: number): void {
+    if (MAP[row]?.[col] === D) {
+      this.scene.start("GarageScene");
+    }
   }
 
   // ── Interaction ────────────────────────────────────────────────────────────
@@ -290,8 +330,6 @@ export class NeighborhoodScene extends Phaser.Scene {
 
     if (near(WIFE_PX))     { this.interactWithWife();            return; }
     if (near(DRYER_PX))    { this.interactWithDryer();           return; }
-    if (near(GARAGE_PX))   { this.scene.start("GarageScene");    return; }
-    if (near(STAIRS_PX))   { this.scene.start("BasementScene");  return; }
     if (near(TILEROOM_PX)) { this.scene.start("TileRoomScene");  return; }
 
     this.startDialogue(["No crisis within reach. This is suspicious."]);
@@ -392,9 +430,21 @@ export class NeighborhoodScene extends Phaser.Scene {
   // ── UI ─────────────────────────────────────────────────────────────────────
 
   private createUi(): void {
-    this.add.rectangle(8, 8, 260, 16, 0xfacc15).setOrigin(0, 0).setScrollFactor(0);
-    this.questText = addPixelText(this, 12, 11, "", 8).setTint(0x111827).setScrollFactor(0);
+    this.questBox = this.add.rectangle(8, 8, 260, 16, 0xfacc15)
+      .setOrigin(0, 0)
+      .setScrollFactor(0)
+      .setVisible(false);
+    this.questText = addPixelText(this, 12, 11, "", 8)
+      .setTint(0x111827)
+      .setScrollFactor(0)
+      .setVisible(false);
     this.dialogueBox = new DialogueBox(this);
+  }
+
+  private updateQuestPrompt(): void {
+    const visible = this.questKey.isDown;
+    this.questBox.setVisible(visible);
+    this.questText.setVisible(visible);
   }
 
   private updateQuestText(prefix?: string): void {

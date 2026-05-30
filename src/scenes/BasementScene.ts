@@ -5,10 +5,9 @@
  * (dust bunnies + Freaky Icky Spiders), three interactive wall objects,
  * and a fixed boss encounter: the Evil Heating Coil.
  *
- * Tiles from garage-ts (garage_basement_16x16.png, 16×16, 64 cols × 96 rows):
- *   Frame 1416 = row 22 col  8 — cool blue-grey stone   → walls
- *   Frame 1640 = row 25 col 40 — dark blue-grey concrete → floor
- *   Frame  936 = row 14 col 40 — warm grey stairs        → exit tile
+ * Tiles from dungeon-16 (0x72_16x16DungeonTileset.v5.png, 16×16):
+ *   Outer walls use explicit frame rules from the numbered tileset preview.
+ *   Default wall = frame 32, default floor = frame 64.
  *
  * Interactive objects
  * ───────────────────
@@ -28,6 +27,7 @@ import { BattleManager } from "../game/BattleManager";
 import { CharacterSprite } from "../game/CharacterSprite";
 import { DAD_DEF } from "../game/characterDefs";
 import { dialogue, enemies } from "../game/content";
+import { installDevShortcuts } from "../game/devShortcuts";
 import { DialogueBox } from "../game/DialogueBox";
 import { getDadBrainLine, getDadLine, getDadMovieQuote } from "../game/dadVoice";
 import { DialogueRunner, type DialogueInput, type DialogueLine } from "../game/DialogueRunner";
@@ -47,62 +47,58 @@ import {
 // ── Tile constants ─────────────────────────────────────────────────────────
 const TILE = 16;
 
-// garage-ts = garage_basement_16x16.png (64 cols × 96 rows, all at 16×16)
-const BWALL_FRAME  = 1416; // row 22 col 8  — blue-grey basement stone
-const BFLOOR_FRAME = 1640; // row 25 col 40 — dark concrete floor
-const STAIR_FRAME  =  936; // row 14 col 40 — warm stairs going up
+const WALL_FRAME_DEFAULT = 32;
+const FLOOR_FRAMES = [64, 65, 188, 227];
 
 const W = 1; // wall
 const F = 2; // floor (walkable)
 const X = 3; // exit tile — triggers return to NeighborhoodScene
 
-// ── Dungeon map: 28 cols × 20 rows = 448 × 320 world px ──────────────────
-//
-//  Entry / exit   cols 13–14, row 0
-//
-//  Dead ends:
-//    NW  cols 3–4,   rows 1–2   old insulation, WD-40 from 2020
-//    NE  cols 22–24, rows 1–2   water-damage stain shaped like South America
-//    E   cols 4–11,  row  9     empty wire shelving — the "organization phase"
-//    S   cols 3–4,   rows 15–18 pool noodles (Dad has no pool)
-//
-//  Main path:
-//    Enter → south shaft → row 3 junction → west → south (col 3–4) →
-//    BREAKER at col 3 row 6   (must flip before fighting boss)
-//    → row 14 E-junction → north N-path (col 19–20) →
-//    boss room cols 19–26 rows 4–8   COIL at col 23 row 6
-//
-/* prettier-ignore */
-const MAP: number[][] = [
-  [W,W,W,W,W,W,W,W,W,W,W,W,W,X,X,W,W,W,W,W,W,W,W,W,W,W,W,W], //  0  exit 13-14
-  [W,W,W,F,F,W,W,W,W,W,W,W,W,F,F,W,W,W,W,W,W,W,F,F,F,W,W,W], //  1  NW|entry shaft|NE dead-end
-  [W,W,W,F,F,W,W,W,W,W,W,W,W,F,F,W,W,W,W,W,W,W,F,F,F,W,W,W], //  2
-  [W,W,W,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,W,W,W], //  3  wide junction
-  [W,W,W,F,F,W,W,W,W,W,W,W,W,W,W,W,W,W,W,F,F,F,F,F,F,F,F,W], //  4  main + boss room top
-  [W,W,W,F,F,W,W,W,W,W,W,W,W,W,W,W,W,W,W,F,F,F,F,F,F,F,F,W], //  5
-  [W,W,W,F,F,W,W,W,W,W,W,W,W,W,W,W,W,W,W,F,F,F,F,F,F,F,F,W], //  6  BREAKER≈col3  COIL at 23
-  [W,W,W,F,F,W,W,W,W,W,W,W,W,W,W,W,W,W,W,F,F,F,F,F,F,F,F,W], //  7  boss room
-  [W,W,W,F,F,W,W,W,W,W,W,W,W,W,W,W,W,W,W,F,F,W,W,W,W,W,W,W], //  8  boss room bottom
-  [W,W,W,F,F,F,F,F,F,F,F,F,W,W,W,W,W,W,W,F,F,W,W,W,W,W,W,W], //  9  E shelf stub | N-path
-  [W,W,W,F,F,W,W,W,W,W,W,W,W,W,W,W,W,W,W,F,F,W,W,W,W,W,W,W], // 10
-  [W,W,W,F,F,W,W,W,W,W,W,W,W,W,W,W,W,W,W,F,F,W,W,W,W,W,W,W], // 11
-  [W,W,W,F,F,W,W,W,W,W,W,W,W,W,W,W,W,W,W,F,F,W,W,W,W,W,W,W], // 12
-  [W,W,W,F,F,W,W,W,W,W,W,W,W,W,W,W,W,W,W,F,F,W,W,W,W,W,W,W], // 13
-  [W,W,W,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,W,W,W,W,W,W,W], // 14  E-junction 3–20
-  [W,W,W,F,F,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W], // 15  S dead-end
-  [W,W,W,F,F,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W], // 16
-  [W,W,W,F,F,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W], // 17
-  [W,W,W,F,F,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W], // 18
-  [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W], // 19  bottom wall
-];
+function buildBasementMap(): number[][] {
+  const map = Array.from({ length: 24 }, () => Array(36).fill(W));
+  const room = (c1: number, r1: number, c2: number, r2: number) => {
+    for (let r = r1; r <= r2; r++) {
+      for (let c = c1; c <= c2; c++) map[r][c] = F;
+    }
+  };
+  const h = (row: number, c1: number, c2: number) => room(c1, row, c2, row);
+  const v = (col: number, r1: number, r2: number) => room(col, r1, col, r2);
 
-const ROWS    = MAP.length;    // 20
-const COLS    = MAP[0].length; // 28
-const WORLD_W = COLS * TILE;   // 448
-const WORLD_H = ROWS * TILE;   // 320
+  map[0][17] = X;
+  map[0][18] = X;
+
+  room(15, 1, 20, 3);  // entry room
+  h(3, 3, 32);         // main choice corridor
+  v(4, 3, 15);         // west long path
+  room(2, 8, 7, 12);
+  h(10, 4, 13);        // breaker dead-end hall
+  v(10, 3, 8);
+  h(8, 10, 16);
+  v(16, 8, 18);
+  room(12, 15, 18, 18);
+  v(24, 3, 14);
+  room(22, 11, 28, 14);
+  h(6, 24, 33);
+  v(33, 6, 18);
+  h(18, 20, 33);
+  v(20, 14, 18);
+  room(29, 17, 34, 21); // dryer room
+  h(21, 4, 12);         // south-west false branch
+  v(12, 18, 21);
+  room(8, 20, 14, 22);
+
+  return map;
+}
+
+const MAP: number[][] = buildBasementMap();
+
+const ROWS    = MAP.length;
+const COLS    = MAP[0].length;
+const WORLD_W = COLS * TILE;
+const WORLD_H = ROWS * TILE;
 
 // Tiles occupied by the coil (boss) — player can't walk through it
-const COIL_BLOCKED: ReadonlySet<string> = new Set(["22,5","23,5","22,6","23,6"]);
+const COIL_BLOCKED: ReadonlySet<string> = new Set(["32,19","33,19","32,20","33,20"]);
 
 // ── Position helpers ──────────────────────────────────────────────────────
 const px = (col: number, row: number) =>
@@ -112,7 +108,7 @@ const px = (col: number, row: number) =>
 interface DeadEnd { x: number; y: number; lines: string[] }
 const DEAD_ENDS: DeadEnd[] = [
   {
-    ...px(3, 1),
+    ...px(4, 12),
     lines: [
       "Old insulation, partially detached from the pipe.",
       "Dad has been meaning to reattach it since 2020.",
@@ -120,7 +116,7 @@ const DEAD_ENDS: DeadEnd[] = [
     ],
   },
   {
-    ...px(22, 1),
+    ...px(26, 13),
     lines: [
       "A water stain on the north wall in the shape of South America.",
       "There was 'an incident' in 2018. Insurance 'handled it'.",
@@ -128,7 +124,7 @@ const DEAD_ENDS: DeadEnd[] = [
     ],
   },
   {
-    ...px(7, 9),
+    ...px(13, 21),
     lines: [
       "A wire-rack shelving unit. Completely empty.",
       "Dad purchased it during an organizational phase in 2019.",
@@ -136,7 +132,7 @@ const DEAD_ENDS: DeadEnd[] = [
     ],
   },
   {
-    ...px(3, 16),
+    ...px(7, 21),
     lines: [
       "Pool noodles. Seven of them. Dad does not own a pool.",
       "\"You never know,\" said Dad, in 2017, at a garage sale.",
@@ -148,12 +144,67 @@ const DEAD_ENDS: DeadEnd[] = [
 const DEAD_END_RADIUS = 3 * TILE;
 
 // ── Interactive object positions ──────────────────────────────────────────
-const BREAKER_PX   = px(3, 6);   // on the left wall of the main south corridor
-const STICKER_PX   = px(5, 6);   // nearby — the safety sticker Dad never read
-const COIL_PX      = px(23, 6);  // Evil Heating Coil — fixed boss
+const BREAKER_PX   = px(14, 10); // wall tile at the end of the breaker hall
+const STICKER_PX   = px(12, 11); // nearby — the safety sticker Dad never read
+const COIL_PX      = px(32, 19); // Evil Heating Coil — bottom-right room
 const COIL_RADIUS  = 2 * TILE;
-const BREAKER_RADIUS = 2 * TILE;
 const STICKER_RADIUS = 2 * TILE;
+const BREAKER_COL = 14;
+const BREAKER_ROW = 10;
+const BREAKER_OFF_FRAME = 48; // !other.png row 5, column 1
+const BREAKER_ON_FRAME = 74;  // !other.png row 7, column 3
+
+interface BasementChest {
+  col: number;
+  row: number;
+  frame: number;
+  tint?: number;
+  contents: DialogueInput[];
+  itemId?: string;
+}
+
+const BASEMENT_CHESTS: BasementChest[] = [
+  {
+    col: 6,
+    row: 11,
+    frame: 0,
+    contents: [
+      { speaker: "NARRATOR", text: "Dad opens a plastic tote and finds three furnace filters, all different sizes." },
+      { speaker: "DAD", text: "One of these is definitely correct for something." },
+    ],
+  },
+  {
+    col: 17,
+    row: 17,
+    frame: 4,
+    tint: 0xaaaaaa,
+    itemId: "ibuprofen",
+    contents: [
+      { speaker: "NARRATOR", text: "A dented metal first-aid tin. Inside: one travel bottle of ibuprofen." },
+      { speaker: "DAD'S BRAIN", text: "Treasure, by suburban dungeon standards." },
+    ],
+  },
+  {
+    col: 27,
+    row: 13,
+    frame: 8,
+    tint: 0xc084fc,
+    contents: [
+      { speaker: "NARRATOR", text: "A cardboard box of coax cables, speaker wire, and one charger for a device nobody remembers." },
+      { speaker: "DAD", text: "Can't throw these out. What if the mystery device comes back?" },
+    ],
+  },
+  {
+    col: 33,
+    row: 18,
+    frame: 0,
+    tint: 0x94a3b8,
+    contents: [
+      { speaker: "NARRATOR", text: "Holiday candles. All labeled Fresh Snow. All smelling faintly like crayons." },
+      { speaker: "DAD", text: "Seasonal." },
+    ],
+  },
+];
 
 // ── Battle types ──────────────────────────────────────────────────────────
 type BasementMode  = "explore" | "dialogue" | "battle";
@@ -166,12 +217,14 @@ export class BasementScene extends Phaser.Scene {
   // movement
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private interactKey!: Phaser.Input.Keyboard.Key;
+  private questKey!: Phaser.Input.Keyboard.Key;
   private mover!: GridMover;
 
   // world objects
   private breakerPanel!: Phaser.GameObjects.Image;   // the full breaker box sprite
-  private breakerSwitch!: Phaser.GameObjects.Rectangle; // the colored on/off indicator
   private coilSprite!: Phaser.GameObjects.Image;
+  private openedChests = new Set<string>();
+  private chestSprites = new Map<string, Phaser.GameObjects.Image>();
 
   // systems
   private mode: BasementMode = "explore";
@@ -194,6 +247,7 @@ export class BasementScene extends Phaser.Scene {
   private battleEnemyText!: Phaser.GameObjects.BitmapText;
   private commandBox!: Phaser.GameObjects.Rectangle;
   private commandText!: Phaser.GameObjects.BitmapText;
+  private questBox!: Phaser.GameObjects.Rectangle;
   private questText!: Phaser.GameObjects.BitmapText;
 
   constructor() { super("BasementScene"); }
@@ -201,13 +255,19 @@ export class BasementScene extends Phaser.Scene {
   // ── Lifecycle ─────────────────────────────────────────────────────────────
 
   create(): void {
+    installDevShortcuts(this);
+
     this.state = getGameState();
     this.mode  = "explore";
+    this.openedChests.clear();
+    this.chestSprites.clear();
     this.cursors     = this.input.keyboard!.createCursorKeys();
     this.interactKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    this.questKey    = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
 
     this.drawTiles();
     this.placeObjects();
+    this.placeChests();
     this.placePlayer();
     this.createUi();
     this.menu = new GameMenu(this, () => this.state);
@@ -226,6 +286,7 @@ export class BasementScene extends Phaser.Scene {
 
   update(_time: number, delta: number): void {
     this.dialogueBox.update(delta);
+    this.updateQuestPrompt();
 
     if (this.mode !== "battle") {
       this.menu.update();
@@ -264,47 +325,95 @@ export class BasementScene extends Phaser.Scene {
         const cy = r * TILE + TILE / 2;
 
         if (t === W) {
-          this.add.image(cx, cy, "garage-ts").setFrame(BWALL_FRAME).setDisplaySize(TILE, TILE);
+          this.add.image(cx, cy, "dungeon-16")
+            .setFrame(this.getBasementWallFrame(c, r))
+            .setDisplaySize(TILE, TILE);
         } else if (t === X) {
-          this.add.image(cx, cy, "garage-ts").setFrame(STAIR_FRAME).setDisplaySize(TILE, TILE);
+          this.add.image(cx, cy, "dungeon-16")
+            .setFrame(WALL_FRAME_DEFAULT)
+            .setDisplaySize(TILE, TILE);
         } else {
-          this.add.image(cx, cy, "garage-ts").setFrame(BFLOOR_FRAME).setDisplaySize(TILE, TILE);
+          this.add.image(cx, cy, "dungeon-16")
+            .setFrame(this.getBasementFloorFrame(c, r))
+            .setDisplaySize(TILE, TILE);
         }
       }
     }
-    addPixelText(this, 13 * TILE, 2, "EXIT ↑", 5).setTint(0x60a5fa);
+
+    this.add.image(17 * TILE, 0, "stairs-down")
+      .setDisplaySize(TILE * 2, TILE)
+      .setOrigin(0, 0);
+  }
+
+  private getBasementWallFrame(col: number, row: number): number {
+    const lastCol = COLS - 1;
+
+    if (row === 0) {
+      if (col === 0) return 16;
+      if (col === lastCol) return 18;
+      return 0;
+    }
+
+    if (row === 1) {
+      if (col === 0) return 48;
+      if (col === lastCol) return 50;
+      return 32;
+    }
+
+    if (row === ROWS - 3) {
+      if (col === 0) return 83;
+      if (col === lastCol) return 84;
+      return WALL_FRAME_DEFAULT;
+    }
+
+    if (row === ROWS - 2) return 115;
+    if (row === ROWS - 1) return 21;
+
+    if (col === 0) return 48;
+    if (col === 1) return 49;
+    if (col === lastCol - 1) return 49;
+    if (col === lastCol) return 50;
+
+    return WALL_FRAME_DEFAULT;
+  }
+
+  private getBasementFloorFrame(col: number, row: number): number {
+    return FLOOR_FRAMES[Math.abs(col * 13 + row * 17) % FLOOR_FRAMES.length];
   }
 
   // ── World objects ─────────────────────────────────────────────────────────
 
   private placeObjects(): void {
     // ── Circuit breaker ────────────────────────────────────────────────────
-    // obj-other frame 49 = row 5 col 2 (1-indexed) = neutral front view of the panel
-    // frame 61 = row 6 col 2 = alternate state (switches thrown)
-    const breakerFrame = this.state.flags.circuitBreakerOff ? 61 : 49;
-    this.breakerPanel = this.add.image(BREAKER_PX.x, BREAKER_PX.y - 4, "obj-other")
+    const breakerFrame = this.state.flags.circuitBreakerOff
+      ? BREAKER_OFF_FRAME
+      : BREAKER_ON_FRAME;
+    this.breakerPanel = this.add.image(BREAKER_PX.x, BREAKER_PX.y, "obj-other")
       .setFrame(breakerFrame)
       .setOrigin(0.5, 0.5)
-      .setDisplaySize(28, 28);
-    this.breakerSwitch = this.add.rectangle(
-      BREAKER_PX.x,
-      BREAKER_PX.y + (this.state.flags.circuitBreakerOff ? 10 : 6),
-      5, 12,
-      this.state.flags.circuitBreakerOff ? 0x22c55e : 0xf97316,
-    );
-    addPixelText(this, BREAKER_PX.x - 20, BREAKER_PX.y + 17, "BREAKER", 6);
+      .setDisplaySize(TILE, TILE);
 
     // ── Safety sticker ─────────────────────────────────────────────────────
     this.add.image(STICKER_PX.x, STICKER_PX.y, "safety-sticker")
       .setOrigin(0.5, 0.5)
-      .setDisplaySize(20, 20);
+      .setDisplaySize(TILE, TILE);
 
     // ── Coil / dryer boss ──────────────────────────────────────────────────
     if (!this.state.flags.bossDefeated) {
       this.coilSprite = this.add.image(COIL_PX.x, COIL_PX.y, "dryer-boss-world")
         .setOrigin(0.5, 0.75)
         .setDisplaySize(30, 30);
-      addPixelText(this, COIL_PX.x - 14, COIL_PX.y + 14, "DRYER", 6);
+    }
+  }
+
+  private placeChests(): void {
+    for (const chest of BASEMENT_CHESTS) {
+      const pos = px(chest.col, chest.row);
+      const sprite = this.add.image(pos.x, pos.y, "chests")
+        .setFrame(chest.frame)
+        .setDisplaySize(TILE, TILE)
+        .setTint(chest.tint ?? 0xffffff);
+      this.chestSprites.set(`${chest.col},${chest.row}`, sprite);
     }
   }
 
@@ -312,8 +421,7 @@ export class BasementScene extends Phaser.Scene {
 
   private placePlayer(): void {
     const char = new CharacterSprite(this, 0, 0, DAD_DEF);
-    this.mover = new GridMover(this, char, TILE, 13, 1);
-    addPixelText(this, 13 * TILE + 3, 1 * TILE - 6, "DAD", 6);
+    this.mover = new GridMover(this, char, TILE, 17, 1);
   }
 
   // ── Collision ─────────────────────────────────────────────────────────────
@@ -321,13 +429,14 @@ export class BasementScene extends Phaser.Scene {
   private canWalkTo(col: number, row: number): boolean {
     if (col < 0 || col >= COLS || row < 0 || row >= ROWS) return false;
     if (!this.state.flags.bossDefeated && COIL_BLOCKED.has(`${col},${row}`)) return false;
+    if (BASEMENT_CHESTS.some((chest) => chest.col === col && chest.row === row)) return false;
     const t = MAP[row][col];
     return t === F || t === X;
   }
 
   private onLand(col: number, row: number): void {
     if (MAP[row][col] === X) {
-      this.scene.start("NeighborhoodScene");
+      this.returnToHouse();
       return;
     }
 
@@ -359,7 +468,7 @@ export class BasementScene extends Phaser.Scene {
 
     // Exit (Space at top)
     if (MAP[this.mover.row]?.[this.mover.col] === X) {
-      this.scene.start("NeighborhoodScene");
+      this.returnToHouse();
       return;
     }
 
@@ -369,8 +478,8 @@ export class BasementScene extends Phaser.Scene {
       return;
     }
 
-    // Circuit breaker
-    if (dist(BREAKER_PX) < BREAKER_RADIUS + TILE) {
+    // Circuit breaker — must stand directly next to the breaker wall tile.
+    if (this.isAdjacentTo(BREAKER_COL, BREAKER_ROW)) {
       this.interactWithBreaker();
       return;
     }
@@ -383,6 +492,13 @@ export class BasementScene extends Phaser.Scene {
         { speaker: "DAD", text: "Fine. Breaker first. Heroics after." },
       ]);
       return;
+    }
+
+    for (const chest of BASEMENT_CHESTS) {
+      if (dist(px(chest.col, chest.row)) < TILE * 1.75) {
+        this.interactWithChest(chest);
+        return;
+      }
     }
 
     // Dead ends
@@ -403,6 +519,25 @@ export class BasementScene extends Phaser.Scene {
 
   // ── Quest interactions ────────────────────────────────────────────────────
 
+  private isAdjacentTo(col: number, row: number): boolean {
+    return Math.abs(this.mover.col - col) + Math.abs(this.mover.row - row) === 1;
+  }
+
+  private interactWithChest(chest: BasementChest): void {
+    const key = `${chest.col},${chest.row}`;
+    if (this.openedChests.has(key)) {
+      this.startDialogue([{ speaker: "NARRATOR", text: "The box contains only the echo of Dad's previous curiosity." }]);
+      return;
+    }
+
+    this.openedChests.add(key);
+    this.chestSprites.get(key)?.setFrame(12).clearTint();
+    if (chest.itemId) {
+      this.state.player.inventory.push(chest.itemId);
+    }
+    this.startDialogue(chest.contents);
+  }
+
   private interactWithCoil(): void {
     if (this.state.flags.bossDefeated) {
       this.startDialogue([{ speaker: "NARRATOR", text: "The heating coil is quiet now. Almost smugly quiet." }]);
@@ -418,7 +553,7 @@ export class BasementScene extends Phaser.Scene {
         { speaker: "DAD", text: "Nope. This is a wrench problem." },
         { speaker: "DAD", text: getDadLine("selfTalk", "frustrated") },
         { speaker: "NARRATOR", text: "The garage waits." },
-      ], () => this.scene.start("NeighborhoodScene"));
+      ], () => this.returnToHouse());
       return;
     }
 
@@ -441,8 +576,7 @@ export class BasementScene extends Phaser.Scene {
         this.state.flags.circuitBreakerOff = false;
         completeQuestStep(this.state, "restore-power");
         setActiveQuestStep(this.state, "return-to-wife");
-        this.breakerPanel.setFrame(49);
-        this.breakerSwitch.setY(BREAKER_PX.y + 6).setFillStyle(0xf97316);
+        this.breakerPanel.setFrame(BREAKER_ON_FRAME);
         this.updateQuestText("BASEMENT");
         this.startDialogue([
           { speaker: "NARRATOR", text: "Dad flips the breaker back on. The house wakes up with a chorus of appliance beeps." },
@@ -461,8 +595,7 @@ export class BasementScene extends Phaser.Scene {
     this.state.flags.circuitBreakerOff = true;
     completeQuestStep(this.state, "flip-breaker");
     setActiveQuestStep(this.state, "defeat-heating-coil");
-    this.breakerPanel.setFrame(61);
-    this.breakerSwitch.setY(BREAKER_PX.y + 10).setFillStyle(0x22c55e);
+    this.breakerPanel.setFrame(BREAKER_OFF_FRAME);
     this.updateQuestText("BASEMENT");
     this.startDialogue([
       { speaker: "DAD'S BRAIN", text: "Kill the power before poking the angry appliance. Revolutionary." },
@@ -594,7 +727,7 @@ export class BasementScene extends Phaser.Scene {
         : []),
     ], () => {
       this.hideBattleUi();
-      this.scene.start("NeighborhoodScene");
+      this.returnToHouse();
     });
   }
 
@@ -612,9 +745,13 @@ export class BasementScene extends Phaser.Scene {
         this.state.player.hp       = this.state.player.maxHp;
         this.state.player.dadPoints = this.state.player.maxDadPoints;
         this.state.player.cash     = Math.max(0, this.state.player.cash - 2);
-        this.scene.start("NeighborhoodScene");
+        this.returnToHouse();
       },
     );
+  }
+
+  private returnToHouse(): void {
+    this.scene.start("NeighborhoodScene", { spawn: "basement" });
   }
 
   private getDefeatHint(): string {
@@ -643,8 +780,14 @@ export class BasementScene extends Phaser.Scene {
   // ── Battle UI ─────────────────────────────────────────────────────────────
 
   private createUi(): void {
-    this.add.rectangle(8, 8, 236, 16, 0xfacc15).setOrigin(0, 0).setScrollFactor(0);
-    this.questText = addPixelText(this, 12, 11, "", 8).setTint(0x111827).setScrollFactor(0);
+    this.questBox = this.add.rectangle(8, 8, 236, 16, 0xfacc15)
+      .setOrigin(0, 0)
+      .setScrollFactor(0)
+      .setVisible(false);
+    this.questText = addPixelText(this, 12, 11, "", 8)
+      .setTint(0x111827)
+      .setScrollFactor(0)
+      .setVisible(false);
     this.dialogueBox = new DialogueBox(this);
     this.statsPanel  = new PlayerStatsPanel(this);
 
@@ -706,5 +849,11 @@ export class BasementScene extends Phaser.Scene {
 
   private updateQuestText(prefix: string): void {
     setPixelText(this.questText, `${prefix} - ${getQuestStepLabel(this.state.quest.questId, this.state.quest.activeStepId)}`);
+  }
+
+  private updateQuestPrompt(): void {
+    const visible = this.questKey.isDown;
+    this.questBox.setVisible(visible);
+    this.questText.setVisible(visible);
   }
 }

@@ -44,6 +44,8 @@ export class BootScene extends Phaser.Scene {
     this.load.image("circuit-breaker", "/assets-active/props/circuit_breaker.png");
     this.load.image("safety-sticker", "/assets-active/props/safety_sticker.png");
     this.load.image("stairs-up", "/assets-active/props/stairs_up.png");
+    this.load.image("stairs-down", "/assets-active/tilesets/Stairs_Down.png");
+    this.load.image("garage-door", "/assets-active/tilesets/Door_Single.png");
     this.load.bitmapFont(
       "dialogue-8x8",
       "/assets-active/fonts/round_6x6.png",
@@ -117,14 +119,17 @@ export class BootScene extends Phaser.Scene {
     this.load.spritesheet("chests", "/assets/full_set/Characters/Chests.png", {
       frameWidth: 32, frameHeight: 32,
     });
+    this.load.spritesheet("full-set-doors", "/assets/full_set/Characters/!Doors.png", {
+      frameWidth: 32, frameHeight: 32,
+    });
 
-    // Misc object sprites — "!other.png" from the Next/High-res character set
-    // 576×384 at 48×48 per frame = 12 cols × 8 rows = 96 frames
+    // Misc object sprites — "!other.png" from the full_set character set
+    // 384×256 at 32×32 per frame = 12 cols × 8 rows = 96 frames
     // Circuit breaker panel: rows 5–8, cols 1–3 (RPG Maker 1-indexed)
-    //   → 0-indexed row 4, col 1 = frame 4*12+1 = 49 (neutral front view)
-    //   → 0-indexed row 5, col 1 = frame 5*12+1 = 61 (alternate state)
-    this.load.spritesheet("obj-other", "/assets/full_set/Next/Characters/!other.png", {
-      frameWidth: 48, frameHeight: 48,
+    //   → row 5 col 1 = frame 48 (off)
+    //   → row 7 col 3 = frame 74 (on)
+    this.load.spritesheet("obj-other", "/assets/full_set/Characters/!other.png", {
+      frameWidth: 32, frameHeight: 32,
     });
 
     // ── Interiors_free 16×16 tilesets (used by TiledRoom / new-house map) ───────
@@ -201,6 +206,12 @@ export class BootScene extends Phaser.Scene {
       .get("stairs-up")
       .setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures
+      .get("stairs-down")
+      .setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures
+      .get("garage-door")
+      .setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures
       .get("dungeon-16")
       .setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures
@@ -224,6 +235,7 @@ export class BootScene extends Phaser.Scene {
     this.textures.get("full-set-int-b").setFilter(Phaser.Textures.FilterMode.NEAREST);
 
     this.textures.get("chests").setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures.get("full-set-doors").setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get("obj-other").setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.generateWrenchIcon();
 

@@ -16,6 +16,7 @@
  */
 
 import Phaser from "phaser";
+import { installDevShortcuts } from "../game/devShortcuts";
 import { DialogueBox } from "../game/DialogueBox";
 import { DialogueRunner, type DialogueInput } from "../game/DialogueRunner";
 import { getGameState, saveGameState } from "../game/session";
@@ -38,6 +39,8 @@ export class StoryIntroScene extends Phaser.Scene {
   // ── Lifecycle ─────────────────────────────────────────────────────────────
 
   create(): void {
+    installDevShortcuts(this);
+
     this.advanceKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
     this.drawBackground();

@@ -15,6 +15,23 @@ export function resetGameState(): GameState {
   return currentState;
 }
 
+export function clearSavedGameState(): GameState {
+  localStorage.removeItem(saveKey);
+  localStorage.removeItem(legacySaveKey);
+  currentState = createInitialGameState();
+  return currentState;
+}
+
+export function startFirstQuestGameState(playerName = "DAD"): GameState {
+  currentState = createInitialGameState();
+  currentState.player.name = playerName.trim() || "DAD";
+  currentState.flags.talkedToWife = true;
+  currentState.quest.activeStepId = "inspect-dryer";
+  currentState.quest.completedStepIds = ["talk-to-wife"];
+  saveGameState(currentState);
+  return currentState;
+}
+
 export function saveGameState(state: GameState = currentState): void {
   localStorage.setItem(saveKey, JSON.stringify(state));
 }

@@ -16,6 +16,7 @@ import { BattleManager } from "../game/BattleManager";
 import { CharacterSprite } from "../game/CharacterSprite";
 import { DAD_DEF } from "../game/characterDefs";
 import { enemies } from "../game/content";
+import { installDevShortcuts } from "../game/devShortcuts";
 import { DialogueBox } from "../game/DialogueBox";
 import { getDadBrainLine, getDadLine, getDadMovieQuote } from "../game/dadVoice";
 import { DialogueRunner, type DialogueInput, type DialogueLine } from "../game/DialogueRunner";
@@ -34,11 +35,9 @@ const TILE = 16;
 //   Frame 17 = row 1 col 1 — dark iron/stone fill
 const WALL_FRAME = 17;
 
-// Floor & stairs — garage-ts = garage_basement_16x16.png (1024×1536, 16×16, 64 cols × 96 rows)
+// Floor — garage-ts = garage_basement_16x16.png (1024×1536, 16×16, 64 cols × 96 rows)
 //   Frame 424 = row 6 col 40 — medium-dark grey concrete (GARAGE FLOOR section)
-//   Frame 936 = row 14 col 40 — bright warm grey (GARAGE STAIRS UP section)
 const GARAGE_FLOOR_FRAME = 424;
-const GARAGE_STAIR_FRAME = 936;
 
 const W = 1; // wall
 const F = 2; // floor
@@ -219,6 +218,7 @@ export class GarageScene extends Phaser.Scene {
   // movement
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private interactKey!: Phaser.Input.Keyboard.Key;
+  private questKey!: Phaser.Input.Keyboard.Key;
   private mover!: GridMover;
   private chestSprite!: Phaser.GameObjects.Image;
   private chestOpened = false;
@@ -243,6 +243,7 @@ export class GarageScene extends Phaser.Scene {
   private battleEnemyText!: Phaser.GameObjects.BitmapText;
   private commandBox!: Phaser.GameObjects.Rectangle;
   private commandText!: Phaser.GameObjects.BitmapText;
+  private questBox!: Phaser.GameObjects.Rectangle;
   private questText!: Phaser.GameObjects.BitmapText;
 
   constructor() { super("GarageScene"); }
@@ -250,10 +251,13 @@ export class GarageScene extends Phaser.Scene {
   // ── Lifecycle ─────────────────────────────────────────────────────────────
 
   create(): void {
+    installDevShortcuts(this);
+
     this.state = getGameState();
     this.mode  = "explore";
     this.cursors     = this.input.keyboard!.createCursorKeys();
     this.interactKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    this.questKey    = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
     this.chestOpened = this.state.flags.foundWrench;
 
     this.drawTiles();
@@ -277,6 +281,7 @@ export class GarageScene extends Phaser.Scene {
 
   update(_time: number, delta: number): void {
     this.dialogueBox.update(delta);
+    this.updateQuestPrompt();
 
     if (this.mode !== "battle") {
       this.menu.update();
@@ -319,9 +324,9 @@ export class GarageScene extends Phaser.Scene {
             .setFrame(WALL_FRAME)
             .setDisplaySize(TILE, TILE);
         } else if (t === X) {
-          // Exit stairs — GARAGE STAIRS (UP) tile from garage_basement_16x16
-          this.add.image(cx, cy, "garage-ts")
-            .setFrame(GARAGE_STAIR_FRAME)
+          // Exit door is embedded in the wall but remains walkable as a trigger tile.
+          this.add.image(cx, cy, "full-set-int-a4")
+            .setFrame(WALL_FRAME)
             .setDisplaySize(TILE, TILE);
         } else {
           // Walkable floor — GARAGE FLOOR (CONCRETE) tile from garage_basement_16x16
@@ -332,8 +337,9 @@ export class GarageScene extends Phaser.Scene {
       }
     }
 
-    // Exit label near the entry/exit tiles
-    addPixelText(this, 13 * TILE, 2, "EXIT ↑", 5).setTint(0x60a5fa);
+    this.add.image(13 * TILE, 0, "garage-door")
+      .setDisplaySize(TILE * 2, TILE)
+      .setOrigin(0, 0);
   }
 
   private placeChest(): void {
@@ -425,7 +431,7 @@ export class GarageScene extends Phaser.Scene {
     const dist = (a: { x: number; y: number }) => Math.hypot(dadX - a.x, dadY - a.y);
 
     // Exit
-    if (MAP[this.mover.row]?.[this.mover.col] === X || dist({ x: 13 * TILE + TILE / 2, y: TILE / 2 }) < 2 * TILE) {
+    if (MAP[this.mover.row]?.[this.mover.col] === X) {
       this.scene.start("NeighborhoodScene");
       return;
     }
@@ -621,9 +627,15 @@ export class GarageScene extends Phaser.Scene {
   private createUi(): void {
     const { addPixelText: apt } = { addPixelText };
 
-    // Quest bar
-    this.add.rectangle(8, 8, 236, 16, 0xfacc15).setOrigin(0, 0).setScrollFactor(0);
-    this.questText = addPixelText(this, 12, 11, "", 8).setTint(0x111827).setScrollFactor(0);
+    // Quest bar — hidden until Q is held.
+    this.questBox = this.add.rectangle(8, 8, 236, 16, 0xfacc15)
+      .setOrigin(0, 0)
+      .setScrollFactor(0)
+      .setVisible(false);
+    this.questText = addPixelText(this, 12, 11, "", 8)
+      .setTint(0x111827)
+      .setScrollFactor(0)
+      .setVisible(false);
 
     // Dialogue
     this.dialogueBox = new DialogueBox(this);
@@ -692,5 +704,11 @@ export class GarageScene extends Phaser.Scene {
 
   private updateQuestText(): void {
     setPixelText(this.questText, `GARAGE - ${getQuestStepLabel(this.state.quest.questId, this.state.quest.activeStepId)}`);
+  }
+
+  private updateQuestPrompt(): void {
+    const visible = this.questKey.isDown;
+    this.questBox.setVisible(visible);
+    this.questText.setVisible(visible);
   }
 }

@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { installDevShortcuts } from "../game/devShortcuts";
 import { getGameState, saveGameState } from "../game/session";
 import { addPixelText, setPixelText } from "../game/uiText";
 
@@ -29,6 +30,8 @@ export class NameEntryScene extends Phaser.Scene {
   }
 
   create(): void {
+    installDevShortcuts(this);
+
     this.cursors = this.input.keyboard!.createCursorKeys();
     this.confirmKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.enterKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);

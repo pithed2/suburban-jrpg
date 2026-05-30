@@ -25,6 +25,9 @@
  *   // Optional step callback (e.g. trigger stair exit when stepped onto):
  *   mover.update(cursors, delta, canWalk, (col, row) => this.onLand(col, row));
  *
+ *   // Optional blocked-step callback (e.g. trigger wall-door stairs when bumped):
+ *   mover.update(cursors, delta, canWalk, onLand, (col, row) => this.onBump(col, row));
+ *
  *   // Camera follow:
  *   camera.startFollow(mover.phaserSprite, true, 0.1, 0.1);
  */
@@ -82,12 +85,14 @@ export class GridMover {
    * @param delta     Frame delta time in ms
    * @param canWalkTo Returns true if the given tile col/row is passable
    * @param onLand    Optional callback fired each time a step completes (receives new col/row)
+   * @param onBump    Optional callback fired when a blocked target tile is bumped
    */
   update(
     cursors: Phaser.Types.Input.Keyboard.CursorKeys,
     delta: number,
     canWalkTo: (col: number, row: number) => boolean,
     onLand?: (col: number, row: number) => void,
+    onBump?: (col: number, row: number) => void,
   ): void {
     if (this._moving) return; // mid-tween: ignore all input
 
@@ -113,7 +118,7 @@ export class GridMover {
     }
 
     if (dir) {
-      this.tryStep(dir, canWalkTo, onLand);
+      this.tryStep(dir, canWalkTo, onLand, onBump);
     }
   }
 
@@ -127,9 +132,10 @@ export class GridMover {
     dir: Direction,
     canWalkTo: (col: number, row: number) => boolean,
     onLand?: (col: number, row: number) => void,
+    onBump?: (col: number, row: number) => void,
   ): boolean {
     if (this._moving) return false;
-    return this.tryStep(dir, canWalkTo, onLand);
+    return this.tryStep(dir, canWalkTo, onLand, onBump);
   }
 
   /** Instantly teleport to a tile (no tween, no animation). */
@@ -146,6 +152,7 @@ export class GridMover {
     dir: Direction,
     canWalkTo: (col: number, row: number) => boolean,
     onLand?: (col: number, row: number) => void,
+    onBump?: (col: number, row: number) => void,
   ): boolean {
     const targetCol = this._col + colDelta(dir);
     const targetRow = this._row + rowDelta(dir);
@@ -154,6 +161,7 @@ export class GridMover {
     this.char.face(dir);
 
     if (!canWalkTo(targetCol, targetRow)) {
+      onBump?.(targetCol, targetRow);
       return false; // blocked — character has already turned to face the wall
     }
 

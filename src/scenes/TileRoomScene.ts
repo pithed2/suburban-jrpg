@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import { CharacterSprite } from "../game/CharacterSprite";
 import { DAD_DEF } from "../game/characterDefs";
+import { installDevShortcuts } from "../game/devShortcuts";
 import { GridMover } from "../game/GridMover";
 import { DialogueBox } from "../game/DialogueBox";
 import { DialogueRunner, type DialogueInput, type DialogueLine } from "../game/DialogueRunner";
@@ -192,10 +193,12 @@ type RoomMode = "explore" | "dialogue";
 export class TileRoomScene extends Phaser.Scene {
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private interactKey!: Phaser.Input.Keyboard.Key;
+  private questKey!: Phaser.Input.Keyboard.Key;
   private mover!: GridMover;
   private propBlockers: { rect: Phaser.Geom.Rectangle; prop: RoomProp }[] = [];
   private stairWorldX = 0;
   private stairWorldY = 0;
+  private questBox!: Phaser.GameObjects.Rectangle;
   private questText!: Phaser.GameObjects.BitmapText;
   private dialogueBox!: DialogueBox;
   private statsPanel!: PlayerStatsPanel;
@@ -209,10 +212,13 @@ export class TileRoomScene extends Phaser.Scene {
   }
 
   create(): void {
+    installDevShortcuts(this);
+
     this.state = getGameState();
     this.mode = "explore";
     this.cursors = this.input.keyboard!.createCursorKeys();
     this.interactKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    this.questKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
 
     this.drawTiles();
     this.placeProps();
@@ -232,6 +238,7 @@ export class TileRoomScene extends Phaser.Scene {
   update(_time: number, delta: number): void {
     this.dialogueBox.update(delta);
     this.menu.update();
+    this.updateQuestPrompt();
 
     if (this.menu.isOpen()) {
       this.statsPanel.hide();
@@ -434,12 +441,22 @@ export class TileRoomScene extends Phaser.Scene {
   // ── UI ───────────────────────────────────────────────────────────────────────
 
   private createUi(): void {
-    this.add.rectangle(8, 8, 236, 16, 0x1e40af).setOrigin(0, 0).setScrollFactor(0);
+    this.questBox = this.add.rectangle(8, 8, 236, 16, 0x1e40af)
+      .setOrigin(0, 0)
+      .setScrollFactor(0)
+      .setVisible(false);
     this.questText = addPixelText(this, 12, 11, "UTILITY ROOM", 8)
       .setTint(0xfacc15)
-      .setScrollFactor(0);
+      .setScrollFactor(0)
+      .setVisible(false);
     this.dialogueBox = new DialogueBox(this);
     this.statsPanel = new PlayerStatsPanel(this);
+  }
+
+  private updateQuestPrompt(): void {
+    const visible = this.questKey.isDown;
+    this.questBox.setVisible(visible);
+    this.questText.setVisible(visible);
   }
 
   private showMessage(message: DialogueLine | string): void {
