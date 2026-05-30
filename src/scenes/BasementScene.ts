@@ -145,7 +145,7 @@ const DEAD_END_RADIUS = 3 * TILE;
 
 // ── Interactive object positions ──────────────────────────────────────────
 const BREAKER_PX   = px(14, 10); // wall tile at the end of the breaker hall
-const STICKER_PX   = px(12, 11); // nearby — the safety sticker Dad never read
+const STICKER_PX   = px(30, 20); // nearby — the safety sticker Dad never read
 const COIL_PX      = px(32, 19); // Evil Heating Coil — bottom-right room
 const COIL_RADIUS  = 2 * TILE;
 const STICKER_RADIUS = 2 * TILE;
