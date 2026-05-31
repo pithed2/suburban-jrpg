@@ -108,7 +108,7 @@
     "name": "Evil Heating Coil",
     "battleTexture": "heating-coil-battle",
     "level": 2,
-    "hp": 24,
+    "hp": 26,
     "attack": 3,
     "agility": 8,
     "dodgeChance": 0.0625,
