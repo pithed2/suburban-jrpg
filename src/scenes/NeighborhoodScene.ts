@@ -341,16 +341,25 @@ export class NeighborhoodScene extends Phaser.Scene {
   private interactWithWife(): void {
     const wifeCheckIn = this.getWifeCheckInLines();
 
+    if (this.state.flags.dryerFixed) {
+      this.startDialogue([
+        { speaker: "WIFE", text: "The dryer is still working. I am choosing to believe this is permanent." },
+        { speaker: "DAD", text: "That's wise. Also brave." },
+        ...wifeCheckIn,
+      ]);
+      return;
+    }
+
     if (this.state.flags.bossDefeated) {
       if (this.state.flags.circuitBreakerOff) {
         setActiveQuestStep(this.state, "restore-power");
         this.updateQuestText("POWER OUT");
         this.startDialogue([
-          ...wifeCheckIn,
           { speaker: "WIFE",       text: "Now, nothing works! What did you do??" },
           { speaker: "DAD'S BRAIN", text: "Dude. Dryers don't work without power." },
           { speaker: "DAD",        text: "Small administrative follow-up. Totally under control." },
           { speaker: "NARRATOR",   text: "The basement breaker waits for Dad's victory lap." },
+          ...wifeCheckIn,
         ]);
         return;
       }
@@ -358,10 +367,20 @@ export class NeighborhoodScene extends Phaser.Scene {
       completeQuestStep(this.state, "return-to-wife");
       this.state.flags.dryerFixed = true;
       this.updateQuestText("DRYER FIXED");
+      saveGameState(this.state);
       this.startDialogue([
-        ...wifeCheckIn,
         { speaker: "DAD",      text: getDadLine("toWife", "greeting") },
+        { speaker: "WIFE",     text: "You fixed it? The towels are actually dry?" },
         ...dialogue.victory.map((text) => ({ speaker: "NARRATOR", text })),
+        { speaker: "DAD",      text: "What can I say? The Dad shows up, identifies the problem, defeats the problem, and restores domestic order." },
+        { speaker: "WIFE",     text: "It only took you one garage expedition, one basement expedition, and a full appliance duel." },
+        { speaker: "DAD",      text: "That's called commitment. Also, I got a pretty good arm workout in. Honestly? Feeling a little swole." },
+        { speaker: "DAD",      text: "You should feel these arms right now. Big flex." },
+        { speaker: "WIFE",     text: "Aw. Look at you." },
+        { speaker: "WIFE",     text: "You wish. Your to-do list is way too long." },
+        { speaker: "WIFE",     text: "Thank you. Sincerely. I will be impressed for at least the next ninety seconds." },
+        { speaker: "WIFE",     text: "Next, we need to talk about that family dinner text from my mom. But first, status check." },
+        ...wifeCheckIn,
         { speaker: "DAD",      text: getDadLine("selfTalk", "victory") },
       ], () => {
         this.mode = "complete";
@@ -373,11 +392,11 @@ export class NeighborhoodScene extends Phaser.Scene {
     // talkedToWife is set by the opening cutscene — no replay needed.
     // In-game wife dialogue is the "check-in / nag" branch.
     this.startDialogue([
-      ...wifeCheckIn,
       { speaker: "DAD'S BRAIN", text: getDadBrainLine("talkToWife") },
       { speaker: "DAD",  text: getDadLine("toWife", "greeting") },
       { speaker: "WIFE", text: "How's the dryer coming?" },
       { speaker: "DAD",  text: getDadLine("toWife", "questReceived") },
+      ...wifeCheckIn,
     ]);
   }
 

@@ -6,6 +6,8 @@ type AdvanceResult = "revealed" | "page" | "done";
 const charsPerLine = 45;
 const linesPerPage = 3;
 const msPerCharacter = 48;
+const defaultTextTint = 0xf8fafc;
+const itemGainTextTint = 0xef4444;
 
 export class DialogueBox {
   private readonly box: Phaser.GameObjects.Rectangle;
@@ -65,6 +67,7 @@ export class DialogueBox {
     this.speakerBreak.setVisible(true);
     setPixelText(this.speakerLabel, speakerText);
     this.speakerLabel.setVisible(true);
+    this.text.setTint(isItemGainMessage(speaker, message) ? itemGainTextTint : defaultTextTint);
     this.text.setVisible(true);
     this.render();
   }
@@ -201,4 +204,9 @@ function splitLongWord(word: string): string[] {
   }
 
   return chunks;
+}
+
+function isItemGainMessage(speaker: string, message: string): boolean {
+  if (speaker !== "SYSTEM") return false;
+  return /\b(YOU GAINED|FOUND|HAD FOUND)\b/i.test(message);
 }
