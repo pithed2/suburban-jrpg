@@ -11,12 +11,16 @@ export interface LevelUpResult {
   message?: string;
 }
 
-const levelTable = [
+export const levelTable = [
   { level: 1, xp: 0, maxHp: 24, maxDadPoints: 8, strength: 8, agility: 5 },
   { level: 2, xp: 8, maxHp: 30, maxDadPoints: 10, strength: 11, agility: 7 },
   { level: 3, xp: 24, maxHp: 38, maxDadPoints: 12, strength: 14, agility: 9 },
   { level: 4, xp: 48, maxHp: 46, maxDadPoints: 15, strength: 18, agility: 12 },
 ];
+
+export function getNextLevelXp(currentLevel: number): number | undefined {
+  return levelTable.find((entry) => entry.level > currentLevel)?.xp;
+}
 
 function randomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -72,6 +76,9 @@ export function rollRunSuccess(state: GameState, enemy: EnemyDefinition): boolea
 }
 
 export function applyExperienceAndLevelUps(state: GameState, xpReward: number): LevelUpResult {
+  const previousLevel = state.player.level;
+  const previousMaxHp = state.player.maxHp;
+  const previousMaxDadPoints = state.player.maxDadPoints;
   state.player.xp += xpReward;
 
   const nextLevel = [...levelTable].reverse().find((entry) => state.player.xp >= entry.xp);
@@ -88,9 +95,23 @@ export function applyExperienceAndLevelUps(state: GameState, xpReward: number): 
   state.player.strength = nextLevel.strength;
   state.player.agility = nextLevel.agility;
   state.player.defense = Math.floor(nextLevel.agility / 2);
+  const learnedSkill = getDadSkillLearnedAtLevel(nextLevel.level, previousLevel);
+  const skillLine = learnedSkill ? `\nNEW DAD SKILL: ${learnedSkill}.` : "";
 
   return {
     leveledUp: true,
-    message: `DAD RISES TO LV ${nextLevel.level}.\nHP AND DAD POINTS RESTORED.`,
+    message: [
+      `LEVEL UP! DAD REACHED LV ${nextLevel.level}!`,
+      `MAX HP ${previousMaxHp} -> ${nextLevel.maxHp}.`,
+      `MAX DP ${previousMaxDadPoints} -> ${nextLevel.maxDadPoints}.`,
+      `HP AND DP RESTORED.${skillLine}`,
+    ].join("\n"),
   };
+}
+
+function getDadSkillLearnedAtLevel(newLevel: number, oldLevel: number): string | undefined {
+  if (oldLevel < 2 && newLevel >= 2) return "Authoritative Sigh";
+  if (oldLevel < 3 && newLevel >= 3) return "Measure Once, Cut Anyway";
+  if (oldLevel < 4 && newLevel >= 4) return "Weekend Warrior Focus";
+  return undefined;
 }

@@ -37,7 +37,8 @@ export class BootScene extends Phaser.Scene {
         frameHeight: 16,
       },
     );
-    this.load.image("dryer-boss", "/assets-active/enemies/dryer_boss.png");
+    this.load.image("heating-coil-battle", "/assets-active/enemies/Heating_Coil.png");
+    this.load.image("dryer-boss", "/assets-active/enemies/Heating_Coil.png");
     this.load.image("dryer-boss-world", "/assets-active/enemies/dryer_boss_world.png");
     this.load.image("dust-bunny", "/assets-active/enemies/Dust_Bunny.png");
     this.load.image("icky-spider", "/assets-active/enemies/Icky_Spider_2.png"); // 74×64, pre-transparent
@@ -114,6 +115,10 @@ export class BootScene extends Phaser.Scene {
     charSheet("chars-scout",    "04-scout.png");      // 4 chars/row × 2 rows =  8 characters
     charSheet("chars-devout",   "05-devout.png");     // 4 chars/row × 2 rows =  8 characters
     charSheet("chars-conjurer", "06-conjurer.png");   // 4 chars/row × 2 rows =  8 characters
+    this.load.spritesheet("actors-4", "/assets/full_set/Characters/Actors_4.png", {
+      frameWidth: 32,
+      frameHeight: 48,
+    });
 
     // Chest / treasure sprites (RPG Maker VX character sheet, 32×32 frames)
     this.load.spritesheet("chests", "/assets/full_set/Characters/Chests.png", {
@@ -189,6 +194,9 @@ export class BootScene extends Phaser.Scene {
       .get("dialogue-8x8")
       .setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures
+      .get("heating-coil-battle")
+      .setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures
       .get("dryer-boss")
       .setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures
@@ -223,7 +231,7 @@ export class BootScene extends Phaser.Scene {
     this.textures
       .get("house-core-16")
       .setFilter(Phaser.Textures.FilterMode.NEAREST);
-    for (const key of ["chars-generic","chars-bard","chars-soldier","chars-scout","chars-devout","chars-conjurer"]) {
+    for (const key of ["chars-generic","chars-bard","chars-soldier","chars-scout","chars-devout","chars-conjurer","actors-4"]) {
       this.textures.get(key).setFilter(Phaser.Textures.FilterMode.NEAREST);
     }
     for (const key of ["ts-garage", "ts-props", "ts-exterior", "garage-ts"]) {

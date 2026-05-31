@@ -60,6 +60,15 @@ const SOLDIER  = sheet("chars-soldier",  4); // 03-soldier.png  —  8 armored t
 const SCOUT    = sheet("chars-scout",    4); // 04-scout.png    —  8 ranger/scout types
 const DEVOUT   = sheet("chars-devout",   4); // 05-devout.png   —  8 cleric types
 const CONJURER = sheet("chars-conjurer", 4); // 06-conjurer.png —  8 mage types
+const ACTORS_4: SheetConfig = {
+  key: "actors-4",
+  frameW: 32,
+  frameH: 48,
+  framesPerDir: 1,
+  rows: { down: 0, left: 0, right: 0, up: 0 },
+  fps: 1,
+  charsPerRow: 12,
+};
 
 // ── Character definitions ─────────────────────────────────────────────────────
 //
@@ -76,7 +85,7 @@ const CONJURER = sheet("chars-conjurer", 4); // 06-conjurer.png —  8 mage type
 
 // Main cast
 export const DAD_DEF:  CharacterDef = { id: "dad",  sheet: GENERIC,  charSlot: 0 };
-export const WIFE_DEF: CharacterDef = { id: "wife", sheet: GENERIC,  charSlot: 1 };
+export const WIFE_DEF: CharacterDef = { id: "wife", sheet: ACTORS_4, charSlot: 4 };
 
 // Generic NPCs — neighbors, bystanders
 export const NPC1_DEF: CharacterDef = { id: "npc1", sheet: GENERIC,  charSlot: 2 };

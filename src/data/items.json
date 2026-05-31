@@ -1,17 +1,41 @@
 [
   {
+    "id": "two-hands",
+    "name": "These Two Hands",
+    "kind": "weapon",
+    "power": 2,
+    "battleMessage": "Dad uses The Two Hands, the oldest repair technique known to fathers.",
+    "battleMessages": [
+      "Dad uses The Two Hands, the oldest repair technique known to fathers.",
+      "Dad pounds on it like he's adjusting the reception on a 1980's TV.",
+      "Flow like a butterfly, sting like a bee.",
+      "Dad kick so much ass, my feet stink.",
+      "Come on over here, I'm about to fold you up like a 4th grade love letter.",
+      "You campaigning for an ass whoopin' son, cuz you about to get elected."
+    ],
+    "description": "Always available. Frequently overconfident."
+  },
+  {
     "id": "percussive-maintenance",
     "name": "Percussive Maintenance",
     "kind": "weapon",
     "power": 2,
-    "battleMessage": "Dad pounds on it like he's adjusting a 1980's TV reception.",
+    "battleMessage": "Dad pounds on it like he's adjusting the reception on a 1980's TV.",
+    "battleMessages": [
+      "Dad pounds on it like he's adjusting the reception on a 1980's TV.",
+      "Dad gives it the old family troubleshooting method: hit it and look confident.",
+      "Dad delivers a corrective thump with warranty-voiding enthusiasm.",
+      "Dad applies percussive maintenance. Somewhere, an appliance manual weeps.",
+      "Dad knocks on it like the problem might answer the door.",
+      "Dad slaps it once, pauses, then slaps it again for science."
+    ],
     "description": "The oldest repair technique known to fathers."
   },
   {
     "id": "ibuprofen",
     "name": "Ibuprofen",
     "kind": "consumable",
-    "heal": 10,
+    "heal": 3,
     "description": "Restores enough resolve to continue dealing with the house."
   },
   {
@@ -20,6 +44,14 @@
     "kind": "weapon",
     "power": 6,
     "battleMessage": "Dad applies the Adjustable Wrench with hard-earned driveway confidence.",
+    "battleMessages": [
+      "Dad applies the Adjustable Wrench with hard-earned driveway confidence.",
+      "Dad tightens nothing in particular, but the threat respects the gesture.",
+      "Dad swings the wrench like a man who has watched three repair videos back-to-back.",
+      "Dad gives the wrench a quarter turn and the situation regrets becoming mechanical.",
+      "Dad raises the wrench. Several nearby bolts reconsider their life choices.",
+      "Dad performs a precision adjustment with extremely non-precision energy."
+    ],
     "description": "A practical tool and, in desperate times, a statement."
   }
 ]

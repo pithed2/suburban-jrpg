@@ -190,7 +190,7 @@ export class BattleManager {
 
       return {
         ...this.getSnapshot(state),
-        message: `${actionMessage}\n${enemy.name} gives one last ominous click.\n${enemy.xpReward} XP. ${enemy.cashReward} ${rewardLabel}.${levelUpMessage}`,
+        message: `${actionMessage}\n${enemy.name} gives one last ominous click.\nYOU GAINED ${enemy.xpReward} XP.\nDAD LOVE +${enemy.cashReward}.${levelUpMessage}`,
         victory: true,
         xpReward: enemy.xpReward,
         cashReward: enemy.cashReward,
@@ -212,9 +212,22 @@ export class BattleManager {
     damage: number,
   ): string {
     const weapon = items.find((item) => item.id === state.player.equipment.weaponId);
-    const message = action === "fight" && weapon?.battleMessage ? weapon.battleMessage : response.message;
+    const message = action === "fight" && weapon
+      ? this.getWeaponBattleMessage(weapon, response.message)
+      : response.message;
     const effect = response.effectLabel ? ` (${response.effectLabel})` : "";
     return `${message}\n${damage} damage${effect}.`;
+  }
+
+  private getWeaponBattleMessage(
+    weapon: { battleMessage?: string; battleMessages?: string[] },
+    fallback: string,
+  ): string {
+    if (weapon.battleMessages?.length) {
+      return Phaser.Utils.Array.GetRandom(weapon.battleMessages);
+    }
+
+    return weapon.battleMessage ?? fallback;
   }
 
   private getActionDamage(
@@ -239,18 +252,20 @@ export class BattleManager {
   }
 
   private getEnemyAttack(enemy: EnemyDefinition, state: GameState): EnemyAttack {
-    if (enemy.id === "evil-heating-coil" && Math.random() < 0.45) {
+    if (enemy.id === "evil-heating-coil") {
       if (state.flags.circuitBreakerOff) {
-        return {
-          message: "casts Static Shock of a Random Sock",
-          damage: Phaser.Math.Between(2, 4),
-        };
+        return Phaser.Utils.Array.GetRandom([
+          { message: "casts Static Shock of a Random Sock", damage: Phaser.Math.Between(6, 8) },
+          { message: "crackles with low-power spite", damage: Phaser.Math.Between(6, 8) },
+          { message: "snaps with unplugged-but-still-angry static", damage: Phaser.Math.Between(6, 8) },
+        ]);
       }
 
-      return {
-        message: "casts Baddass Zap",
-        damage: Phaser.Math.Between(10, 15),
-      };
+      return Phaser.Utils.Array.GetRandom([
+        { message: "casts Badass Zap", damage: Phaser.Math.Between(10, 15) },
+        { message: "surges with fully powered appliance hatred", damage: Phaser.Math.Between(10, 15) },
+        { message: "throws live current like it pays the mortgage", damage: Phaser.Math.Between(10, 15) },
+      ]);
     }
 
     return Phaser.Utils.Array.GetRandom(enemy.attackPattern);

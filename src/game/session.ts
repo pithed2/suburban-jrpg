@@ -55,8 +55,20 @@ function normalizeGameState(state: GameState): GameState {
   state.player.agility ??= fallback.player.agility;
   state.player.defense ??= fallback.player.defense;
   state.player.cash ??= fallback.player.cash;
+  state.player.equipment ??= fallback.player.equipment;
+  state.player.equipment.weaponId ??= fallback.player.equipment.weaponId;
   state.flags.circuitBreakerOff ??= fallback.flags.circuitBreakerOff;
   state.flags.devRandomEncountersDisabled ??= fallback.flags.devRandomEncountersDisabled;
+  state.flags.basementFirstAidOpened ??= fallback.flags.basementFirstAidOpened;
+  state.openedChestIds ??= fallback.openedChestIds;
+
+  if (state.player.equipment.weaponId === "percussive-maintenance") {
+    state.player.equipment.weaponId = "two-hands";
+  }
+
+  if (!state.flags.basementFirstAidOpened) {
+    state.player.inventory = state.player.inventory.filter((itemId) => itemId !== "ibuprofen");
+  }
 
   return state;
 }

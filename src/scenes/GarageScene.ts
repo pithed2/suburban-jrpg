@@ -25,7 +25,7 @@ import { GameMenu } from "../game/GameMenu";
 import { GridMover } from "../game/GridMover";
 import { PlayerStatsPanel } from "../game/PlayerStatsPanel";
 import { getQuestStepLabel } from "../game/quests";
-import { getGameState } from "../game/session";
+import { getGameState, saveGameState } from "../game/session";
 import { addPixelText, setPixelText } from "../game/uiText";
 import { completeQuestStep, setActiveQuestStep, type GameState } from "../game/state";
 
@@ -151,11 +151,12 @@ const DEAD_ENDS: DeadEnd[] = [
 const DEAD_END_RADIUS = 3 * TILE;
 
 // ── Side chests (flavor items — dialogue only, no game effect) ────────────
-interface SideChest { col: number; row: number; label: string; lines: DialogueInput[] }
+interface SideChest { id: string; col: number; row: number; frame: number; tint?: number; lines: DialogueInput[] }
 const SIDE_CHESTS: SideChest[] = [
   {
+    id: "garage:easter",
     col: 25, row: 1,
-    label: "EASTER",
+    frame: 0,
     lines: [
       { speaker: "NARRATOR",    text: "A purple Rubbermaid tub. Label: EASTER." },
       { speaker: "NARRATOR",    text: "Inside: one plastic egg with a desiccated jelly bean, a basket with no handle, seventeen feet of green plastic grass that will never fully leave this garage." },
@@ -168,8 +169,10 @@ const SIDE_CHESTS: SideChest[] = [
     ],
   },
   {
+    id: "garage:cards",
     col: 17, row: 6,
-    label: "CARDS",
+    frame: 4,
+    tint: 0xaaaaaa,
     lines: [
       { speaker: "NARRATOR",    text: "A flat plastic case. Label in careful Sharpie: '1990 FLEER COMPLETE SET.'" },
       { speaker: "DAD",         text: "Oh. Oh wow." },
@@ -185,8 +188,10 @@ const SIDE_CHESTS: SideChest[] = [
     ],
   },
   {
+    id: "garage:taxes",
     col: 13, row: 16,
-    label: "TAXES",
+    frame: 8,
+    tint: 0x94a3b8,
     lines: [
       { speaker: "NARRATOR",    text: "A manila folder. Label: TAXES 2017." },
       { speaker: "NARRATOR",    text: "Beneath it: TAXES 2016. TAXES 2015. A warranty card for a TV Dad no longer owns." },
@@ -203,6 +208,7 @@ const SIDE_CHESTS: SideChest[] = [
 
 // ── Main wrench chest ──────────────────────────────────────────────────────
 const CHEST_COL = 25, CHEST_ROW = 9;
+const CHEST_ID = "garage:toolbox";
 const CHEST_PX  = px(CHEST_COL, CHEST_ROW);
 const CHEST_RADIUS = 2 * TILE;
 const SIDE_CHEST_RADIUS = 2 * TILE;
@@ -221,6 +227,7 @@ export class GarageScene extends Phaser.Scene {
   private questKey!: Phaser.Input.Keyboard.Key;
   private mover!: GridMover;
   private chestSprite!: Phaser.GameObjects.Image;
+  private sideChestSprites = new Map<string, Phaser.GameObjects.Image>();
   private chestOpened = false;
 
   // systems
@@ -255,10 +262,11 @@ export class GarageScene extends Phaser.Scene {
 
     this.state = getGameState();
     this.mode  = "explore";
+    this.sideChestSprites.clear();
     this.cursors     = this.input.keyboard!.createCursorKeys();
     this.interactKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.questKey    = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
-    this.chestOpened = this.state.flags.foundWrench;
+    this.chestOpened = this.state.flags.foundWrench || this.state.openedChestIds.includes(CHEST_ID);
 
     this.drawTiles();
     this.placeChest();
@@ -347,45 +355,39 @@ export class GarageScene extends Phaser.Scene {
     const { x, y } = CHEST_PX;
     this.chestSprite = this.add.image(x, y, "chests")
       .setFrame(this.chestOpened ? 12 : 0)   // 0 = closed, 12 = open
-      .setDisplaySize(TILE * 2, TILE * 2);
-    addPixelText(this, x - 18, y + TILE + 2, "TOOLBOX", 6).setTint(0xfacc15);
+      .setDisplaySize(TILE, TILE);
 
-    // Side chests — different tint to distinguish from the main chest
     for (const sc of SIDE_CHESTS) {
       const sp = px(sc.col, sc.row);
-      this.add.image(sp.x, sp.y, "chests")
-        .setFrame(4)                           // frame 4 = different colour variant
-        .setDisplaySize(TILE * 2, TILE * 2)
-        .setTint(0xaaaaaa);                    // grey tint: clearly secondary
-      addPixelText(this, sp.x - sc.label.length * 3, sp.y + TILE + 2, sc.label, 5)
-        .setTint(0x94a3b8);
+      const isOpened = this.state.openedChestIds.includes(sc.id);
+      const sprite = this.add.image(sp.x, sp.y, "chests")
+        .setFrame(isOpened ? 12 : sc.frame)
+        .setDisplaySize(TILE, TILE)
+        .setTint(isOpened ? 0xffffff : sc.tint ?? 0xffffff);
+      this.sideChestSprites.set(sc.id, sprite);
     }
   }
 
   private placePlayer(): void {
     const char = new CharacterSprite(this, 0, 0, DAD_DEF);
     this.mover = new GridMover(this, char, TILE, 13, 1); // spawn just inside entry (col 13-14 = exit tiles)
-    addPixelText(this, 13 * TILE + 3, 1 * TILE - 6, "DAD", 6);
   }
 
   // ── Collision ──────────────────────────────────────────────────────────────
 
   /**
    * All chest footprints — blocked regardless of open/closed state.
-   * Each chest sprite is displayed at TILE*2 × TILE*2 (32×32 world px),
-   * centred at px(col, row), so it visually occupies a 2×2 tile area:
-   *   (col, row)  (col+1, row)
-   *   (col, row+1)(col+1, row+1)
+   * Chests follow BasementScene's one-tile sprite footprint.
    */
   private static readonly CHEST_TILES: ReadonlySet<string> = new Set([
     // Main toolbox  (25, 9)
-    "25,9", "26,9", "25,10", "26,10",
+    "25,9",
     // Easter chest  (25, 1)
-    "25,1", "26,1", "25,2",  "26,2",
+    "25,1",
     // Baseball cards chest (17, 6)
-    "17,6", "18,6", "17,7",  "18,7",
+    "17,6",
     // Taxes chest   (13, 16)
-    "13,16","14,16","13,17", "14,17",
+    "13,16",
   ]);
 
   private canWalkTo(col: number, row: number): boolean {
@@ -449,6 +451,7 @@ export class GarageScene extends Phaser.Scene {
     // Side chests (Easter / baseball cards / taxes)
     for (const sc of SIDE_CHESTS) {
       if (dist(px(sc.col, sc.row)) < SIDE_CHEST_RADIUS) {
+        this.openSideChest(sc);
         this.startDialogue(sc.lines);
         return;
       }
@@ -472,20 +475,35 @@ export class GarageScene extends Phaser.Scene {
 
   private openChest(): void {
     this.state.flags.foundWrench = true;
+    if (!this.state.openedChestIds.includes(CHEST_ID)) {
+      this.state.openedChestIds.push(CHEST_ID);
+    }
     this.state.player.inventory.push("adjustable-wrench");
     this.state.player.equipment.weaponId = "adjustable-wrench";
     completeQuestStep(this.state, "find-wrench");
     setActiveQuestStep(this.state, "flip-breaker");
     this.chestOpened = true;
     this.chestSprite.setFrame(12); // open chest
+    saveGameState(this.state);
     this.updateQuestText();
     this.startDialogue([
-      { speaker: "DAD'S BRAIN", text: getDadBrainLine("wrenchFound") },
       { speaker: "NARRATOR",   text: "Dad opens the toolbox. Inside, beneath a receipt for a drill he bought in 2019," },
       { speaker: "NARRATOR",   text: "and never used, and a bag of mystery screws — the Adjustable Wrench." },
+      { speaker: "SYSTEM",     text: "The Dad had found ADJUSTABLE WRENCH!" },
+      { speaker: "SYSTEM",     text: "You can feel your kick ass immediately improve." },
+      { speaker: "DAD'S BRAIN", text: "Somewhere in the basement, you know the dryer is already worried its days of not drying shit are numbered." },
+      { speaker: "DAD'S BRAIN", text: "When you get around to actually fixing it." },
+      { speaker: "DAD'S BRAIN", text: getDadBrainLine("wrenchFound") },
       { speaker: "DAD",        text: getDadMovieQuote("findItem") },
       { speaker: "DAD",        text: getDadLine("selfTalk", "victory") },
     ]);
+  }
+
+  private openSideChest(chest: SideChest): void {
+    if (this.state.openedChestIds.includes(chest.id)) return;
+    this.state.openedChestIds.push(chest.id);
+    this.sideChestSprites.get(chest.id)?.setFrame(12).clearTint();
+    saveGameState(this.state);
   }
 
   // ── Dialogue ───────────────────────────────────────────────────────────────
@@ -678,10 +696,11 @@ export class GarageScene extends Phaser.Scene {
     setPixelText(this.battleEnemyText, `${snap.enemy.name}\nHP ${snap.enemyHp}/${snap.enemyMaxHp}`);
     if (snap.enemy.battleTexture) {
       const isSpider = snap.enemy.id === "icky-spider";
+      const isCoil = snap.enemy.id === "evil-heating-coil";
       // Spider is bigger on screen — it deserves to fill the box so you can see every leg
-      const sw = isSpider ? 60 : 32; // spider native 74×64, displayed at 60×52
-      const sh = isSpider ? 52 : 32;
-      const sy = isSpider ? 88 : 93;
+      const sw = isCoil ? 74 : isSpider ? 60 : 32; // spider/coil native 74×64
+      const sh = isCoil ? 64 : isSpider ? 52 : 32;
+      const sy = isCoil ? 84 : isSpider ? 88 : 93;
       this.battleEnemyBox.setFillStyle(isSpider ? 0x1a0a2e : 0x65a30d); // dark for spider, green for others
       this.battleEnemySprite
         .setTexture(snap.enemy.battleTexture)

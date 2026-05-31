@@ -36,7 +36,7 @@ import { GameMenu } from "../game/GameMenu";
 import { GridMover } from "../game/GridMover";
 import { PlayerStatsPanel } from "../game/PlayerStatsPanel";
 import { getQuestStepLabel } from "../game/quests";
-import { getGameState } from "../game/session";
+import { getGameState, saveGameState } from "../game/session";
 import { addPixelText, setPixelText } from "../game/uiText";
 import {
   completeQuestStep,
@@ -155,16 +155,19 @@ const BREAKER_OFF_FRAME = 48; // !other.png row 5, column 1
 const BREAKER_ON_FRAME = 74;  // !other.png row 7, column 3
 
 interface BasementChest {
+  id: string;
   col: number;
   row: number;
   frame: number;
   tint?: number;
   contents: DialogueInput[];
   itemId?: string;
+  openedFlag?: keyof GameState["flags"];
 }
 
 const BASEMENT_CHESTS: BasementChest[] = [
   {
+    id: "basement:furnace-filters",
     col: 6,
     row: 11,
     frame: 0,
@@ -174,17 +177,21 @@ const BASEMENT_CHESTS: BasementChest[] = [
     ],
   },
   {
+    id: "basement:first-aid",
     col: 17,
     row: 17,
     frame: 4,
     tint: 0xaaaaaa,
     itemId: "ibuprofen",
+    openedFlag: "basementFirstAidOpened",
     contents: [
       { speaker: "NARRATOR", text: "A dented metal first-aid tin. Inside: one travel bottle of ibuprofen." },
+      { speaker: "SYSTEM", text: "YOU GAINED IBUPROFEN" },
       { speaker: "DAD'S BRAIN", text: "Treasure, by suburban dungeon standards." },
     ],
   },
   {
+    id: "basement:cables",
     col: 27,
     row: 13,
     frame: 8,
@@ -192,16 +199,6 @@ const BASEMENT_CHESTS: BasementChest[] = [
     contents: [
       { speaker: "NARRATOR", text: "A cardboard box of coax cables, speaker wire, and one charger for a device nobody remembers." },
       { speaker: "DAD", text: "Can't throw these out. What if the mystery device comes back?" },
-    ],
-  },
-  {
-    col: 33,
-    row: 18,
-    frame: 0,
-    tint: 0x94a3b8,
-    contents: [
-      { speaker: "NARRATOR", text: "Holiday candles. All labeled Fresh Snow. All smelling faintly like crayons." },
-      { speaker: "DAD", text: "Seasonal." },
     ],
   },
 ];
@@ -223,7 +220,6 @@ export class BasementScene extends Phaser.Scene {
   // world objects
   private breakerPanel!: Phaser.GameObjects.Image;   // the full breaker box sprite
   private coilSprite!: Phaser.GameObjects.Image;
-  private openedChests = new Set<string>();
   private chestSprites = new Map<string, Phaser.GameObjects.Image>();
 
   // systems
@@ -259,7 +255,6 @@ export class BasementScene extends Phaser.Scene {
 
     this.state = getGameState();
     this.mode  = "explore";
-    this.openedChests.clear();
     this.chestSprites.clear();
     this.cursors     = this.input.keyboard!.createCursorKeys();
     this.interactKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -409,10 +404,11 @@ export class BasementScene extends Phaser.Scene {
   private placeChests(): void {
     for (const chest of BASEMENT_CHESTS) {
       const pos = px(chest.col, chest.row);
+      const isOpened = this.isChestOpened(chest);
       const sprite = this.add.image(pos.x, pos.y, "chests")
-        .setFrame(chest.frame)
+        .setFrame(isOpened ? 12 : chest.frame)
         .setDisplaySize(TILE, TILE)
-        .setTint(chest.tint ?? 0xffffff);
+        .setTint(isOpened ? 0xffffff : chest.tint ?? 0xffffff);
       this.chestSprites.set(`${chest.col},${chest.row}`, sprite);
     }
   }
@@ -525,17 +521,26 @@ export class BasementScene extends Phaser.Scene {
 
   private interactWithChest(chest: BasementChest): void {
     const key = `${chest.col},${chest.row}`;
-    if (this.openedChests.has(key)) {
+    if (this.isChestOpened(chest)) {
       this.startDialogue([{ speaker: "NARRATOR", text: "The box contains only the echo of Dad's previous curiosity." }]);
       return;
     }
 
-    this.openedChests.add(key);
+    this.state.openedChestIds.push(chest.id);
+    if (chest.openedFlag) {
+      this.state.flags[chest.openedFlag] = true;
+    }
     this.chestSprites.get(key)?.setFrame(12).clearTint();
-    if (chest.itemId) {
+    if (chest.itemId && !this.state.player.inventory.includes(chest.itemId)) {
       this.state.player.inventory.push(chest.itemId);
     }
+    saveGameState(this.state);
     this.startDialogue(chest.contents);
+  }
+
+  private isChestOpened(chest: BasementChest): boolean {
+    return this.state.openedChestIds.includes(chest.id)
+      || Boolean(chest.openedFlag && this.state.flags[chest.openedFlag]);
   }
 
   private interactWithCoil(): void {
@@ -827,9 +832,10 @@ export class BasementScene extends Phaser.Scene {
     setPixelText(this.battleEnemyText, `${snap.enemy.name}\nHP ${snap.enemyHp}/${snap.enemyMaxHp}`);
     if (snap.enemy.battleTexture) {
       const isSpider = snap.enemy.id === "icky-spider";
-      const sw = isSpider ? 60 : 42; // spider native 74×64, displayed at 60×52
-      const sh = isSpider ? 52 : 42;
-      const sy = isSpider ? 88 : 92;
+      const isCoil = snap.enemy.id === "evil-heating-coil";
+      const sw = isCoil ? 74 : isSpider ? 60 : 42; // spider/coil native 74×64
+      const sh = isCoil ? 64 : isSpider ? 52 : 42;
+      const sy = isCoil ? 84 : isSpider ? 88 : 92;
       this.battleEnemySprite.setTexture(snap.enemy.battleTexture).setPosition(154, sy).setDisplaySize(sw, sh);
     }
   }

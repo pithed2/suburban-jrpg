@@ -23,8 +23,9 @@ import { getDadBrainLine, getDadLine } from "../game/dadVoice";
 import { DialogueRunner, type DialogueInput, type DialogueLine } from "../game/DialogueRunner";
 import { GameMenu } from "../game/GameMenu";
 import { GridMover } from "../game/GridMover";
+import { getNextLevelXp } from "../game/dragonWarriorMath";
 import { getQuest, getQuestStepLabel } from "../game/quests";
-import { getGameState, resetGameState } from "../game/session";
+import { getGameState, resetGameState, saveGameState } from "../game/session";
 import { addPixelText, setPixelText } from "../game/uiText";
 import {
   completeQuestStep,
@@ -123,6 +124,8 @@ function px(col: number, row: number) {
 }
 
 const WIFE_PX     = px(7,  6);   // living room centre
+const WIFE_COL    = 7;
+const WIFE_ROW    = 6;
 const DRYER_PX    = px(27, 6);   // kitchen right-of-centre
 const GARAGE_PX   = px(7,  21);  // bottom wall opening (garage)
 const TILEROOM_PX = px(28, 14);  // hallway right-centre (utility room door)
@@ -280,12 +283,10 @@ export class NeighborhoodScene extends Phaser.Scene {
     this.mover = new GridMover(this, dadChar, TILE, spawnCol, spawnRow);
 
     this.wifeChar = new CharacterSprite(this, WIFE_PX.x, WIFE_PX.y, WIFE_DEF);
+    this.wifeChar.setScale(0.5);
     this.wifeChar.face("down");
 
-    // Block the tile(s) the wife stands on
-    const wCol = Math.round(WIFE_PX.x / TILE);
-    const wRow = Math.round(WIFE_PX.y / TILE);
-    this.npcTiles.add(`${wCol},${wRow}`);
+    this.npcTiles.add(`${WIFE_COL},${WIFE_ROW}`);
   }
 
   // ── Collision ──────────────────────────────────────────────────────────────
@@ -338,11 +339,14 @@ export class NeighborhoodScene extends Phaser.Scene {
   // ── Quest dialogues ────────────────────────────────────────────────────────
 
   private interactWithWife(): void {
+    const wifeCheckIn = this.getWifeCheckInLines();
+
     if (this.state.flags.bossDefeated) {
       if (this.state.flags.circuitBreakerOff) {
         setActiveQuestStep(this.state, "restore-power");
         this.updateQuestText("POWER OUT");
         this.startDialogue([
+          ...wifeCheckIn,
           { speaker: "WIFE",       text: "Now, nothing works! What did you do??" },
           { speaker: "DAD'S BRAIN", text: "Dude. Dryers don't work without power." },
           { speaker: "DAD",        text: "Small administrative follow-up. Totally under control." },
@@ -355,6 +359,7 @@ export class NeighborhoodScene extends Phaser.Scene {
       this.state.flags.dryerFixed = true;
       this.updateQuestText("DRYER FIXED");
       this.startDialogue([
+        ...wifeCheckIn,
         { speaker: "DAD",      text: getDadLine("toWife", "greeting") },
         ...dialogue.victory.map((text) => ({ speaker: "NARRATOR", text })),
         { speaker: "DAD",      text: getDadLine("selfTalk", "victory") },
@@ -368,11 +373,35 @@ export class NeighborhoodScene extends Phaser.Scene {
     // talkedToWife is set by the opening cutscene — no replay needed.
     // In-game wife dialogue is the "check-in / nag" branch.
     this.startDialogue([
+      ...wifeCheckIn,
       { speaker: "DAD'S BRAIN", text: getDadBrainLine("talkToWife") },
       { speaker: "DAD",  text: getDadLine("toWife", "greeting") },
       { speaker: "WIFE", text: "How's the dryer coming?" },
       { speaker: "DAD",  text: getDadLine("toWife", "questReceived") },
     ]);
+  }
+
+  private getWifeCheckInLines(): DialogueLine[] {
+    const player = this.state.player;
+    const nextLevelXp = getNextLevelXp(player.level);
+    const xpLine = nextLevelXp === undefined
+      ? "You're already at peak Dad, statistically speaking. I am as surprised as you are."
+      : `You need ${Math.max(0, nextLevelXp - player.xp)} XP before your next level.`;
+
+    const wasHurt = player.hp < player.maxHp;
+    player.hp = player.maxHp;
+    saveGameState(this.state);
+
+    return [
+      { speaker: "WIFE", text: xpLine },
+      {
+        speaker: "WIFE",
+        text: wasHurt
+          ? "Come here. Kiss. There. Try not to lose a fight to lint."
+          : "You still get a kiss. Preventative maintenance.",
+      },
+      { speaker: "SYSTEM", text: `HP RESTORED TO ${player.maxHp}.` },
+    ];
   }
 
   private interactWithDryer(): void {

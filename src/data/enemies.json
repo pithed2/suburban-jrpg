@@ -29,6 +29,7 @@
       "fight": {
         "damage": 6,
         "damageByWeapon": {
+          "two-hands": 6,
           "percussive-maintenance": 6,
           "adjustable-wrench": 7
         },
@@ -82,6 +83,7 @@
       "fight": {
         "damage": 3,
         "damageByWeapon": {
+          "two-hands": 7,
           "percussive-maintenance": 7,
           "adjustable-wrench": 3
         },
@@ -106,7 +108,7 @@
     "name": "Evil Heating Coil",
     "battleTexture": "heating-coil-battle",
     "level": 2,
-    "hp": 18,
+    "hp": 24,
     "attack": 3,
     "agility": 8,
     "dodgeChance": 0.0625,
@@ -131,6 +133,7 @@
       "fight": {
         "damage": 3,
         "damageByWeapon": {
+          "two-hands": 2,
           "percussive-maintenance": 2,
           "adjustable-wrench": 8
         },

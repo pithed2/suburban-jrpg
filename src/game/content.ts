@@ -88,6 +88,7 @@ export interface ItemDefinition {
   heal?: number;
   power?: number;
   battleMessage?: string;
+  battleMessages?: string[];
   description: string;
 }
 

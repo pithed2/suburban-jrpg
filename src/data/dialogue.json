@@ -86,10 +86,10 @@
       ],
       "takingDamage": [
         "Shiitake mushrooms! That stings!",
+        "Goddamn, brutha!",
         "Crud. Okay. I felt that one.",
         "Mother of pearl, what are you made of?",
-        "Sone of Sea Biscuit!  What are they feeding you in the factory, buddy?",
-        "I'm funny how? I mean, funny like a clown, I amuse you? I make you laugh? I'm here to fckin' amuse you?",
+        "Son of Sea Biscuit!  What are they feeding you in the factory, buddy?",
         "Inconceivable! Also, ow."
       ],
       "lowHp": [
@@ -121,7 +121,7 @@
     "findItem": [
       "Life is like a box of chocolates. You never know what you're gonna get. Today Dad got a wrench. That tracks.",
       "If you build it, he will come. Dad did not build it. Dad found it. Close enough.",
-      "I'm going to make him an offer he can't refuse. The offer is: Dad is now armed with the wrench."
+      "I'm going to make him an offer he can't refuse. The offer is: Dad is now armed."
     ],
     "deadEnd": [
       "Nobody puts Baby in a corner. And yet every path in this garage is a corner. Ironic.",
@@ -258,7 +258,9 @@
     "victory": [
       "The Dad survives. The Dad thrives. The Dad will mention this later.  Probably numerous times.",
       "Add one victory to the suburban ledger.",
-      "The Dad handled it. No further questions."
+      "The Dad handled it. No further questions.",
+      "I came, I saw, I kicked its ass!",
+      "When someone asks me if I'm a god, I say YES!"
     ]
   }
 }

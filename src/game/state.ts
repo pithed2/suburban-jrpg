@@ -39,12 +39,14 @@ export interface GameFlags {
   bossDefeated: boolean;
   dryerFixed: boolean;
   devRandomEncountersDisabled: boolean;
+  basementFirstAidOpened: boolean;
 }
 
 export interface GameState {
   player: PlayerState;
   quest: QuestProgress;
   flags: GameFlags;
+  openedChestIds: string[];
 }
 
 export function createInitialGameState(): GameState {
@@ -61,9 +63,9 @@ export function createInitialGameState(): GameState {
       defense: 2,
       cash: 12,
       xp: 0,
-      inventory: ["ibuprofen"],
+      inventory: [],
       equipment: {
-        weaponId: "percussive-maintenance",
+        weaponId: "two-hands",
       },
     },
     quest: {
@@ -79,7 +81,9 @@ export function createInitialGameState(): GameState {
       bossDefeated: false,
       dryerFixed: false,
       devRandomEncountersDisabled: false,
+      basementFirstAidOpened: false,
     },
+    openedChestIds: [],
   };
 }
 
