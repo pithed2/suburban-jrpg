@@ -793,7 +793,7 @@ export class BasementScene extends Phaser.Scene {
   }
 
   private handleVictory(msg: string): void {
-    if (this.activeEnemyId === "dust-bunny" || this.activeEnemyId === "icky-spider") {
+    if (this.activeEnemyId === "dust-bunny" || this.activeEnemyId === "angry-dust-bunny" || this.activeEnemyId === "icky-spider") {
       this.startDialogue([
         { speaker: "BATTLE",     text: msg },
         { speaker: "DAD'S BRAIN", text: getDadBrainLine("victory") },
