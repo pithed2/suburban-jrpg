@@ -265,13 +265,70 @@ export class NeighborhoodScene extends Phaser.Scene {
   }
 
   // ── Decorations ────────────────────────────────────────────────────────────
-  // Subtle non-label markers for interactables that do not have final sprites yet.
 
   private placeDecorations(): void {
-    // ── Utility room ───────────────────────────────────────────────────────
-    // Subtle tinted marker until a prop is added.
+    // ── Utility room marker ────────────────────────────────────────────────
     this.add.rectangle(TILEROOM_PX.x, TILEROOM_PX.y, 2 * TILE, TILE, 0x60a5fa, 0.12)
       .setStrokeStyle(1, 0x60a5fa, 0.5);
+
+    const spr16 = (col: number, row: number, frame: number) =>
+      this.add.image(col * TILE + TILE / 2, row * TILE + TILE / 2, "interiors-free-16")
+        .setFrame(frame).setDisplaySize(TILE, TILE);
+
+    // kitchen_LRK.png: 26 cols × 25 rows, 16×16 px per frame
+    const KW = 26;
+    const kitchen = (col: number, row: number, tsRow: number, tsCol: number) =>
+      this.add.image(col * TILE + TILE / 2, row * TILE + TILE / 2, "kitchen-props")
+        .setFrame(tsRow * KW + tsCol).setDisplaySize(TILE, TILE);
+
+    const web = (cx: number, cy: number, alpha = 0.75) =>
+      this.add.image(cx, cy, "full-set-int-c")
+        .setFrame(167).setDisplaySize(TILE * 2, TILE * 2).setAlpha(alpha);
+
+    const block = (col: number, row: number) => this.npcTiles.add(`${col},${row}`);
+
+    // ── Living room ────────────────────────────────────────────────────────
+    // TV + stand against north wall (cols 4-5, rows 2-3; row 2 = wall, no block needed)
+    spr16(4, 2, 224); spr16(5, 2, 225);  // screen on wall
+    spr16(4, 3, 240); spr16(5, 3, 241);  // stand on floor — block
+    block(4, 3); block(5, 3);
+
+    // Window on north wall (row 2 = wall, no block)
+    spr16(9, 2, 208); spr16(10, 2, 209);
+
+    // Sofa against south wall (cols 8-11, rows 8-9)
+    spr16(8, 8, 160); spr16(9, 8, 161); spr16(10, 8, 162); spr16(11, 8, 163);
+    spr16(8, 9, 176); spr16(9, 9, 177); spr16(10, 9, 178); spr16(11, 9, 179);
+    for (let c = 8; c <= 11; c++) { block(c, 8); block(c, 9); }
+
+    // End table beside sofa
+    spr16(12, 8, 187);
+    block(12, 8);
+
+    // ── Kitchen ────────────────────────────────────────────────────────────
+    // Window on north wall (row 2 = wall, no block)
+    spr16(25, 2, 208); spr16(26, 2, 209);
+
+    // Counter top + sink + stove: gray kitchen set row 21 (frames 546-555), 10 tiles
+    // Cabinet fronts:             gray kitchen set row 22 (frames 572-581), 10 tiles
+    for (let i = 0; i < 10; i++) {
+      kitchen(23 + i, 3, 21, i);  // counter surface (sink ~col2, stove ~cols6-9)
+      kitchen(23 + i, 4, 22, i);  // cabinet fronts
+      block(23 + i, 3);
+      block(23 + i, 4);
+    }
+
+    // Fridge against east wall: 2 tiles wide × 4 tiles tall (cols 31-32, rows 5-8)
+    // kitchen_LRK fridge: rows 1-4, cols 22-23 → frames 48-49, 74-75, 100-101, 126-127
+    const fridgeRows = [1, 2, 3, 4];
+    for (let r = 0; r < 4; r++) {
+      kitchen(31, 5 + r, fridgeRows[r], 22);
+      kitchen(32, 5 + r, fridgeRows[r], 23);
+      block(31, 5 + r); block(32, 5 + r);
+    }
+
+    // ── Hallway — cobweb in NE corner near basement stairs ────────────────
+    web(33 * TILE, 12 * TILE, 0.6);
   }
 
   // ── Characters ─────────────────────────────────────────────────────────────

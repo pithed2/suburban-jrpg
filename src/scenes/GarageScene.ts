@@ -269,6 +269,7 @@ export class GarageScene extends Phaser.Scene {
     this.chestOpened = this.state.flags.foundWrench || this.state.openedChestIds.includes(CHEST_ID);
 
     this.drawTiles();
+    this.placeDecorations();
     this.placeChest();
     this.placePlayer();
     this.createUi();
@@ -366,6 +367,50 @@ export class GarageScene extends Phaser.Scene {
         .setTint(isOpened ? 0xffffff : sc.tint ?? 0xffffff);
       this.sideChestSprites.set(sc.id, sprite);
     }
+  }
+
+  private placeDecorations(): void {
+    // Int-C frame 167 = cobweb. Place at wall-floor corners, 2×2 tile display.
+    const web = (wx: number, wy: number, alpha = 0.8) =>
+      this.add.image(wx, wy, "full-set-int-c")
+        .setFrame(167).setDisplaySize(TILE * 2, TILE * 2).setAlpha(alpha);
+
+    // Int-B props (32×32 art → display at TILE for clutter items)
+    const propB = (col: number, row: number, frame: number, size = TILE) =>
+      this.add.image(col * TILE + TILE / 2, row * TILE + TILE / 2, "full-set-int-b")
+        .setFrame(frame).setDisplaySize(size, size);
+
+    // NW dead end — paint cans corner (wall at row 0, col 2)
+    web(2 * TILE, 0 * TILE, 0.8);               // NW wall corner
+    propB(3, 1, 96);  propB(4, 1, 97);          // orange pots = paint cans
+    propB(3, 2, 64);  propB(4, 2, 65);          // dark crates
+
+    // NE dead end — Xmas boxes corner (wall at row 0, col 22)
+    web(22 * TILE, 0 * TILE, 0.8);
+    propB(20, 1, 67); propB(21, 1, 64);         // wooden crates = Xmas boxes
+    propB(20, 2, 65); propB(21, 2, 67);
+
+    // Power-tools branch — cobweb in the dead-end pocket (row 6, west wall)
+    web(2 * TILE, 6 * TILE, 0.65);
+    propB(5, 6, 70, TILE * 2);                  // large barrel (frame 70 is 2-tile art)
+    propB(8, 6, 79);                             // small appliance
+
+    // Extension-cord area — minimal web, cord mess speaks for itself
+    web(2 * TILE, 9 * TILE, 0.55);
+
+    // Exercise graveyard — most neglected, most webs (cols 3-4, rows 15-18)
+    web(2 * TILE, 14 * TILE, 0.85);             // NW corner
+    web(2 * TILE, 18 * TILE, 0.75);             // SW corner
+    propB(3, 15, 128); propB(4, 15, 129);       // blue pots = dumbbells
+    propB(3, 16, 112); propB(4, 17, 113);       // green pots = more junk
+    propB(3, 18, 130);                           // stone pile = ankle weights
+
+    // Toolbox room corners — the wrench has been here a while
+    web(22 * TILE, 6 * TILE, 0.7);
+    web(29 * TILE, 6 * TILE, 0.7);
+    web(22 * TILE, 12 * TILE, 0.65);
+    web(29 * TILE, 12 * TILE, 0.65);
+    propB(23, 9, 65); propB(24, 9, 64);         // crates flanking the chest
   }
 
   private placePlayer(): void {

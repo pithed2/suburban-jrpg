@@ -261,6 +261,7 @@ export class BasementScene extends Phaser.Scene {
     this.questKey    = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
 
     this.drawTiles();
+    this.placeDecorations();
     this.placeObjects();
     this.placeChests();
     this.placePlayer();
@@ -374,6 +375,59 @@ export class BasementScene extends Phaser.Scene {
 
   private getBasementFloorFrame(col: number, row: number): number {
     return FLOOR_FRAMES[Math.abs(col * 13 + row * 17) % FLOOR_FRAMES.length];
+  }
+
+  // ── Decorations ───────────────────────────────────────────────────────────
+
+  private placeDecorations(): void {
+    // Int-C frame 167 = cobweb. Anchored at wall corners, 2×2 tile display.
+    const web = (wx: number, wy: number, alpha = 0.8) =>
+      this.add.image(wx, wy, "full-set-int-c")
+        .setFrame(167).setDisplaySize(TILE * 2, TILE * 2).setAlpha(alpha);
+
+    // Int-B prop
+    const propB = (col: number, row: number, frame: number, size = TILE) =>
+      this.add.image(col * TILE + TILE / 2, row * TILE + TILE / 2, "full-set-int-b")
+        .setFrame(frame).setDisplaySize(size, size);
+
+    // NW room (insulation pipe dead end) — room cols 2-7, rows 8-12
+    web(1 * TILE, 7 * TILE, 0.85);   // top-left corner
+    web(1 * TILE, 12 * TILE, 0.7);   // bottom-left corner
+    web(7 * TILE, 7 * TILE, 0.6);    // top-right corner
+    propB(3, 10, 67); propB(4, 10, 64); propB(5, 10, 65); // old crates/stuff
+
+    // Water stain room (cols 22-28, rows 11-14)
+    web(21 * TILE, 10 * TILE, 0.8);   // top-left
+    web(28 * TILE, 10 * TILE, 0.75);  // top-right
+    web(21 * TILE, 14 * TILE, 0.65);  // bottom-left
+    web(28 * TILE, 14 * TILE, 0.7);   // bottom-right
+
+    // Pool noodles dead end (row 21, cols 4-12)
+    web(3 * TILE, 20 * TILE, 0.75);   // west corner
+    web(12 * TILE, 20 * TILE, 0.65);  // east corner
+    propB(6, 21, 128); propB(7, 21, 129); propB(9, 21, 112); // pool noodles → colourful pots
+
+    // Wire rack dead end (cols 8-14, rows 20-22)
+    web(7 * TILE, 19 * TILE, 0.8);
+    web(14 * TILE, 19 * TILE, 0.7);
+    propB(10, 21, 8, TILE * 2);  // empty wooden shelving unit
+
+    // Dryer boss room — heavy cobwebs in all four corners (cols 29-34, rows 17-21)
+    web(28 * TILE, 16 * TILE, 0.9);  // top-left
+    web(34 * TILE, 16 * TILE, 0.9);  // top-right
+    web(28 * TILE, 21 * TILE, 0.8);  // bottom-left
+    web(34 * TILE, 21 * TILE, 0.85); // bottom-right
+    web(31 * TILE, 16 * TILE, 0.5);  // top-centre extra wisp
+
+    // Long west corridor (col 4) — scattered single webs
+    web(3 * TILE, 4 * TILE, 0.5);
+    web(3 * TILE, 9 * TILE, 0.45);
+    web(3 * TILE, 13 * TILE, 0.5);
+
+    // Long east corridor (col 33) — scattered
+    web(33 * TILE, 7 * TILE, 0.5);
+    web(33 * TILE, 12 * TILE, 0.45);
+    web(33 * TILE, 16 * TILE, 0.5);
   }
 
   // ── World objects ─────────────────────────────────────────────────────────

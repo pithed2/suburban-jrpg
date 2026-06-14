@@ -42,6 +42,7 @@ export class BootScene extends Phaser.Scene {
     this.load.image("dryer-boss-world", "/assets-active/enemies/dryer_boss_world.png");
     this.load.image("dust-bunny", "/assets-active/enemies/Dust_Bunny.png");
     this.load.image("icky-spider", "/assets-active/enemies/Icky_Spider_2.png"); // 74×64, pre-transparent
+    this.load.image("intro-scene", "/assets-active/props/Intro.png");
     this.load.image("circuit-breaker", "/assets-active/props/circuit_breaker.png");
     this.load.image("safety-sticker", "/assets-active/props/safety_sticker.png");
     this.load.image("stairs-up", "/assets-active/props/stairs_up.png");
@@ -161,6 +162,16 @@ export class BootScene extends Phaser.Scene {
       "/assets/full_set/Tilesets/Int-B.png",
       { frameWidth: 32, frameHeight: 32 },
     );
+    this.load.spritesheet(
+      "full-set-int-c",
+      "/assets/full_set/Tilesets/Int-C.png",
+      { frameWidth: 32, frameHeight: 32 },
+    );
+    this.load.spritesheet(
+      "kitchen-props",
+      "/assets/tilesets/kitchen_LRK.png",
+      { frameWidth: 16, frameHeight: 16 },
+    );
   }
 
   /** Draws a tiny wrench icon for use in the inventory / item UI. */
@@ -204,6 +215,7 @@ export class BootScene extends Phaser.Scene {
       .setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get("dust-bunny").setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get("icky-spider").setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures.get("intro-scene").setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures
       .get("circuit-breaker")
       .setFilter(Phaser.Textures.FilterMode.NEAREST);
@@ -241,6 +253,8 @@ export class BootScene extends Phaser.Scene {
     this.textures.get("full-set-int-a2").setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get("full-set-int-a4").setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get("full-set-int-b").setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures.get("full-set-int-c").setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures.get("kitchen-props").setFilter(Phaser.Textures.FilterMode.NEAREST);
 
     this.textures.get("chests").setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get("full-set-doors").setFilter(Phaser.Textures.FilterMode.NEAREST);

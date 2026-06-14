@@ -142,6 +142,9 @@ export class StoryIntroScene extends Phaser.Scene {
       .setOrigin(0.5, 0)
       .setTint(0xfacc15);
 
+    // Scene illustration — centered in the gap between header (y≈14) and dialogue box (y≈121)
+    this.add.image(160, 67, "intro-scene").setOrigin(0.5, 0.5);
+
     const name = getGameState().player.name || "DAD";
     const lines = this.buildLines(name);
 
