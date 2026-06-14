@@ -29,7 +29,7 @@ import { DAD_DEF } from "../game/characterDefs";
 import { dialogue, enemies } from "../game/content";
 import { installDevShortcuts } from "../game/devShortcuts";
 import { DialogueBox } from "../game/DialogueBox";
-import { getDadBrainLine, getDadLine, getDadMovieQuote } from "../game/dadVoice";
+import { getDadBrainLine, getDadCombatLine, getDadLine, getDadMovieQuote, getEnemyBanter } from "../game/dadVoice";
 import { DialogueRunner, type DialogueInput, type DialogueLine } from "../game/DialogueRunner";
 import { RandomEncounterTracker } from "../game/EncounterManager";
 import { GameMenu } from "../game/GameMenu";
@@ -82,7 +82,7 @@ function buildBasementMap(): number[][] {
   v(33, 6, 18);
   h(18, 20, 33);
   v(20, 14, 18);
-  room(29, 17, 34, 21); // dryer room
+  room(29, 17, 34, 20); // dryer room
   h(21, 4, 12);         // south-west false branch
   v(12, 18, 21);
   room(8, 20, 14, 22);
@@ -225,6 +225,8 @@ export class BasementScene extends Phaser.Scene {
   // systems
   private mode: BasementMode = "explore";
   private activeEnemyId = "evil-heating-coil";
+  private bgMusic?: Phaser.Sound.BaseSound;
+  private bossMusicActive = false;
   private dialogueBox!: DialogueBox;
   private statsPanel!: PlayerStatsPanel;
   private menu!: GameMenu;
@@ -271,6 +273,10 @@ export class BasementScene extends Phaser.Scene {
 
     this.cameras.main.setBounds(0, 0, WORLD_W, WORLD_H);
     this.cameras.main.startFollow(this.mover.phaserSprite, true, 0.1, 0.1);
+
+    this.bgMusic = this.sound.add("dramatic-bg", { loop: true, volume: 0.4 });
+    this.bgMusic.play();
+    this.events.once("shutdown", () => { this.bgMusic?.stop(); });
 
     if (!this.state.flags.bossDefeated) {
       this.startDialogue([
@@ -362,8 +368,16 @@ export class BasementScene extends Phaser.Scene {
       return WALL_FRAME_DEFAULT;
     }
 
-    if (row === ROWS - 2) return 115;
-    if (row === ROWS - 1) return 21;
+    if (row === ROWS - 2) {
+      if (col === 0) return 83;
+      if (col === lastCol) return 84;
+      return 115;
+    }
+    if (row === ROWS - 1) {
+      if (col === 0) return 83;
+      if (col === lastCol) return 84;
+      return 21;
+    }
 
     if (col === 0) return 48;
     if (col === 1) return 49;
@@ -448,7 +462,11 @@ export class BasementScene extends Phaser.Scene {
       .setDisplaySize(TILE, TILE);
 
     // ── Coil / dryer boss ──────────────────────────────────────────────────
-    if (!this.state.flags.bossDefeated) {
+    if (this.state.flags.bossDefeated) {
+      this.coilSprite = this.add.image(COIL_PX.x, COIL_PX.y, "dryer-fixed")
+        .setOrigin(0.5, 0.75)
+        .setDisplaySize(32, 32);
+    } else {
       this.coilSprite = this.add.image(COIL_PX.x, COIL_PX.y, "dryer-boss-world")
         .setOrigin(0.5, 0.75)
         .setDisplaySize(30, 30);
@@ -478,7 +496,7 @@ export class BasementScene extends Phaser.Scene {
 
   private canWalkTo(col: number, row: number): boolean {
     if (col < 0 || col >= COLS || row < 0 || row >= ROWS) return false;
-    if (!this.state.flags.bossDefeated && COIL_BLOCKED.has(`${col},${row}`)) return false;
+    if (COIL_BLOCKED.has(`${col},${row}`)) return false;
     if (BASEMENT_CHESTS.some((chest) => chest.col === col && chest.row === row)) return false;
     const t = MAP[row][col];
     return t === F || t === X;
@@ -689,10 +707,28 @@ export class BasementScene extends Phaser.Scene {
 
   // ── Battle ────────────────────────────────────────────────────────────────
 
+  private startBossMusicSwap(): void {
+    if (this.bossMusicActive) return;
+    this.bossMusicActive = true;
+    this.bgMusic?.stop();
+    const bossMusic = this.sound.add("mini-boss", { loop: true, volume: 0.45 });
+    bossMusic.play();
+    this.bgMusic = bossMusic;
+  }
+
+  private stopBossMusicSwap(): void {
+    if (!this.bossMusicActive) return;
+    this.bossMusicActive = false;
+    this.bgMusic?.stop();
+    this.bgMusic = this.sound.add("dramatic-bg", { loop: true, volume: 0.4 });
+    this.bgMusic.play();
+  }
+
   private startBattle(enemyId: string): void {
     const enemy = enemies.find((e) => e.id === enemyId);
     if (!enemy) return;
     this.activeEnemyId = enemyId;
+    if (enemyId === "evil-heating-coil") this.startBossMusicSwap();
     const snap = this.battle.start(enemy, this.state);
     this.mode = "battle";
     this.battlePhase = "command";
@@ -728,7 +764,11 @@ export class BasementScene extends Phaser.Scene {
       this.updateBattlePanels(res);
       if (res.defeated) { this.handleDefeat(res.message); return; }
       const mood = res.heroHp <= res.heroMaxHp * 0.3 ? "lowHp" : "takingDamage";
-      this.showMessage(`${res.message}\n${getDadLine("toEnemy", mood)}`, "BATTLE");
+      const isCoil = this.activeEnemyId === "evil-heating-coil";
+      const colorCommentary = isCoil
+        ? getEnemyBanter("dryerBoss")
+        : getDadCombatLine(mood);
+      this.showMessage(`${res.message}\n${colorCommentary}`, "BATTLE");
       return;
     }
 
@@ -738,6 +778,7 @@ export class BasementScene extends Phaser.Scene {
 
     if (res.victory)  { this.hideCommandMenu(); this.handleVictory(res.message);  return; }
     if (res.escaped)  {
+      this.stopBossMusicSwap();
       this.hideCommandMenu();
       this.encounters.resetPosition(new Phaser.Math.Vector2(this.mover.x, this.mover.y));
       this.startDialogue(
@@ -762,6 +803,7 @@ export class BasementScene extends Phaser.Scene {
     }
 
     // Heating coil boss victory
+    this.stopBossMusicSwap();
     this.state.flags.bossDefeated = true;
     completeQuestStep(this.state, "defeat-heating-coil");
     setActiveQuestStep(
@@ -769,7 +811,7 @@ export class BasementScene extends Phaser.Scene {
       this.state.flags.circuitBreakerOff ? "restore-power" : "return-to-wife",
     );
     this.updateQuestText("VICTORY");
-    if (this.coilSprite) this.coilSprite.setVisible(false);
+    if (this.coilSprite) this.coilSprite.setTexture("dryer-fixed");
 
     this.startDialogue([
       { speaker: "BATTLE",     text: msg },
@@ -791,6 +833,7 @@ export class BasementScene extends Phaser.Scene {
   }
 
   private handleDefeat(msg: string): void {
+    this.stopBossMusicSwap();
     this.hideCommandMenu();
     this.startDialogue(
       [
@@ -887,9 +930,9 @@ export class BasementScene extends Phaser.Scene {
     if (snap.enemy.battleTexture) {
       const isSpider = snap.enemy.id === "icky-spider";
       const isCoil = snap.enemy.id === "evil-heating-coil";
-      const sw = isCoil ? 74 : isSpider ? 60 : 42; // spider/coil native 74×64
-      const sh = isCoil ? 64 : isSpider ? 52 : 42;
-      const sy = isCoil ? 84 : isSpider ? 88 : 92;
+      const sw = isCoil ? 48 : isSpider ? 60 : 42;
+      const sh = isCoil ? 42 : isSpider ? 52 : 42;
+      const sy = isCoil ? 95 : isSpider ? 88 : 92;
       this.battleEnemySprite.setTexture(snap.enemy.battleTexture).setPosition(154, sy).setDisplaySize(sw, sh);
     }
   }

@@ -5,7 +5,7 @@
     "randomEncounters": {
       "enabled": true,
       "stepDistance": 80,
-      "baseChance": 0.18,
+      "baseChance": 0.23,
       "cooldownRolls": 3,
       "disabledWhenFlags": ["bossDefeated"],
       "introMessages": [
@@ -15,7 +15,16 @@
       "entries": [
         {
           "enemyId": "dust-bunny",
-          "weight": 2
+          "weight": 3
+        },
+        {
+          "enemyId": "angry-dust-bunny",
+          "weight": 1,
+          "introMessages": [
+            "Something rolls out from under the dryer. It is furious.",
+            "A dust bunny emerges from the dark. It does not look like a regular dust bunny.",
+            "The basement floor shifts. Whatever this is, it has been waiting."
+          ]
         },
         {
           "enemyId": "icky-spider",
@@ -44,7 +53,7 @@
     "randomEncounters": {
       "enabled": true,
       "stepDistance": 80,
-      "baseChance": 0.15,
+      "baseChance": 0.20,
       "cooldownRolls": 4,
       "disabledWhenFlags": ["foundWrench"],
       "introMessages": [
@@ -55,7 +64,16 @@
       "entries": [
         {
           "enemyId": "dust-bunny",
-          "weight": 2
+          "weight": 3
+        },
+        {
+          "enemyId": "angry-dust-bunny",
+          "weight": 1,
+          "introMessages": [
+            "Something rolls out from behind the toolbox. It is not happy.",
+            "A dust bunny near the workbench stirs. It looks different. Angrier.",
+            "Dad disturbs something near the wrench rack. It disturbs him back."
+          ]
         },
         {
           "enemyId": "icky-spider",

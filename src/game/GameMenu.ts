@@ -14,6 +14,7 @@ export class GameMenu {
   private readonly title: Phaser.GameObjects.BitmapText;
   private readonly optionText: Phaser.GameObjects.BitmapText;
   private readonly detailText: Phaser.GameObjects.BitmapText;
+  private readonly menuHint: Phaser.GameObjects.BitmapText;
   private readonly cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   private readonly menuKey: Phaser.Input.Keyboard.Key;
   private readonly escapeKey: Phaser.Input.Keyboard.Key;
@@ -50,6 +51,13 @@ export class GameMenu {
       .setDepth(101)
       .setScrollFactor(0)
       .setVisible(false);
+
+    this.menuHint = addPixelText(scene, 314, 174, "M=MENU", 6)
+      .setOrigin(1, 1)
+      .setTint(0x64748b)
+      .setAlpha(0.7)
+      .setDepth(50)
+      .setScrollFactor(0);
   }
 
   isOpen(): boolean {
@@ -92,6 +100,7 @@ export class GameMenu {
     this.title.setVisible(visible);
     this.optionText.setVisible(visible);
     this.detailText.setVisible(visible);
+    this.menuHint.setVisible(!visible);
 
     if (visible) {
       this.render();

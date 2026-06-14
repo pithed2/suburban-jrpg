@@ -18,7 +18,7 @@ import { DAD_DEF } from "../game/characterDefs";
 import { enemies } from "../game/content";
 import { installDevShortcuts } from "../game/devShortcuts";
 import { DialogueBox } from "../game/DialogueBox";
-import { getDadBrainLine, getDadLine, getDadMovieQuote } from "../game/dadVoice";
+import { getDadBrainLine, getDadCombatLine, getDadLine, getDadMovieQuote } from "../game/dadVoice";
 import { DialogueRunner, type DialogueInput, type DialogueLine } from "../game/DialogueRunner";
 import { RandomEncounterTracker } from "../game/EncounterManager";
 import { GameMenu } from "../game/GameMenu";
@@ -33,7 +33,7 @@ import { completeQuestStep, setActiveQuestStep, type GameState } from "../game/s
 const TILE = 16;
 // Walls — full-set-int-a4 (512×480, 32×32, 16 cols × 15 rows)
 //   Frame 17 = row 1 col 1 — dark iron/stone fill
-const WALL_FRAME = 17;
+const WALL_FRAME = 134; // gray concrete block — garage wall
 
 // Floor — garage-ts = garage_basement_16x16.png (1024×1536, 16×16, 64 cols × 96 rows)
 //   Frame 424 = row 6 col 40 — medium-dark grey concrete (GARAGE FLOOR section)
@@ -279,6 +279,10 @@ export class GarageScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, WORLD_W, WORLD_H);
     this.cameras.main.startFollow(this.mover.phaserSprite, true, 0.1, 0.1);
 
+    const bgMusic = this.sound.add("dramatic-bg", { loop: true, volume: 0.4 });
+    bgMusic.play();
+    this.events.once("shutdown", () => bgMusic.stop());
+
     if (!this.state.flags.foundWrench) {
       this.startDialogue([
         { speaker: "DAD'S BRAIN", text: getDadBrainLine("garage") },
@@ -445,7 +449,7 @@ export class GarageScene extends Phaser.Scene {
   private onLand(col: number, row: number): void {
     // Exit tile
     if (MAP[row][col] === X) {
-      this.scene.start("NeighborhoodScene");
+      this.scene.start("NeighborhoodScene", { spawn: "garage" });
       return;
     }
 
@@ -479,7 +483,7 @@ export class GarageScene extends Phaser.Scene {
 
     // Exit
     if (MAP[this.mover.row]?.[this.mover.col] === X) {
-      this.scene.start("NeighborhoodScene");
+      this.scene.start("NeighborhoodScene", { spawn: "garage" });
       return;
     }
 
@@ -616,7 +620,7 @@ export class GarageScene extends Phaser.Scene {
       this.battlePhase = "enemyResult";
       this.updateBattlePanels(res);
       if (res.defeated) { this.handleDefeat(res.message); return; }
-      this.showMessage(`${res.message}\n${getDadLine("toEnemy", res.heroHp <= res.heroMaxHp * 0.3 ? "lowHp" : "takingDamage")}`, "BATTLE");
+      this.showMessage(`${res.message}\n${getDadCombatLine(res.heroHp <= res.heroMaxHp * 0.3 ? "lowHp" : "takingDamage")}`, "BATTLE");
       return;
     }
 
@@ -663,7 +667,7 @@ export class GarageScene extends Phaser.Scene {
         this.state.player.hp = this.state.player.maxHp;
         this.state.player.dadPoints = this.state.player.maxDadPoints;
         this.state.player.cash = Math.max(0, this.state.player.cash - 2);
-        this.scene.start("NeighborhoodScene");
+        this.scene.start("NeighborhoodScene", { spawn: "garage" });
       },
     );
   }
@@ -743,9 +747,9 @@ export class GarageScene extends Phaser.Scene {
       const isSpider = snap.enemy.id === "icky-spider";
       const isCoil = snap.enemy.id === "evil-heating-coil";
       // Spider is bigger on screen — it deserves to fill the box so you can see every leg
-      const sw = isCoil ? 74 : isSpider ? 60 : 32; // spider/coil native 74×64
-      const sh = isCoil ? 64 : isSpider ? 52 : 32;
-      const sy = isCoil ? 84 : isSpider ? 88 : 93;
+      const sw = isCoil ? 48 : isSpider ? 60 : 32;
+      const sh = isCoil ? 42 : isSpider ? 52 : 32;
+      const sy = isCoil ? 95 : isSpider ? 88 : 93;
       this.battleEnemyBox.setFillStyle(isSpider ? 0x1a0a2e : 0x65a30d); // dark for spider, green for others
       this.battleEnemySprite
         .setTexture(snap.enemy.battleTexture)

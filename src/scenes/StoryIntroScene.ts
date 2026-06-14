@@ -134,6 +134,10 @@ export class StoryIntroScene extends Phaser.Scene {
   private beginDialogue(): void {
     this.phase = "dialogue";
 
+    const bgMusic = this.sound.add("home-bg", { loop: true, volume: 0.4 });
+    bgMusic.play();
+    this.events.once("shutdown", () => bgMusic.stop());
+
     // Clear title visuals by drawing over them with the dark background
     this.add.rectangle(160, 90, 320, 180, 0x050a0f);
 
@@ -182,98 +186,25 @@ export class StoryIntroScene extends Phaser.Scene {
 
   private buildLines(name: string): DialogueInput[] {
     return [
-      // ── Setting the scene ────────────────────────────────────────────────
       {
         speaker: "NARRATOR",
-        text: "Saturday afternoon. A man of considerable dad energy occupies his throne — a La-Z-Boy of distinguished and slightly suspicious age.",
+        text: "Saturday afternoon. A man of considerable dad energy inspects the backs of his eyelids. This is a medical necessity.",
       },
-      {
-        speaker: "NARRATOR",
-        text: "Remote in one hand. Beer in the other. The game is on.",
-      },
-      {
-        speaker: "NARRATOR",
-        text: "He is not asleep. He is inspecting the backs of his eyelids for structural damage. This is a medical necessity.",
-      },
-      {
-        speaker: "NARRATOR",
-        text: "His breathing is measured. Authoritative. Also loud.",
-      },
-
-      // ── The awakening ────────────────────────────────────────────────────
-      { speaker: "WIFE", text: "Honey." },
-      { speaker: "NARRATOR", text: "Nothing." },
-      { speaker: "WIFE", text: "Hon." },
-      { speaker: "NARRATOR", text: "The remote shifts almost imperceptibly in his grip." },
       { speaker: "WIFE", text: `${name}.` },
-      { speaker: "DAD'S BRAIN", text: "Someone said the name." },
       { speaker: "DAD", text: "[snort] — I was watching that." },
-
-      // ── Quest 1: The Dryer ───────────────────────────────────────────────
-      { speaker: "WIFE", text: "The dryer isn't drying clothes." },
-      { speaker: "DAD", text: "How long has it been doing that?" },
-      { speaker: "WIFE", text: "Since Tuesday." },
-      { speaker: "DAD", text: "And today is..." },
-      { speaker: "WIFE", text: "Saturday." },
+      { speaker: "WIFE", text: "The dryer isn't drying clothes. Since Tuesday." },
       {
         speaker: "DAD'S BRAIN",
         text: "Four days. She waited four days to mention it. This is a political move.",
       },
-      { speaker: "DAD", text: "I'll look at it. Right after this drive." },
-      { speaker: "WIFE", text: "The game ended an hour ago." },
-      { speaker: "DAD'S BRAIN", text: "He was watching the replay." },
-
-      // ── The Bomb ─────────────────────────────────────────────────────────
-      { speaker: "WIFE", text: "There's also something else." },
-      { speaker: "DAD'S BRAIN", text: "There is always something else." },
-      { speaker: "WIFE", text: "I invited my parents to come stay with us." },
+      { speaker: "WIFE", text: "Also... I invited my parents to stay with us." },
       { speaker: "DAD", text: "..." },
-      { speaker: "WIFE", text: "They'll be here in two weeks." },
-      { speaker: "DAD", text: "Houston, we have a problem." },
-      { speaker: "WIFE", text: "What?" },
-      { speaker: "DAD", text: "Nothing. Two weeks." },
-
-      // ── The Honey-Do List ─────────────────────────────────────────────────
-      {
-        speaker: "WIFE",
-        text: "The dryer, the basement, the guest room. You know how my mother gets.",
-      },
-      { speaker: "DAD", text: "I do." },
-      { speaker: "WIFE", text: "And the garage." },
-      { speaker: "DAD", text: "Yep." },
-      { speaker: "WIFE", text: "And the yard." },
-      { speaker: "DAD", text: "Sure." },
-      { speaker: "WIFE", text: "And the bathroom grout." },
-      {
-        speaker: "DAD'S BRAIN",
-        text: "The bathroom grout. She said the bathroom grout. This is not a chore list. This is a military campaign.",
-      },
-      { speaker: "DAD", text: "As you wish." },
-
-      // ── The Lasagna ───────────────────────────────────────────────────────
-      {
-        speaker: "WIFE",
-        text: "I know it's a lot. I'll make the good lasagna when they're here.",
-      },
-      { speaker: "DAD", text: "...She's making the lasagna." },
+      { speaker: "WIFE", text: "They'll be here in two weeks. The dryer, the basement, the garage. You know how my mother gets." },
+      { speaker: "WIFE", text: "I'll make the good lasagna when they're here." },
       { speaker: "DAD'S BRAIN", text: "We fight for the lasagna." },
-
-      // ── The Quest Log Opens ───────────────────────────────────────────────
       {
         speaker: "NARRATOR",
-        text: "The remote comes to rest on the armrest. The beer is no longer cold. The game was over an hour ago.",
-      },
-      {
-        speaker: "NARRATOR",
-        text: "Somewhere in the basement, a dryer hums a low, unsatisfying hum.",
-      },
-      {
-        speaker: "NARRATOR",
-        text: "Fourteen days. One dad. One house. One impossible standard of cleanliness set by someone who does not live here.",
-      },
-      {
-        speaker: "DAD'S BRAIN",
-        text: "The Dad surveys his domain. It is a disaster. It is also, technically, home. Time to fix both of those things.",
+        text: "Fourteen days. One dad. One impossible standard set by someone who does not live here.",
       },
     ];
   }

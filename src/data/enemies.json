@@ -50,6 +50,60 @@
     }
   },
   {
+    "id": "angry-dust-bunny",
+    "name": "Angry Dust Bunny",
+    "battleTexture": "angry-dust-bunny",
+    "level": 2,
+    "hp": 18,
+    "attack": 4,
+    "agility": 4,
+    "dodgeChance": 0.03,
+    "xpReward": 7,
+    "cashReward": 4,
+    "emotionalMeaning": "Neglect with a grudge",
+    "attackPattern": [
+      {
+        "message": "Hurls itself at Dad with absolute personal grievance",
+        "damage": 3
+      },
+      {
+        "message": "Performs a dramatic rolling charge straight at Dad's ankles",
+        "damage": 4
+      },
+      {
+        "message": "Emits a cloud of malicious lint",
+        "damage": 2
+      },
+      {
+        "message": "Stares Dad down with the fury of years of neglect",
+        "damage": 3
+      }
+    ],
+    "actionResponses": {
+      "fight": {
+        "damage": 5,
+        "damageByWeapon": {
+          "two-hands": 5,
+          "percussive-maintenance": 5,
+          "adjustable-wrench": 6
+        },
+        "message": "You swat it. It bounces back. It is angrier now.",
+        "effectLabel": "it's personal"
+      },
+      "dadSkill": {
+        "damage": 4,
+        "message": "You take a Deep Sigh. The dust bunny takes this as an insult.",
+        "effectLabel": "backfired slightly"
+      }
+    },
+    "initiative": {
+      "baseAmbushChance": 0.10,
+      "levelAdvantageBonus": 0.03,
+      "maxAmbushChance": 0.22,
+      "ambushMessage": "An Angry Dust Bunny launches itself from beneath the dryer before Dad can react."
+    }
+  },
+  {
     "id": "icky-spider",
     "name": "Freaky Icky Spider",
     "battleTexture": "icky-spider",

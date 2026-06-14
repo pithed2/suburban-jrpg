@@ -37,7 +37,7 @@ import {
 const TILE = 16;
 
 // Walls — full-set-int-a4 (32×32 per frame)
-const WALL_FRAME = 17; // dark stone fill
+const WALL_FRAME = 140; // warm cream plaster — suburban interior wall
 
 // Floors — house-core-16 = house_core_16x16.png (16×16 per frame, 64 cols × 96 rows)
 // These are the same frame numbers used before the full_set refactor.
@@ -133,6 +133,8 @@ const SPAWN_COL   = 8;
 const SPAWN_ROW   = 20;
 const BASEMENT_RETURN_COL = 13;
 const BASEMENT_RETURN_ROW = 13;
+const GARAGE_RETURN_COL   = 8;
+const GARAGE_RETURN_ROW   = 20;
 
 const INTERACT_PX     = 36; // proximity threshold in world pixels
 
@@ -146,7 +148,7 @@ const FLOOR_FRAME: Record<number, number> = {
 
 // ── Scene ─────────────────────────────────────────────────────────────────
 type SceneMode = "explore" | "dialogue" | "complete";
-type NeighborhoodSpawn = "default" | "basement";
+type NeighborhoodSpawn = "default" | "basement" | "garage";
 
 export class NeighborhoodScene extends Phaser.Scene {
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -193,6 +195,10 @@ export class NeighborhoodScene extends Phaser.Scene {
 
     this.cameras.main.setBounds(0, 0, WORLD_W, WORLD_H);
     this.cameras.main.startFollow(this.mover.phaserSprite, true, 0.1, 0.1);
+
+    const bgMusic = this.sound.add("comfort-bg", { loop: true, volume: 0.4 });
+    bgMusic.play();
+    this.events.once("shutdown", () => bgMusic.stop());
   }
 
   update(_time: number, delta: number): void {
@@ -335,8 +341,8 @@ export class NeighborhoodScene extends Phaser.Scene {
 
   private placeCharacters(): void {
     const dadChar = new CharacterSprite(this, 0, 0, DAD_DEF);
-    const spawnCol = this.spawn === "basement" ? BASEMENT_RETURN_COL : SPAWN_COL;
-    const spawnRow = this.spawn === "basement" ? BASEMENT_RETURN_ROW : SPAWN_ROW;
+    const spawnCol = this.spawn === "basement" ? BASEMENT_RETURN_COL : this.spawn === "garage" ? GARAGE_RETURN_COL : SPAWN_COL;
+    const spawnRow = this.spawn === "basement" ? BASEMENT_RETURN_ROW : this.spawn === "garage" ? GARAGE_RETURN_ROW : SPAWN_ROW;
     this.mover = new GridMover(this, dadChar, TILE, spawnCol, spawnRow);
 
     this.wifeChar = new CharacterSprite(this, WIFE_PX.x, WIFE_PX.y, WIFE_DEF);
@@ -436,7 +442,14 @@ export class NeighborhoodScene extends Phaser.Scene {
         { speaker: "WIFE",     text: "Aw. Look at you." },
         { speaker: "WIFE",     text: "You wish. Your to-do list is way too long." },
         { speaker: "WIFE",     text: "Thank you. Sincerely. I will be impressed for at least the next ninety seconds." },
-        { speaker: "WIFE",     text: "Next, we need to talk about that family dinner text from my mom. But first, status check." },
+        { speaker: "WIFE",     text: "Now... about the upstairs toilet." },
+        { speaker: "DAD",      text: "..." },
+        { speaker: "WIFE",     text: "It's been making that sound again." },
+        { speaker: "DAD'S BRAIN", text: "There is always another sound." },
+        { speaker: "DAD",      text: "I handled a live heating coil today. The toilet doesn't scare me." },
+        { speaker: "WIFE",     text: "It should." },
+        { speaker: "NARRATOR", text: "The Dad makes a mental note. The toilet will have to wait. Developer Andy needs to build that quest first." },
+        { speaker: "DAD'S BRAIN", text: "One disaster at a time. That's the code." },
         ...wifeCheckIn,
         { speaker: "DAD",      text: getDadLine("selfTalk", "victory") },
       ], () => {

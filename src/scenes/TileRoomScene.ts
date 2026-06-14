@@ -229,6 +229,10 @@ export class TileRoomScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, WORLD_W, WORLD_H);
     this.cameras.main.startFollow(this.mover.phaserSprite, true, 0.1, 0.1);
 
+    const bgMusic = this.sound.add("comfort-bg", { loop: true, volume: 0.4 });
+    bgMusic.play();
+    this.events.once("shutdown", () => bgMusic.stop());
+
     this.startDialogue([
       { speaker: "NARRATOR", text: "The utility basement. It smells like old carpet, regret, and possibility." },
       { speaker: "DAD'S BRAIN", text: "Don't touch the fridge. You know the rules. You MADE the rules." },

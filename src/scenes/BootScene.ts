@@ -40,8 +40,15 @@ export class BootScene extends Phaser.Scene {
     this.load.image("heating-coil-battle", "/assets-active/enemies/Heating_Coil.png");
     this.load.image("dryer-boss", "/assets-active/enemies/Heating_Coil.png");
     this.load.image("dryer-boss-world", "/assets-active/enemies/dryer_boss_world.png");
+    this.load.image("dryer-fixed", "/assets-active/props/Happy_Dryer.png");
     this.load.image("dust-bunny", "/assets-active/enemies/Dust_Bunny.png");
+    this.load.image("angry-dust-bunny", "/assets-active/enemies/Angry_Dust_Bunny_battle.png");
     this.load.image("icky-spider", "/assets-active/enemies/Icky_Spider_2.png"); // 74×64, pre-transparent
+    this.load.audio("dramatic-bg", "/assets-active/audio/dramatic-bg.mp3");
+    this.load.audio("overworld-bg", "/assets-active/audio/overworld-bg.mp3");
+    this.load.audio("home-bg", "/assets-active/audio/home-bg.mp3");
+    this.load.audio("comfort-bg", "/assets-active/audio/comfort-bg.mp3");
+    this.load.audio("mini-boss", "/assets-active/audio/mini-boss.mp3");
     this.load.image("intro-scene", "/assets-active/props/Intro.png");
     this.load.image("circuit-breaker", "/assets-active/props/circuit_breaker.png");
     this.load.image("safety-sticker", "/assets-active/props/safety_sticker.png");
@@ -214,6 +221,8 @@ export class BootScene extends Phaser.Scene {
       .get("dryer-boss-world")
       .setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get("dust-bunny").setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures.get("angry-dust-bunny").setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures.get("dryer-fixed").setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get("icky-spider").setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get("intro-scene").setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures
