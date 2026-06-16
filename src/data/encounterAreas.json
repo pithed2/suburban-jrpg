@@ -87,5 +87,67 @@
       ]
     },
     "fixedEncounters": []
+  },
+  {
+    "id": "bathroom",
+    "label": "Bathroom",
+    "randomEncounters": {
+      "enabled": true,
+      "stepDistance": 80,
+      "baseChance": 0.22,
+      "cooldownRolls": 3,
+      "disabledWhenFlags": ["clogBossDefeated"],
+      "introMessages": [
+        "Something shifts behind the shower curtain.",
+        "Dad pauses. The bathroom has chosen violence."
+      ],
+      "entries": [
+        {
+          "enemyId": "single-ply-sam",
+          "weight": 3,
+          "introMessages": [
+            "A roll of suspiciously thin toilet paper unspools itself menacingly.",
+            "Single-Ply Sam tumbles out from under the cabinet.",
+            "Something flimsy but determined blocks the path."
+          ]
+        },
+        {
+          "enemyId": "toothpaste-slime",
+          "weight": 2,
+          "introMessages": [
+            "A glob of toothpaste oozes off the sink with intent.",
+            "The Toothpaste Slime drops from the medicine cabinet.",
+            "Something minty and hostile blocks the sink."
+          ]
+        },
+        {
+          "enemyId": "mold-patch",
+          "weight": 2,
+          "introMessages": [
+            "The grout near the shower has been waiting for this moment.",
+            "A Mold Patch unsticks itself from the tile.",
+            "Something green and patient stirs behind the curtain."
+          ]
+        },
+        {
+          "enemyId": "olfactory-ninja",
+          "weight": 1,
+          "introMessages": [
+            "The Olfactory Ninja strikes before Dad registers the smell.",
+            "A cloud of pure offense materializes near the exhaust fan.",
+            "Something silent, deadly, and airborne has entered the room."
+          ]
+        }
+      ]
+    },
+    "fixedEncounters": [
+      {
+        "enemyId": "clogged-toilet",
+        "kind": "boss",
+        "x": 216,
+        "y": 248,
+        "requiredQuestStepId": "defeat-clogged-toilet"
+      }
+    ]
   }
 ]

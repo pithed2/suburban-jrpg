@@ -206,5 +206,265 @@
       "maxAmbushChance": 0.12,
       "ambushMessage": "The Evil Heating Coil glows before you can brace yourself."
     }
+  },
+  {
+    "id": "single-ply-sam",
+    "name": "Single-Ply Sam",
+    "battleTexture": "single-ply-sam",
+    "level": 2,
+    "hp": 8,
+    "attack": 2,
+    "agility": 6,
+    "dodgeChance": 0.20,
+    "xpReward": 4,
+    "cashReward": 2,
+    "emotionalMeaning": "Cheapskate college days, unresolved",
+    "attackPattern": [
+      {
+        "message": "Unspools dramatically and gets everywhere",
+        "damage": 1
+      },
+      {
+        "message": "Disintegrates ominously mid-fight, which is somehow worse",
+        "damage": 2
+      },
+      {
+        "message": "Rolls under the cabinet, daring Dad to chase it",
+        "damage": 1
+      }
+    ],
+    "actionResponses": {
+      "fight": {
+        "damage": 5,
+        "damageByWeapon": {
+          "two-hands": 5,
+          "percussive-maintenance": 5,
+          "adjustable-wrench": 6,
+          "plumbing-snake": 7,
+          "plunger-of-the-gods": 8
+        },
+        "message": "You swat it. It tears apart with shameful ease.",
+        "effectLabel": "structurally weak"
+      },
+      "dadSkill": {
+        "damage": 3,
+        "message": "You take a Deep Sigh. Sam was never going to make it anyway.",
+        "effectLabel": "resisted"
+      }
+    },
+    "initiative": {
+      "baseAmbushChance": 0.08,
+      "levelAdvantageBonus": 0.02,
+      "maxAmbushChance": 0.18,
+      "ambushMessage": "Single-Ply Sam unrolls from behind the cabinet before Dad can react."
+    }
+  },
+  {
+    "id": "olfactory-ninja",
+    "name": "Olfactory Ninja",
+    "battleTexture": "olfactory-ninja",
+    "level": 3,
+    "hp": 9,
+    "attack": 4,
+    "agility": 9,
+    "dodgeChance": 0.30,
+    "xpReward": 6,
+    "cashReward": 3,
+    "emotionalMeaning": "A stink bomb waiting to happen",
+    "attackPattern": [
+      {
+        "message": "Vanishes in a cloud of pure offense",
+        "damage": 3
+      },
+      {
+        "message": "Deploys a silent-but-deadly smoke bomb",
+        "damage": 4
+      },
+      {
+        "message": "Strikes from the shadows of the exhaust fan",
+        "damage": 3
+      }
+    ],
+    "actionResponses": {
+      "fight": {
+        "damage": 4,
+        "damageByWeapon": {
+          "two-hands": 4,
+          "percussive-maintenance": 4,
+          "adjustable-wrench": 4,
+          "plumbing-snake": 5,
+          "plunger-of-the-gods": 6
+        },
+        "message": "Dad swings through the cloud, mostly out of spite.",
+        "effectLabel": "smells like victory"
+      },
+      "dadSkill": {
+        "damage": 3,
+        "message": "You take a Deep Sigh. Tactically, this was a mistake in here.",
+        "effectLabel": "self-inflicted"
+      }
+    },
+    "initiative": {
+      "baseAmbushChance": 0.22,
+      "levelAdvantageBonus": 0.03,
+      "maxAmbushChance": 0.38,
+      "ambushMessage": "The Olfactory Ninja strikes before Dad even registers the smell."
+    }
+  },
+  {
+    "id": "toothpaste-slime",
+    "name": "Toothpaste Slime",
+    "battleTexture": "toothpaste-slime",
+    "level": 2,
+    "hp": 14,
+    "attack": 3,
+    "agility": 3,
+    "dodgeChance": 0.05,
+    "xpReward": 5,
+    "cashReward": 3,
+    "emotionalMeaning": "Sticky, minty resentment",
+    "attackPattern": [
+      {
+        "message": "Oozes onto Dad's shoe with minty menace",
+        "damage": 2
+      },
+      {
+        "message": "Sticks Dad's fingers together in a show of dominance",
+        "damage": 3
+      },
+      {
+        "message": "Sprays a fine mist of fluoride-scented contempt",
+        "damage": 2
+      }
+    ],
+    "actionResponses": {
+      "fight": {
+        "damage": 5,
+        "damageByWeapon": {
+          "two-hands": 5,
+          "percussive-maintenance": 5,
+          "adjustable-wrench": 5,
+          "plumbing-snake": 6,
+          "plunger-of-the-gods": 7
+        },
+        "message": "Dad strikes. It splatters, then reforms, vaguely smug.",
+        "effectLabel": "sticky but manageable"
+      },
+      "dadSkill": {
+        "damage": 4,
+        "message": "You take a Deep Sigh. The slime takes this personally.",
+        "effectLabel": "resisted"
+      }
+    },
+    "initiative": {
+      "baseAmbushChance": 0.06,
+      "levelAdvantageBonus": 0.02,
+      "maxAmbushChance": 0.16,
+      "ambushMessage": "The Toothpaste Slime drops from the medicine cabinet shelf."
+    }
+  },
+  {
+    "id": "mold-patch",
+    "name": "Mold Patch",
+    "battleTexture": "mold-patch",
+    "level": 3,
+    "hp": 20,
+    "attack": 4,
+    "agility": 2,
+    "dodgeChance": 0.03,
+    "xpReward": 8,
+    "cashReward": 4,
+    "emotionalMeaning": "Creeping, patient grime",
+    "attackPattern": [
+      {
+        "message": "Spreads slightly, somehow making the grout worse",
+        "damage": 3
+      },
+      {
+        "message": "Releases a spore cloud of pure landlord-deposit dread",
+        "damage": 4
+      },
+      {
+        "message": "Just sits there, multiplying, judging",
+        "damage": 2
+      }
+    ],
+    "actionResponses": {
+      "fight": {
+        "damage": 4,
+        "damageByWeapon": {
+          "two-hands": 4,
+          "percussive-maintenance": 4,
+          "adjustable-wrench": 4,
+          "plumbing-snake": 5,
+          "plunger-of-the-gods": 6
+        },
+        "message": "You scrub it. It clings to the grout with quiet defiance.",
+        "effectLabel": "tenacious"
+      },
+      "dadSkill": {
+        "damage": 5,
+        "message": "You take a Deep Sigh. The mold does not care about your feelings.",
+        "effectLabel": "unmoved"
+      }
+    },
+    "initiative": {
+      "baseAmbushChance": 0.04,
+      "levelAdvantageBonus": 0.02,
+      "maxAmbushChance": 0.14,
+      "ambushMessage": "The Mold Patch has been waiting behind the shower curtain the entire time."
+    }
+  },
+  {
+    "id": "clogged-toilet",
+    "name": "Clogged Toilet",
+    "battleTexture": "clogged-toilet-battle",
+    "level": 3,
+    "hp": 30,
+    "attack": 5,
+    "agility": 4,
+    "dodgeChance": 0.04,
+    "xpReward": 16,
+    "cashReward": 10,
+    "emotionalMeaning": "Plumbing dread",
+    "attackPattern": [
+      {
+        "message": "Gurgles with rising, deeply concerning pressure",
+        "damage": 4
+      },
+      {
+        "message": "Threatens to overflow with biblical confidence",
+        "damage": 5
+      },
+      {
+        "message": "Backs up in a way that voids several warranties",
+        "damage": 3
+      }
+    ],
+    "actionResponses": {
+      "fight": {
+        "damage": 3,
+        "damageByWeapon": {
+          "two-hands": 1,
+          "percussive-maintenance": 1,
+          "adjustable-wrench": 2,
+          "plumbing-snake": 7,
+          "plunger-of-the-gods": 13
+        },
+        "message": "Dad strikes the bowl. It gurgles in defiance.",
+        "effectLabel": "resisted"
+      },
+      "dadSkill": {
+        "damage": 6,
+        "message": "Dad summons Porcelain Courage. The clog briefly considers its life choices.",
+        "effectLabel": "vulnerable"
+      }
+    },
+    "initiative": {
+      "baseAmbushChance": 0.02,
+      "levelAdvantageBonus": 0.03,
+      "maxAmbushChance": 0.12,
+      "ambushMessage": "The Clogged Toilet groans ominously before Dad can brace himself."
+    }
   }
 ]

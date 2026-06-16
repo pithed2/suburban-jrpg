@@ -44,6 +44,11 @@ export class BootScene extends Phaser.Scene {
     this.load.image("dust-bunny", "/assets-active/enemies/Dust_Bunny.png");
     this.load.image("angry-dust-bunny", "/assets-active/enemies/Angry_Dust_Bunny_battle.png");
     this.load.image("icky-spider", "/assets-active/enemies/Icky_Spider_2.png"); // 74×64, pre-transparent
+    this.load.image("single-ply-sam", "/assets-active/enemies/Single_Ply_Sam_battle.png");
+    this.load.image("olfactory-ninja", "/assets-active/enemies/olfactory-ninja.png");
+    this.load.image("toothpaste-slime", "/assets-active/enemies/toothpaste_slime.png");
+    this.load.image("mold-patch", "/assets-active/enemies/mold-patch.png");
+    this.load.image("clogged-toilet-battle", "/assets-active/enemies/clogged_toilet_boss.png");
     this.load.audio("dramatic-bg", "/assets-active/audio/dramatic-bg.mp3");
     this.load.audio("overworld-bg", "/assets-active/audio/overworld-bg.mp3");
     this.load.audio("home-bg", "/assets-active/audio/home-bg.mp3");
@@ -222,6 +227,11 @@ export class BootScene extends Phaser.Scene {
       .setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get("dust-bunny").setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get("angry-dust-bunny").setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures.get("single-ply-sam").setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures.get("olfactory-ninja").setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures.get("toothpaste-slime").setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures.get("mold-patch").setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures.get("clogged-toilet-battle").setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get("dryer-fixed").setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get("icky-spider").setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get("intro-scene").setFilter(Phaser.Textures.FilterMode.NEAREST);

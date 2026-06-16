@@ -33,5 +33,40 @@
         "label": "Return to wife"
       }
     ]
+  },
+  {
+    "id": "fix-bathroom",
+    "title": "Unclog the Bathroom",
+    "countdownLabel": "11 DAYS UNTIL ARRIVAL",
+    "steps": [
+      {
+        "id": "talk-to-wife-bathroom",
+        "label": "Talk to wife"
+      },
+      {
+        "id": "visit-home-depot",
+        "label": "Visit THEE Home Depot"
+      },
+      {
+        "id": "find-plunger",
+        "label": "Buy a plunger"
+      },
+      {
+        "id": "inspect-toilet",
+        "label": "Inspect the toilet"
+      },
+      {
+        "id": "defeat-clogged-toilet",
+        "label": "Defeat the Clogged Toilet"
+      },
+      {
+        "id": "mop-up",
+        "label": "Mop up the bathroom"
+      },
+      {
+        "id": "return-to-wife-bathroom",
+        "label": "Return to wife"
+      }
+    ]
   }
 ]

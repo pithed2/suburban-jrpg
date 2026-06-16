@@ -53,5 +53,39 @@
       "Dad performs a precision adjustment with extremely non-precision energy."
     ],
     "description": "A practical tool and, in desperate times, a statement."
+  },
+  {
+    "id": "plumbing-snake",
+    "name": "Plumbing Snake",
+    "kind": "weapon",
+    "power": 7,
+    "price": 15,
+    "battleMessage": "Dad feeds the Plumbing Snake into the unknown with grim determination.",
+    "battleMessages": [
+      "Dad feeds the Plumbing Snake into the unknown with grim determination.",
+      "Dad cranks the handle like he's starting a lawnmower that owes him money.",
+      "Dad commits to a depth he will regret describing to his wife later.",
+      "The snake goes in. Dad's dignity does not come back out the same.",
+      "Dad mutters 'just a little further' to a 25-foot length of flexible steel.",
+      "Dad performs the ancient ritual: insert, twist, pray."
+    ],
+    "description": "Cheap, effective, and deeply unpleasant. Home Depot aisle 14."
+  },
+  {
+    "id": "plunger-of-the-gods",
+    "name": "Plunger of the Gods",
+    "kind": "weapon",
+    "power": 12,
+    "price": 45,
+    "battleMessage": "Dad raises the Plunger of the Gods. Lesser clogs flee on sight.",
+    "battleMessages": [
+      "Dad raises the Plunger of the Gods. Lesser clogs flee on sight.",
+      "Behold: the Plunger of the Gods, $44.99 plus tax, worth every cent.",
+      "Dad achieves perfect suction. A single tear of pride is shed.",
+      "The Plunger of the Gods does not negotiate. It only plunges.",
+      "Dad swings it like Excalibur, if Excalibur was rated for 6-inch drains.",
+      "With great suction comes great responsibility."
+    ],
+    "description": "THEE Home Depot's finest. Expensive. Mythic. Worth the drive."
   }
 ]

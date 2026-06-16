@@ -5,7 +5,14 @@ export type QuestStepId =
   | "flip-breaker"
   | "defeat-heating-coil"
   | "restore-power"
-  | "return-to-wife";
+  | "return-to-wife"
+  | "talk-to-wife-bathroom"
+  | "visit-home-depot"
+  | "find-plunger"
+  | "inspect-toilet"
+  | "defeat-clogged-toilet"
+  | "mop-up"
+  | "return-to-wife-bathroom";
 
 export interface QuestProgress {
   questId: string;
@@ -40,6 +47,13 @@ export interface GameFlags {
   dryerFixed: boolean;
   devRandomEncountersDisabled: boolean;
   basementFirstAidOpened: boolean;
+  visitedHomeDepot: boolean;
+  ownsPlunger: boolean;
+  toiletInspected: boolean;
+  clogBossDefeated: boolean;
+  bathroomFixed: boolean;
+  toiletPaperFound: boolean;
+  rubberDuckFound: boolean;
 }
 
 export interface GameState {
@@ -82,6 +96,13 @@ export function createInitialGameState(): GameState {
       dryerFixed: false,
       devRandomEncountersDisabled: false,
       basementFirstAidOpened: false,
+      visitedHomeDepot: false,
+      ownsPlunger: false,
+      toiletInspected: false,
+      clogBossDefeated: false,
+      bathroomFixed: false,
+      toiletPaperFound: false,
+      rubberDuckFound: false,
     },
     openedChestIds: [],
   };

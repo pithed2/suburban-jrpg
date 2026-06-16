@@ -55,8 +55,10 @@ const H = 4;   // hallway floor      (neutral)
 const M = 5;   // mudroom floor      (concrete)
 const D = 6;   // garage door        (solid wall bump marker)
 const S = 7;   // basement stairs    (walkable exit marker)
+const U = 8;   // bathroom stairs up (walkable exit marker)
+const P = 9;   // front door         (solid wall bump marker — Home Depot)
 
-const WALKABLE = new Set([L, K, H, M, S]);
+const WALKABLE = new Set([L, K, H, M, S, U]);
 
 // ── Four rooms, Dragon Warrior style ──────────────────────────────────────
 //
@@ -87,7 +89,7 @@ const _ = 0;
 const MAP: number[][] = [
   [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_], //  0
   [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_], //  1
-  [_,_,W,W,W,W,W,W,W,W,W,W,W,W,W,_,_,_,_,_,_,_,W,W,W,W,W,W,W,W,W,W,W,W,_,_], //  2  top walls
+  [_,_,W,W,W,W,W,W,W,W,W,P,P,W,W,_,_,_,_,_,_,_,W,W,W,W,W,W,W,W,W,W,W,W,_,_], //  2  top walls (front door 11-12)
   [_,_,W,L,L,L,L,L,L,L,L,L,L,L,W,_,_,_,_,_,_,_,W,K,K,K,K,K,K,K,K,K,K,K,W,_,_], //  3
   [_,_,W,L,L,L,L,L,L,L,L,L,L,L,W,_,_,_,_,_,_,_,W,K,K,K,K,K,K,K,K,K,K,K,W,_,_], //  4
   [_,_,W,L,L,L,L,L,L,L,L,L,L,L,W,_,_,_,_,_,_,_,W,K,K,K,K,K,K,K,K,K,K,K,W,_,_], //  5
@@ -97,7 +99,7 @@ const MAP: number[][] = [
   [_,_,W,L,L,L,L,L,L,L,L,L,L,L,W,_,_,_,_,_,_,_,W,K,K,K,K,K,K,K,K,K,K,K,W,_,_], //  9
   [_,_,W,W,W,W,W,L,L,W,W,W,W,W,W,_,_,_,_,_,_,_,W,W,W,W,W,K,K,W,W,W,W,W,W,_,_], // 10  south walls + door gaps
   [_,_,_,_,_,_,_,L,L,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,K,K,_,_,_,_,_,_,_], // 11  passage tiles
-  [_,_,W,W,W,W,W,H,H,W,W,W,W,S,S,W,W,W,W,W,W,W,W,W,W,W,W,H,H,W,W,W,W,W,_,_], // 12  hallway top wall
+  [_,_,W,W,W,W,W,H,H,W,W,W,W,S,S,W,W,W,W,W,U,U,W,W,W,W,W,H,H,W,W,W,W,W,_,_], // 12  hallway top wall (bathroom stairs 20-21)
   [_,_,W,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,W,_,_], // 13
   [_,_,W,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,W,_,_], // 14
   [_,_,W,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,W,_,_], // 15
@@ -135,6 +137,10 @@ const BASEMENT_RETURN_COL = 13;
 const BASEMENT_RETURN_ROW = 13;
 const GARAGE_RETURN_COL   = 8;
 const GARAGE_RETURN_ROW   = 20;
+const BATHROOM_RETURN_COL = 20;
+const BATHROOM_RETURN_ROW = 13;
+const HOMEDEPOT_RETURN_COL = 11;
+const HOMEDEPOT_RETURN_ROW = 3;
 
 const INTERACT_PX     = 36; // proximity threshold in world pixels
 
@@ -148,7 +154,7 @@ const FLOOR_FRAME: Record<number, number> = {
 
 // ── Scene ─────────────────────────────────────────────────────────────────
 type SceneMode = "explore" | "dialogue" | "complete";
-type NeighborhoodSpawn = "default" | "basement" | "garage";
+type NeighborhoodSpawn = "default" | "basement" | "garage" | "bathroom" | "homedepot";
 
 export class NeighborhoodScene extends Phaser.Scene {
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -262,6 +268,15 @@ export class NeighborhoodScene extends Phaser.Scene {
     this.add.image(13 * TILE, 12 * TILE, "stairs-down")
       .setDisplaySize(TILE * 2, TILE)
       .setOrigin(0, 0);
+
+    this.add.image(20 * TILE, 12 * TILE, "stairs-up")
+      .setDisplaySize(TILE * 2, TILE)
+      .setOrigin(0, 0);
+
+    this.add.image(11 * TILE, 2 * TILE, "garage-door")
+      .setDisplaySize(TILE * 2, TILE)
+      .setOrigin(0, 0)
+      .setTint(0x93c5fd);
   }
 
   private addFloorTile(x: number, y: number, frame: number): void {
@@ -341,8 +356,15 @@ export class NeighborhoodScene extends Phaser.Scene {
 
   private placeCharacters(): void {
     const dadChar = new CharacterSprite(this, 0, 0, DAD_DEF);
-    const spawnCol = this.spawn === "basement" ? BASEMENT_RETURN_COL : this.spawn === "garage" ? GARAGE_RETURN_COL : SPAWN_COL;
-    const spawnRow = this.spawn === "basement" ? BASEMENT_RETURN_ROW : this.spawn === "garage" ? GARAGE_RETURN_ROW : SPAWN_ROW;
+    const spawnTable: Record<NeighborhoodSpawn, { col: number; row: number }> = {
+      default: { col: SPAWN_COL, row: SPAWN_ROW },
+      basement: { col: BASEMENT_RETURN_COL, row: BASEMENT_RETURN_ROW },
+      garage: { col: GARAGE_RETURN_COL, row: GARAGE_RETURN_ROW },
+      bathroom: { col: BATHROOM_RETURN_COL, row: BATHROOM_RETURN_ROW },
+      homedepot: { col: HOMEDEPOT_RETURN_COL, row: HOMEDEPOT_RETURN_ROW },
+    };
+    const spawnCol = spawnTable[this.spawn].col;
+    const spawnRow = spawnTable[this.spawn].row;
     this.mover = new GridMover(this, dadChar, TILE, spawnCol, spawnRow);
 
     this.wifeChar = new CharacterSprite(this, WIFE_PX.x, WIFE_PX.y, WIFE_DEF);
@@ -364,11 +386,24 @@ export class NeighborhoodScene extends Phaser.Scene {
     if (MAP[row]?.[col] === S) {
       this.scene.start("BasementScene");
     }
+    if (MAP[row]?.[col] === U) {
+      this.scene.start("BathroomScene");
+    }
   }
 
   private onBump(col: number, row: number): void {
     if (MAP[row]?.[col] === D) {
       this.scene.start("GarageScene");
+    }
+    if (MAP[row]?.[col] === P) {
+      this.startDialogue(
+        [
+          { speaker: "NARRATOR",   text: "Dad jumps in the old cruiser, keys jangling with purpose." },
+          { speaker: "NARRATOR",   text: "The path to THEE Home Depot. A path Dad knows all too well." },
+          { speaker: "DAD'S BRAIN", text: "It's a wonderland in there. A fluorescent, orange-aproned wonderland." },
+        ],
+        () => this.scene.start("HardwareStoreScene"),
+      );
     }
   }
 
@@ -403,6 +438,11 @@ export class NeighborhoodScene extends Phaser.Scene {
 
   private interactWithWife(): void {
     const wifeCheckIn = this.getWifeCheckInLines();
+
+    if (this.state.quest.questId === "fix-bathroom") {
+      this.interactWithWifeBathroomQuest(wifeCheckIn);
+      return;
+    }
 
     if (this.state.flags.dryerFixed) {
       this.startDialogue([
@@ -442,19 +482,26 @@ export class NeighborhoodScene extends Phaser.Scene {
         { speaker: "WIFE",     text: "Aw. Look at you." },
         { speaker: "WIFE",     text: "You wish. Your to-do list is way too long." },
         { speaker: "WIFE",     text: "Thank you. Sincerely. I will be impressed for at least the next ninety seconds." },
+        { speaker: "KID",      text: "Hey Dad, the toilet is doing that thing again." },
+        { speaker: "DAD",      text: "That's not vague at all." },
         { speaker: "WIFE",     text: "Now... about the upstairs toilet." },
         { speaker: "DAD",      text: "..." },
         { speaker: "WIFE",     text: "It's been making that sound again." },
         { speaker: "DAD'S BRAIN", text: "There is always another sound." },
         { speaker: "DAD",      text: "I handled a live heating coil today. The toilet doesn't scare me." },
         { speaker: "WIFE",     text: "It should." },
-        { speaker: "NARRATOR", text: "The Dad makes a mental note. The toilet will have to wait. Developer Andy needs to build that quest first." },
+        { speaker: "NARRATOR", text: "The Dad's brief moment of peace ends. Upstairs, something gurgles." },
         { speaker: "DAD'S BRAIN", text: "One disaster at a time. That's the code." },
         ...wifeCheckIn,
         { speaker: "DAD",      text: getDadLine("selfTalk", "victory") },
       ], () => {
-        this.mode = "complete";
-        this.showMessage({ speaker: "SYSTEM", text: "Quest complete! Press Space to restart." });
+        this.state.quest = { questId: "fix-bathroom", activeStepId: "talk-to-wife-bathroom", completedStepIds: [] };
+        completeQuestStep(this.state, "talk-to-wife-bathroom");
+        setActiveQuestStep(this.state, "visit-home-depot");
+        saveGameState(this.state);
+        this.updateQuestText();
+        this.mode = "explore";
+        this.dialogueBox.hide();
       });
       return;
     }
@@ -466,6 +513,58 @@ export class NeighborhoodScene extends Phaser.Scene {
       { speaker: "DAD",  text: getDadLine("toWife", "greeting") },
       { speaker: "WIFE", text: "How's the dryer coming?" },
       { speaker: "DAD",  text: getDadLine("toWife", "questReceived") },
+      ...wifeCheckIn,
+    ]);
+  }
+
+  private interactWithWifeBathroomQuest(wifeCheckIn: DialogueLine[]): void {
+    if (this.state.flags.bathroomFixed) {
+      this.startDialogue([
+        { speaker: "WIFE", text: "The bathroom is still working. I'm choosing to believe this is also permanent." },
+        ...wifeCheckIn,
+      ]);
+      return;
+    }
+
+    if (this.state.flags.clogBossDefeated) {
+      completeQuestStep(this.state, "mop-up");
+      completeQuestStep(this.state, "return-to-wife-bathroom");
+      this.state.flags.bathroomFixed = true;
+      this.updateQuestText("BATHROOM FIXED");
+      saveGameState(this.state);
+      this.startDialogue([
+        { speaker: "DAD",      text: "The toilet has been... handled." },
+        { speaker: "WIFE",     text: "Handled how?" },
+        { speaker: "DAD",      text: "With confidence. And the Plunger of the Gods." },
+        { speaker: "WIFE",     text: "We're going to need that receipt for our records." },
+        { speaker: "NARRATOR", text: "Somewhere upstairs, a toilet flushes with newfound dignity." },
+        ...wifeCheckIn,
+        { speaker: "DAD",      text: getDadLine("selfTalk", "victory") },
+      ]);
+      return;
+    }
+
+    if (!this.state.flags.toiletInspected) {
+      this.startDialogue([
+        { speaker: "WIFE", text: "Have you looked at the toilet yet?" },
+        { speaker: "DAD",  text: "On my way. Building up courage." },
+        ...wifeCheckIn,
+      ]);
+      return;
+    }
+
+    if (!this.state.flags.ownsPlunger) {
+      this.startDialogue([
+        { speaker: "WIFE", text: "Did you get a plunger yet?" },
+        { speaker: "DAD",  text: "Working on it. Might need a Home Depot run." },
+        ...wifeCheckIn,
+      ]);
+      return;
+    }
+
+    this.startDialogue([
+      { speaker: "WIFE", text: "How's the bathroom situation?" },
+      { speaker: "DAD",  text: "Armed and ready. The clog has no idea what's coming." },
       ...wifeCheckIn,
     ]);
   }
