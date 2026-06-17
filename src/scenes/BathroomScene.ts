@@ -333,7 +333,7 @@ export class BathroomScene extends Phaser.Scene {
     if (!this.state.flags.ownsPlunger) {
       this.startDialogue([
         { speaker: "NARRATOR",   text: "The clog gurgles ominously. Dad's bare hands are not going to be enough this time." },
-        { speaker: "DAD'S BRAIN", text: "We need a plunger. A real one. THEE Home Depot has what we need." },
+        { speaker: "DAD'S BRAIN", text: "We need a plunger. A real one. THEE Dome Hepot has what we need." },
       ]);
       return;
     }

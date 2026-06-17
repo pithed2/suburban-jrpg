@@ -3,6 +3,7 @@ import { BasementScene } from "./scenes/BasementScene";
 import { BathroomScene } from "./scenes/BathroomScene";
 import { BootScene } from "./scenes/BootScene";
 import { GarageScene } from "./scenes/GarageScene";
+import { HDCutScene } from "./scenes/HDCutScene";
 import { HardwareStoreScene } from "./scenes/HardwareStoreScene";
 import { NameEntryScene } from "./scenes/NameEntryScene";
 import { NeighborhoodScene } from "./scenes/NeighborhoodScene";
@@ -32,7 +33,7 @@ const config: Phaser.Types.Core.GameConfig = {
     height: 180,
     zoom: 3,
   },
-  scene: [BootScene, NameEntryScene, StoryIntroScene, NeighborhoodScene, BasementScene, GarageScene, TileRoomScene, HardwareStoreScene, BathroomScene],
+  scene: [BootScene, NameEntryScene, StoryIntroScene, NeighborhoodScene, BasementScene, GarageScene, TileRoomScene, HDCutScene, HardwareStoreScene, BathroomScene],
 };
 
 logger.info("starting game", { width: 320, height: 180, zoom: 3 });

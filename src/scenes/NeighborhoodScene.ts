@@ -56,7 +56,7 @@ const M = 5;   // mudroom floor      (concrete)
 const D = 6;   // garage door        (solid wall bump marker)
 const S = 7;   // basement stairs    (walkable exit marker)
 const U = 8;   // bathroom stairs up (walkable exit marker)
-const P = 9;   // front door         (solid wall bump marker — Home Depot)
+const P = 9;   // front door         (solid wall bump marker — Dome Hepot)
 
 const WALKABLE = new Set([L, K, H, M, S, U]);
 
@@ -396,14 +396,7 @@ export class NeighborhoodScene extends Phaser.Scene {
       this.scene.start("GarageScene");
     }
     if (MAP[row]?.[col] === P) {
-      this.startDialogue(
-        [
-          { speaker: "NARRATOR",   text: "Dad jumps in the old cruiser, keys jangling with purpose." },
-          { speaker: "NARRATOR",   text: "The path to THEE Home Depot. A path Dad knows all too well." },
-          { speaker: "DAD'S BRAIN", text: "It's a wonderland in there. A fluorescent, orange-aproned wonderland." },
-        ],
-        () => this.scene.start("HardwareStoreScene"),
-      );
+      this.scene.start("HDCutScene");
     }
   }
 
@@ -556,7 +549,7 @@ export class NeighborhoodScene extends Phaser.Scene {
     if (!this.state.flags.ownsPlunger) {
       this.startDialogue([
         { speaker: "WIFE", text: "Did you get a plunger yet?" },
-        { speaker: "DAD",  text: "Working on it. Might need a Home Depot run." },
+        { speaker: "DAD",  text: "Working on it. Might need a Dome Hepot run." },
         ...wifeCheckIn,
       ]);
       return;
