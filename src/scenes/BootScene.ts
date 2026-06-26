@@ -56,6 +56,10 @@ export class BootScene extends Phaser.Scene {
     this.load.audio("mini-boss", "/assets-active/audio/mini-boss.mp3");
     this.load.image("intro-scene", "/assets-active/props/Intro.png");
     this.load.image("hd-cutscene", "/assets-active/props/HD_Cut_Scene.png");
+    this.load.image("portrait-dad",        "/assets-active/portraits/dad.png");
+    this.load.image("portrait-wife",       "/assets-active/portraits/wife.png");
+    this.load.image("portrait-narrator",   "/assets-active/portraits/narrator.png");
+    this.load.image("portrait-dads-brain", "/assets-active/portraits/brain.png");
     this.load.image("circuit-breaker", "/assets-active/props/circuit_breaker.png");
     this.load.image("safety-sticker", "/assets-active/props/safety_sticker.png");
     this.load.image("stairs-up", "/assets-active/props/stairs_up.png");
@@ -237,6 +241,9 @@ export class BootScene extends Phaser.Scene {
     this.textures.get("icky-spider").setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get("intro-scene").setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get("hd-cutscene").setFilter(Phaser.Textures.FilterMode.NEAREST);
+    for (const key of ["portrait-dad", "portrait-wife", "portrait-narrator", "portrait-dads-brain"]) {
+      this.textures.get(key).setFilter(Phaser.Textures.FilterMode.NEAREST);
+    }
     this.textures
       .get("circuit-breaker")
       .setFilter(Phaser.Textures.FilterMode.NEAREST);

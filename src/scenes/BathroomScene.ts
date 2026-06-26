@@ -413,7 +413,7 @@ export class BathroomScene extends Phaser.Scene {
 
   private showMessage(msg: DialogueLine | string, speaker = "DAD"): void {
     const line = typeof msg === "string" ? { speaker, text: msg } : msg;
-    this.dialogueBox.show(line.text, line.speaker === "DAD" ? (this.state.player.name || "DAD") : line.speaker);
+    this.dialogueBox.show(line.text, line.speaker === "DAD" ? (this.state.player.name || "DAD") : line.speaker, line.speaker);
   }
 
   // ── Battle ───────────────────────────────────────────────────────────────

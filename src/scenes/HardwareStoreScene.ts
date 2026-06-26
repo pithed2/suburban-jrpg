@@ -559,7 +559,7 @@ export class HardwareStoreScene extends Phaser.Scene {
 
   private showMessage(message: DialogueLine | string): void {
     const line = typeof message === "string" ? { speaker: "NARRATOR", text: message } : message;
-    this.dialogueBox.show(line.text, this.getSpeakerLabel(line.speaker));
+    this.dialogueBox.show(line.text, this.getSpeakerLabel(line.speaker), line.speaker);
   }
 
   private getSpeakerLabel(speaker: string): string {

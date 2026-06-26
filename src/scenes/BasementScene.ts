@@ -702,7 +702,7 @@ export class BasementScene extends Phaser.Scene {
   private showMessage(msg: DialogueLine | string, speaker = "DAD"): void {
     const line = typeof msg === "string" ? { speaker, text: msg } : msg;
     const label = line.speaker === "DAD" ? (this.state.player.name || "DAD") : line.speaker;
-    this.dialogueBox.show(line.text, label);
+    this.dialogueBox.show(line.text, label, line.speaker);
   }
 
   // ── Battle ────────────────────────────────────────────────────────────────

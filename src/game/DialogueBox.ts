@@ -3,16 +3,27 @@ import { addPixelText, setPixelText } from "./uiText";
 
 type AdvanceResult = "revealed" | "page" | "done";
 
-const charsPerLine = 45;
+const charsPerLineLabelMode = 45;
+const charsPerLinePortraitMode = 37;
 const linesPerPage = 3;
 const msPerCharacter = 48;
 const defaultTextTint = 0xf8fafc;
 const itemGainTextTint = 0xef4444;
 
+const PORTRAIT_KEYS: Record<string, string> = {
+  "DAD": "portrait-dad",
+  "WIFE": "portrait-wife",
+  "NARRATOR": "portrait-narrator",
+  "DAD'S BRAIN": "portrait-dads-brain",
+};
+
 export class DialogueBox {
   private readonly box: Phaser.GameObjects.Rectangle;
   private readonly speakerBreak: Phaser.GameObjects.Rectangle;
   private readonly speakerLabel: Phaser.GameObjects.BitmapText;
+  private readonly portraitFrame: Phaser.GameObjects.Rectangle;
+  private readonly portraitDivider: Phaser.GameObjects.Rectangle;
+  private readonly portraitImage: Phaser.GameObjects.Image;
   private readonly text: Phaser.GameObjects.BitmapText;
   private readonly moreMarker: Phaser.GameObjects.BitmapText;
   private pages: string[] = [];
@@ -20,6 +31,7 @@ export class DialogueBox {
   private visibleCharacters = 0;
   private elapsedMs = 0;
   private isTyping = false;
+  private charsPerLine = charsPerLineLabelMode;
 
   constructor(scene: Phaser.Scene) {
     this.box = scene.add.rectangle(160, 150, 304, 50, 0x111827, 0.94)
@@ -38,6 +50,23 @@ export class DialogueBox {
       .setScrollFactor(0)
       .setVisible(false);
 
+    this.portraitImage = scene.add.image(30, 150, "portrait-dad")
+      .setDisplaySize(34, 34)
+      .setDepth(70)
+      .setScrollFactor(0)
+      .setVisible(false);
+
+    this.portraitFrame = scene.add.rectangle(30, 150, 38, 38)
+      .setStrokeStyle(1, 0xf8fafc, 0.6)
+      .setDepth(71)
+      .setScrollFactor(0)
+      .setVisible(false);
+
+    this.portraitDivider = scene.add.rectangle(52, 150, 1, 42, 0xf8fafc, 0.4)
+      .setDepth(71)
+      .setScrollFactor(0)
+      .setVisible(false);
+
     this.text = addPixelText(scene, 16, 132, "", 7)
       .setDepth(71)
       .setScrollFactor(0)
@@ -51,22 +80,41 @@ export class DialogueBox {
       .setVisible(false);
   }
 
-  show(message: string, speaker = "DAD"): void {
-    this.pages = paginate(message);
+  show(message: string, speaker = "DAD", portraitRole: string = speaker): void {
+    const portraitKey = PORTRAIT_KEYS[portraitRole];
+    this.charsPerLine = portraitKey ? charsPerLinePortraitMode : charsPerLineLabelMode;
+
+    this.pages = paginate(message, this.charsPerLine);
     this.pageIndex = 0;
     this.visibleCharacters = 0;
     this.elapsedMs = 0;
     this.isTyping = true;
 
     this.box.setVisible(true);
-    const speakerText = `-- ${speaker} --`;
-    const speakerBreakWidth = Math.max(44, speakerText.length * 6 + 8);
-    this.speakerBreak
-      .setPosition(18 + speakerBreakWidth / 2, 125)
-      .setDisplaySize(speakerBreakWidth, 8);
-    this.speakerBreak.setVisible(true);
-    setPixelText(this.speakerLabel, speakerText);
-    this.speakerLabel.setVisible(true);
+
+    if (portraitKey) {
+      this.portraitImage.setTexture(portraitKey).setVisible(true);
+      this.portraitFrame.setVisible(true);
+      this.portraitDivider.setVisible(true);
+      this.speakerBreak.setVisible(false);
+      this.speakerLabel.setVisible(false);
+      this.text.setPosition(58, 132).setMaxWidth(246);
+    } else {
+      this.portraitImage.setVisible(false);
+      this.portraitFrame.setVisible(false);
+      this.portraitDivider.setVisible(false);
+
+      const speakerText = `-- ${speaker} --`;
+      const speakerBreakWidth = Math.max(44, speakerText.length * 6 + 8);
+      this.speakerBreak
+        .setPosition(18 + speakerBreakWidth / 2, 125)
+        .setDisplaySize(speakerBreakWidth, 8);
+      this.speakerBreak.setVisible(true);
+      setPixelText(this.speakerLabel, speakerText);
+      this.speakerLabel.setVisible(true);
+      this.text.setPosition(16, 132).setMaxWidth(288);
+    }
+
     this.text.setTint(isItemGainMessage(speaker, message) ? itemGainTextTint : defaultTextTint);
     this.text.setVisible(true);
     this.render();
@@ -122,6 +170,9 @@ export class DialogueBox {
     this.box.setVisible(false);
     this.speakerBreak.setVisible(false);
     this.speakerLabel.setVisible(false);
+    this.portraitImage.setVisible(false);
+    this.portraitFrame.setVisible(false);
+    this.portraitDivider.setVisible(false);
     this.text.setVisible(false);
     this.moreMarker.setVisible(false);
   }
@@ -146,8 +197,8 @@ export class DialogueBox {
   }
 }
 
-function paginate(message: string): string[] {
-  const lines = wrapMessage(message);
+function paginate(message: string, charsPerLine: number): string[] {
+  const lines = wrapMessage(message, charsPerLine);
   const pages: string[] = [];
 
   for (let index = 0; index < lines.length; index += linesPerPage) {
@@ -157,13 +208,13 @@ function paginate(message: string): string[] {
   return pages.length > 0 ? pages : [""];
 }
 
-function wrapMessage(message: string): string[] {
+function wrapMessage(message: string, charsPerLine: number): string[] {
   return message
     .split("\n")
-    .flatMap((paragraph) => wrapParagraph(paragraph));
+    .flatMap((paragraph) => wrapParagraph(paragraph, charsPerLine));
 }
 
-function wrapParagraph(paragraph: string): string[] {
+function wrapParagraph(paragraph: string, charsPerLine: number): string[] {
   const words = paragraph.trim().split(/\s+/).filter(Boolean);
   const lines: string[] = [];
   let currentLine = "";
@@ -174,7 +225,7 @@ function wrapParagraph(paragraph: string): string[] {
         lines.push(currentLine);
         currentLine = "";
       }
-      lines.push(...splitLongWord(word));
+      lines.push(...splitLongWord(word, charsPerLine));
       continue;
     }
 
@@ -196,7 +247,7 @@ function wrapParagraph(paragraph: string): string[] {
   return lines;
 }
 
-function splitLongWord(word: string): string[] {
+function splitLongWord(word: string, charsPerLine: number): string[] {
   const chunks: string[] = [];
 
   for (let index = 0; index < word.length; index += charsPerLine) {
