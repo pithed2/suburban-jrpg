@@ -57,7 +57,14 @@ const CLERK_ROW =  6;
 const SPAWN_COL = 13;
 const SPAWN_ROW =  1;
 
-const SHOP_ITEMS = ["plumbing-snake", "plunger-of-the-gods"] as const;
+const SHOP_ITEMS = [
+  "plumbing-snake",
+  "plunger-of-the-gods",
+  "tool-belt",
+  "steel-toe-boots",
+  "cold-coffee",
+  "energy-drink",
+] as const;
 
 // Dept sign data: [centerCol, label, rowY]
 const DEPT_SIGNS: [number, string][] = [
@@ -409,7 +416,9 @@ export class HardwareStoreScene extends Phaser.Scene {
     const item = items.find((i) => i.id === itemId);
     if (!item || item.price === undefined) return;
 
-    if (this.state.player.inventory.includes(itemId)) {
+    const isConsumable = item.kind === "consumable";
+
+    if (!isConsumable && this.state.player.inventory.includes(itemId)) {
       setPixelText(this.shopDetailText, `ALREADY OWNED.\nDAD DOESN'T NEED TWO.`);
       return;
     }
@@ -420,15 +429,24 @@ export class HardwareStoreScene extends Phaser.Scene {
 
     this.state.player.cash -= item.price;
     this.state.player.inventory.push(itemId);
-    this.state.player.equipment.weaponId = itemId;
-    this.state.flags.ownsPlunger = true;
 
-    if (this.state.quest.activeStepId === "find-plunger") {
-      completeQuestStep(this.state, "find-plunger");
-      setActiveQuestStep(this.state, "inspect-toilet");
+    let resultLine = `PURCHASED.\n\n"${item.description}"`;
+
+    if (item.kind === "weapon") {
+      this.state.player.equipment.weaponId = itemId;
+      this.state.flags.ownsPlunger = true;
+      if (this.state.quest.activeStepId === "find-plunger") {
+        completeQuestStep(this.state, "find-plunger");
+        setActiveQuestStep(this.state, "inspect-toilet");
+      }
+      resultLine = `PURCHASED + EQUIPPED.\n\n"${item.description}"`;
+    } else if (item.kind === "armor") {
+      this.state.player.equipment.armorId = itemId;
+      resultLine = `PURCHASED + EQUIPPED.\n\n"${item.description}"`;
     }
+
     saveGameState(this.state);
-    setPixelText(this.shopDetailText, `PURCHASED + EQUIPPED.\n\n"${item.description}"`);
+    setPixelText(this.shopDetailText, resultLine);
     this.renderShop();
   }
 
@@ -436,7 +454,7 @@ export class HardwareStoreScene extends Phaser.Scene {
     // Item list
     const lines = SHOP_ITEMS.map((id, i) => {
       const item = items.find((it) => it.id === id);
-      const owned   = this.state.player.inventory.includes(id);
+      const owned   = item?.kind !== "consumable" && this.state.player.inventory.includes(id);
       const cursor  = i === this.shopSelected ? ">" : " ";
       const priceTag = owned ? "(OWNED)" : `${item?.price} ♥`;
       return `${cursor} ${item?.name?.padEnd(22, " ")}${priceTag}`;
@@ -451,7 +469,7 @@ export class HardwareStoreScene extends Phaser.Scene {
     // Detail for selected item
     if (this.shopSelected < SHOP_ITEMS.length) {
       const item = items.find((it) => it.id === SHOP_ITEMS[this.shopSelected]);
-      const owned = this.state.player.inventory.includes(SHOP_ITEMS[this.shopSelected]);
+      const owned = item?.kind !== "consumable" && this.state.player.inventory.includes(SHOP_ITEMS[this.shopSelected]);
       if (!owned) {
         setPixelText(this.shopDetailText, item?.description ?? "");
       }
@@ -482,9 +500,9 @@ export class HardwareStoreScene extends Phaser.Scene {
     this.dialogueBox = new DialogueBox(this);
     this.statsPanel  = new PlayerStatsPanel(this);
 
-    // Panel: 244 wide × 138 tall, screen-centered at (160, 90)
-    // → left=38, top=21, right=282, bottom=159
-    const PX = 160, PY = 90, PW = 244, PH = 138;
+    // Panel: 244 wide × 156 tall, screen-centered at (160, 90)
+    // → left=38, top=12, right=282, bottom=168
+    const PX = 160, PY = 90, PW = 244, PH = 156;
     const LEFT = PX - PW / 2;
     const TOP  = PY - PH / 2;
 
@@ -510,14 +528,14 @@ export class HardwareStoreScene extends Phaser.Scene {
 
     // Thin divider under header
     // Item list
-    this.shopItemsText = addPixelText(this, LEFT + 8, TOP + 26, "", 7)
+    this.shopItemsText = addPixelText(this, LEFT + 8, TOP + 26, "", 6)
       .setTint(0xF9C74F)
       .setScrollFactor(0)
       .setVisible(false)
       .setDepth(102);
 
     // Detail / feedback
-    this.shopDetailText = addPixelText(this, LEFT + 8, TOP + 80, "", 6)
+    this.shopDetailText = addPixelText(this, LEFT + 8, TOP + 102, "", 6)
       .setMaxWidth(PW - 16)
       .setTint(0xAAAAAA)
       .setScrollFactor(0)
@@ -525,14 +543,14 @@ export class HardwareStoreScene extends Phaser.Scene {
       .setDepth(102);
 
     // Balance
-    this.shopBalanceText = addPixelText(this, LEFT + 8, TOP + 116, "", 7)
+    this.shopBalanceText = addPixelText(this, LEFT + 8, TOP + 138, "", 7)
       .setTint(0xF96302)
       .setScrollFactor(0)
       .setVisible(false)
       .setDepth(102);
 
     // Controls hint
-    this.shopHintText = addPixelText(this, LEFT + 8, TOP + 128, "↑↓ SELECT  ␣ BUY  ESC CLOSE", 5)
+    this.shopHintText = addPixelText(this, LEFT + 8, TOP + 148, "↑↓ SELECT  ␣ BUY  ESC CLOSE", 5)
       .setTint(0x556677)
       .setScrollFactor(0)
       .setVisible(false)

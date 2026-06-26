@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import { items, type EnemyActionResponse, type EnemyAttack, type EnemyDefinition } from "./content";
+import { chooseDadSkill, type DadSkillDefinition } from "./dadSkills";
 import {
   applyExperienceAndLevelUps,
   rollDadSkillDamage,
@@ -68,9 +69,9 @@ export class BattleManager {
   }
 
   useDadSkill(state: GameState): BattleTurnResult {
-    const skillCost = 3;
+    const skill = chooseDadSkill(state);
 
-    if (state.player.dadPoints < skillCost) {
+    if (state.player.dadPoints < skill.cost) {
       return {
         ...this.getSnapshot(state),
         message: "Dad reaches for inner calm.\nNot enough Dad Points.",
@@ -78,8 +79,19 @@ export class BattleManager {
       };
     }
 
-    state.player.dadPoints -= skillCost;
-    return this.resolveHeroAction(state, "dadSkill");
+    state.player.dadPoints -= skill.cost;
+
+    if (skill.kind === "heal") {
+      const healing = rollHealing(skill.healMin ?? 10, skill.healMax ?? 16);
+      state.player.hp = Math.min(state.player.maxHp, state.player.hp + healing);
+      return {
+        ...this.getSnapshot(state),
+        message: `Dad uses ${skill.name}.\nHP restored by ${healing}.`,
+        victory: false,
+      };
+    }
+
+    return this.resolveHeroAction(state, "dadSkill", skill);
   }
 
   useItem(state: GameState, itemId: string): BattleTurnResult {
@@ -95,12 +107,23 @@ export class BattleManager {
 
     state.player.inventory.splice(itemIndex, 1);
     const item = items.find((candidate) => candidate.id === itemId);
+
+    if (item?.restoreDp) {
+      const restored = Math.min(state.player.maxDadPoints - state.player.dadPoints, item.restoreDp);
+      state.player.dadPoints = Math.min(state.player.maxDadPoints, state.player.dadPoints + item.restoreDp);
+      return {
+        ...this.getSnapshot(state),
+        message: `You use ${item.name}.\nDad Points recover by ${restored}.`,
+        victory: false,
+      };
+    }
+
     const healing = item?.heal ? rollHealing(Math.max(1, item.heal - 3), item.heal + 4) : rollHealing();
     state.player.hp = Math.min(state.player.maxHp, state.player.hp + healing);
 
     return {
       ...this.getSnapshot(state),
-      message: `You use Ibuprofen.\nHP recovers by ${healing}.`,
+      message: `You use ${item?.name ?? "Ibuprofen"}.\nHP recovers by ${healing}.`,
       victory: false,
     };
   }
@@ -172,15 +195,16 @@ export class BattleManager {
   private resolveHeroAction(
     state: GameState,
     action: keyof EnemyDefinition["actionResponses"],
+    skill?: DadSkillDefinition,
   ): BattleTurnResult {
     const enemy = this.requireEnemy();
     const response = enemy.actionResponses[action];
-    const damageRoll = this.getActionDamage(response, action, state, enemy);
+    const damageRoll = this.getActionDamage(response, action, state, enemy, skill);
     const damage = damageRoll.amount;
     this.enemyHp = Math.max(0, this.enemyHp - damage);
     const actionMessage = damageRoll.dodged
       ? `${enemy.name} dodges the attack.`
-      : this.formatActionMessage(response, action, state, damage);
+      : this.formatActionMessage(response, action, state, damage, skill);
 
     if (this.enemyHp <= 0) {
       state.player.cash += enemy.cashReward;
@@ -210,11 +234,17 @@ export class BattleManager {
     action: keyof EnemyDefinition["actionResponses"],
     state: GameState,
     damage: number,
+    skill?: DadSkillDefinition,
   ): string {
     const weapon = items.find((item) => item.id === state.player.equipment.weaponId);
-    const message = action === "fight" && weapon
+    let message = action === "fight" && weapon
       ? this.getWeaponBattleMessage(weapon, response.message)
       : response.message;
+
+    if (action === "dadSkill" && skill) {
+      message = `Dad uses ${skill.name}! ${message}`;
+    }
+
     const effect = response.effectLabel ? ` (${response.effectLabel})` : "";
     return `${message}\n${damage} damage${effect}.`;
   }
@@ -235,6 +265,7 @@ export class BattleManager {
     action: keyof EnemyDefinition["actionResponses"],
     state: GameState,
     enemy: EnemyDefinition,
+    skill?: DadSkillDefinition,
   ): { amount: number; dodged: boolean } {
     if (action === "fight") {
       const roll = rollHeroDamage(state, enemy);
@@ -245,8 +276,9 @@ export class BattleManager {
       };
     }
 
+    const multiplier = skill?.multiplier ?? 1;
     return {
-      amount: Math.max(response.damage, rollDadSkillDamage(state, enemy)),
+      amount: Math.max(response.damage, Math.round(rollDadSkillDamage(state, enemy) * multiplier)),
       dodged: false,
     };
   }

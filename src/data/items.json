@@ -39,6 +39,45 @@
     "description": "Restores enough resolve to continue dealing with the house."
   },
   {
+    "id": "dads-cardigan",
+    "name": "Dad's Cardigan",
+    "kind": "armor",
+    "defense": 1,
+    "description": "Faded, beloved, structurally questionable. Still counts as armor."
+  },
+  {
+    "id": "tool-belt",
+    "name": "Tool Belt",
+    "kind": "armor",
+    "defense": 3,
+    "price": 12,
+    "description": "Heavy with pouches Dad has never once used correctly. Surprisingly protective."
+  },
+  {
+    "id": "steel-toe-boots",
+    "name": "Steel-Toe Boots",
+    "kind": "armor",
+    "defense": 5,
+    "price": 30,
+    "description": "Dome Hepot's finest footwear. Stub a toe on a clog and the clog loses."
+  },
+  {
+    "id": "cold-coffee",
+    "name": "Cold Coffee",
+    "kind": "consumable",
+    "heal": 8,
+    "price": 6,
+    "description": "Microwaved twice, finished anyway. Restores HP through sheer caffeine spite."
+  },
+  {
+    "id": "energy-drink",
+    "name": "Energy Drink",
+    "kind": "consumable",
+    "restoreDp": 4,
+    "price": 8,
+    "description": "Tastes like a battery. Restores Dad Points. Wife disapproves."
+  },
+  {
     "id": "adjustable-wrench",
     "name": "Adjustable Wrench",
     "kind": "weapon",

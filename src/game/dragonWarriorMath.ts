@@ -1,4 +1,5 @@
 import { items, type EnemyDefinition } from "./content";
+import { getDadSkillLearnedAtLevel } from "./dadSkills";
 import type { GameState } from "./state";
 
 export interface DamageRoll {
@@ -31,6 +32,11 @@ function getWeaponPower(state: GameState): number {
   return weapon?.power ?? 0;
 }
 
+function getArmorDefense(state: GameState): number {
+  const armor = items.find((item) => item.id === state.player.equipment.armorId);
+  return armor?.defense ?? 0;
+}
+
 export function rollHeroDamage(state: GameState, enemy: EnemyDefinition): DamageRoll {
   const dodgeChance = (enemy.dodgeChance ?? 1 / 64);
 
@@ -57,7 +63,7 @@ export function rollDadSkillDamage(state: GameState, enemy: EnemyDefinition): nu
 }
 
 export function rollEnemyDamage(state: GameState, enemy: EnemyDefinition, listedDamage: number): number {
-  const defense = Math.floor(state.player.agility / 2) + state.player.defense;
+  const defense = Math.floor(state.player.agility / 2) + state.player.defense + getArmorDefense(state);
   const baseDamage = Math.max(1, Math.floor((enemy.attack - defense) / 2));
   const dramaticFloor = Math.max(1, listedDamage - 1);
   const dramaticCeiling = Math.max(dramaticFloor, listedDamage + 1);
@@ -79,6 +85,8 @@ export function applyExperienceAndLevelUps(state: GameState, xpReward: number): 
   const previousLevel = state.player.level;
   const previousMaxHp = state.player.maxHp;
   const previousMaxDadPoints = state.player.maxDadPoints;
+  const previousStrength = state.player.strength;
+  const previousDefense = state.player.defense;
   state.player.xp += xpReward;
 
   const nextLevel = [...levelTable].reverse().find((entry) => state.player.xp >= entry.xp);
@@ -96,7 +104,7 @@ export function applyExperienceAndLevelUps(state: GameState, xpReward: number): 
   state.player.agility = nextLevel.agility;
   state.player.defense = Math.floor(nextLevel.agility / 2);
   const learnedSkill = getDadSkillLearnedAtLevel(nextLevel.level, previousLevel);
-  const skillLine = learnedSkill ? `\nNEW DAD SKILL: ${learnedSkill}.` : "";
+  const skillLine = learnedSkill ? `\nNEW DAD SKILL: ${learnedSkill.name}.` : "";
 
   return {
     leveledUp: true,
@@ -104,14 +112,8 @@ export function applyExperienceAndLevelUps(state: GameState, xpReward: number): 
       `LEVEL UP! DAD REACHED LV ${nextLevel.level}!`,
       `MAX HP ${previousMaxHp} -> ${nextLevel.maxHp}.`,
       `MAX DP ${previousMaxDadPoints} -> ${nextLevel.maxDadPoints}.`,
+      `STR ${previousStrength} -> ${nextLevel.strength}. DEF ${previousDefense} -> ${state.player.defense}.`,
       `HP AND DP RESTORED.${skillLine}`,
     ].join("\n"),
   };
-}
-
-function getDadSkillLearnedAtLevel(newLevel: number, oldLevel: number): string | undefined {
-  if (oldLevel < 2 && newLevel >= 2) return "Authoritative Sigh";
-  if (oldLevel < 3 && newLevel >= 3) return "Measure Once, Cut Anyway";
-  if (oldLevel < 4 && newLevel >= 4) return "Weekend Warrior Focus";
-  return undefined;
 }

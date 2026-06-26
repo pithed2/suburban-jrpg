@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import { items } from "./content";
+import { getUnlockedDadSkills } from "./dadSkills";
 import { getQuest, getQuestStepLabel } from "./quests";
 import { saveGameState } from "./session";
 import type { GameState } from "./state";
@@ -155,10 +156,14 @@ export class GameMenu {
           })
           .join("\n");
       const weapon = items.find((item) => item.id === state.player.equipment.weaponId);
-      return `EQUIPPED:\n${weapon?.name ?? "NONE"}\n\nBAG:\n${inventory}`;
+      const armor  = items.find((item) => item.id === state.player.equipment.armorId);
+      return `EQUIPPED:\nWPN: ${weapon?.name ?? "NONE"}\nARM: ${armor?.name ?? "NONE"}\n\nBAG:\n${inventory}`;
     }
 
     const player = state.player;
-    return `${player.name || "DAD"}\nLV ${player.level}\nHP ${player.hp}/${player.maxHp}\nDP ${player.dadPoints}/${player.maxDadPoints}\nSTR ${player.strength}\nAGI ${player.agility}\nDEF ${player.defense}\nLOVE ${player.cash}\nXP ${player.xp}`;
+    const armor = items.find((item) => item.id === player.equipment.armorId);
+    const totalDefense = player.defense + (armor?.defense ?? 0);
+    const skills = getUnlockedDadSkills(player.level).map((skill) => skill.name).join(", ");
+    return `${player.name || "DAD"}\nLV ${player.level}\nHP ${player.hp}/${player.maxHp}\nDP ${player.dadPoints}/${player.maxDadPoints}\nSTR ${player.strength}\nAGI ${player.agility}\nDEF ${totalDefense} (${player.defense}+${armor?.defense ?? 0} armor)\nLOVE ${player.cash}\nXP ${player.xp}\n\nDAD SKILLS:\n${skills}`;
   }
 }

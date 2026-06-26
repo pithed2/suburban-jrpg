@@ -57,6 +57,7 @@ function normalizeGameState(state: GameState): GameState {
   state.player.cash ??= fallback.player.cash;
   state.player.equipment ??= fallback.player.equipment;
   state.player.equipment.weaponId ??= fallback.player.equipment.weaponId;
+  state.player.equipment.armorId ??= fallback.player.equipment.armorId;
   state.flags.circuitBreakerOff ??= fallback.flags.circuitBreakerOff;
   state.flags.devRandomEncountersDisabled ??= fallback.flags.devRandomEncountersDisabled;
   state.flags.basementFirstAidOpened ??= fallback.flags.basementFirstAidOpened;

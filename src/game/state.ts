@@ -35,6 +35,7 @@ export interface PlayerState {
   inventory: string[];
   equipment: {
     weaponId: string;
+    armorId: string;
   };
 }
 
@@ -80,6 +81,7 @@ export function createInitialGameState(): GameState {
       inventory: [],
       equipment: {
         weaponId: "two-hands",
+        armorId: "dads-cardigan",
       },
     },
     quest: {
