@@ -17,6 +17,19 @@ import {
 
 type SceneMode = "explore" | "dialogue" | "complete";
 
+const houseCoreFrames = {
+  woodFloor: 2052,
+  kitchenFloor: 2060,
+  mudroomFloor: 2116,
+  hallFloor: 2576,
+  topWall: 512,
+  sideWall: 528,
+  bottomWall: 1024,
+  window: 560,
+  door: 1084,
+  stairs: 3072,
+};
+
 export class NeighborhoodScene extends Phaser.Scene {
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private interactKey!: Phaser.Input.Keyboard.Key;
@@ -81,50 +94,59 @@ export class NeighborhoodScene extends Phaser.Scene {
 
   private createWorld(): void {
     this.add.rectangle(160, 90, 320, 180, 0x0f172a);
-    this.addFloor(24, 32, 136, 116, 0xcdbb82);
-    this.addFloor(160, 32, 88, 116, 0xd5c790);
-    this.addFloor(248, 32, 48, 76, 0xbfc7c9);
-    this.addFloor(104, 132, 64, 28, 0x737373);
+    this.addFloor(32, 40, 128, 88, 0xcdbb82);
+    this.addFloor(160, 72, 48, 56, 0xb7a06a);
+    this.addFloor(208, 40, 88, 88, 0xd5c790);
+    this.addFloor(32, 128, 64, 36, 0x737373);
+    this.addFloor(176, 128, 32, 36, 0x8a8170);
+    this.addFloor(208, 128, 88, 36, 0x475569);
 
-    this.addWall(22, 30, 276, 5);
-    this.addWall(22, 148, 76, 5);
-    this.addWall(158, 148, 140, 5);
-    this.addWall(20, 32, 5, 118);
-    this.addWall(296, 32, 5, 118);
-    this.addWall(158, 32, 5, 45);
-    this.addWall(158, 111, 5, 37);
-    this.addWall(246, 32, 5, 36);
-    this.addWall(246, 102, 5, 46);
-    this.addWall(90, 148, 5, 27);
-    this.addWall(154, 148, 5, 27);
+    this.addWall(30, 38, 268, 5);
+    this.addWall(30, 164, 268, 5);
+    this.addWall(30, 40, 5, 124);
+    this.addWall(296, 40, 5, 124);
+    this.addWall(160, 40, 5, 24);
+    this.addWall(160, 112, 5, 52);
+    this.addWall(208, 40, 5, 24);
+    this.addWall(208, 112, 5, 16);
+    this.addWall(208, 148, 5, 16);
+    this.addWall(96, 128, 64, 5);
+    this.addWall(208, 128, 88, 5);
+    this.addWall(96, 148, 80, 5);
 
-    this.addSlidingDoor(159, 94, 5, 34);
-    this.addSlidingDoor(246, 84, 5, 34);
-    this.addEntryway(122, 153);
-    this.addGarageDoor(58, 148);
+    this.addHouseCoreShell();
 
-    this.addFurniture(43, 56, 46, 20, 0x8b5e3c, 0x593a27);
-    this.addFurniture(44, 112, 42, 26, 0x72523b, 0x3f2b22);
-    this.addFurniture(104, 94, 54, 32, 0x8f6f46, 0x4b3827);
-    this.addFurniture(104, 94, 36, 20, 0x2f3b50, 0x1f2937);
-    this.addFurniture(186, 54, 50, 18, 0x7b5f3c, 0x433121);
-    this.addFurniture(214, 112, 42, 26, 0x6b7280, 0x374151);
-    this.addFurniture(278, 54, 22, 28, 0x94a3b8, 0x475569);
-    this.addFurniture(270, 92, 38, 22, 0x64748b, 0x334155);
-    this.addStairs(272, 124);
-    this.addPlant(136, 52);
-    this.addPlant(36, 132);
-    this.addPlant(228, 92);
-    this.addPlant(282, 136);
-    this.addWindow(72, 34);
-    this.addWindow(202, 34);
-    this.addWindow(278, 34);
+    this.addSlidingDoor(160, 78, 5, 26);
+    this.addSlidingDoor(208, 78, 5, 26);
+    this.addEntryway(64, 132);
+    this.addGarageDoor(64, 154);
+    this.addStairs(192, 144);
 
-    this.dryer = this.add.rectangle(270, 92, 30, 24, 0xffffff, 0);
-    this.garage = this.add.rectangle(58, 148, 56, 32, 0xffffff, 0);
-    this.basementStairs = this.add.rectangle(272, 124, 42, 32, 0xffffff, 0);
-    this.wife = this.add.rectangle(90, 105, 14, 18, 0xffffff, 0);
-    this.player = this.add.rectangle(128, 116, 14, 18, 0xffffff, 0);
+    this.addFurniture(76, 60, 52, 18, 0x8b5e3c, 0x593a27);
+    this.addFurniture(74, 108, 50, 18, 0x72523b, 0x3f2b22);
+    this.addFurniture(118, 92, 36, 24, 0x8f6f46, 0x4b3827);
+    this.addFurniture(118, 91, 26, 16, 0x2f3b50, 0x1f2937);
+    this.addFurniture(250, 58, 64, 18, 0x7b5f3c, 0x433121);
+    this.addFurniture(270, 98, 38, 24, 0x64748b, 0x334155);
+    this.addFurniture(236, 146, 42, 22, 0x4b5563, 0x1f2937);
+    this.addFurniture(276, 146, 28, 22, 0x334155, 0x111827);
+    this.addFurniture(44, 146, 20, 18, 0x6b7280, 0x374151);
+    this.addFurniture(84, 146, 20, 18, 0x6b7280, 0x374151);
+    this.addPlant(144, 54);
+    this.addPlant(40, 116);
+    this.addPlant(286, 116);
+    this.addWindow(82, 42);
+    this.addWindow(252, 42);
+
+    addPixelText(this, 62, 48, "QUEST", 5).setTint(0xfacc15);
+    addPixelText(this, 225, 78, "FRIDGE", 5).setTint(0x111827);
+    addPixelText(this, 221, 153, "LOCKED", 5).setTint(0xfacc15);
+
+    this.dryer = this.add.rectangle(270, 98, 30, 24, 0xffffff, 0);
+    this.garage = this.add.rectangle(64, 154, 56, 28, 0xffffff, 0);
+    this.basementStairs = this.add.rectangle(192, 144, 42, 32, 0xffffff, 0);
+    this.wife = this.add.rectangle(94, 78, 14, 18, 0xffffff, 0);
+    this.player = this.add.rectangle(104, 112, 14, 18, 0xffffff, 0);
 
     addWorldSprite(this, this.wife.x, this.wife.y, spriteFrames.wife);
     this.playerSprite = addWorldSprite(this, this.player.x, this.player.y, spriteFrames.dad);
@@ -285,6 +307,43 @@ export class NeighborhoodScene extends Phaser.Scene {
 
     for (let tileY = y; tileY <= y + height; tileY += 16) {
       this.add.rectangle(x + width / 2, tileY, width, 1, 0x7a6f55, 0.25);
+    }
+  }
+
+  private addHouseCoreShell(): void {
+    this.addHouseTileBlock(32, 40, 8, 6, houseCoreFrames.woodFloor);
+    this.addHouseTileBlock(160, 72, 3, 4, houseCoreFrames.hallFloor);
+    this.addHouseTileBlock(208, 40, 6, 6, houseCoreFrames.kitchenFloor);
+    this.addHouseTileBlock(32, 128, 4, 3, houseCoreFrames.mudroomFloor);
+    this.addHouseTileBlock(176, 128, 2, 3, houseCoreFrames.hallFloor);
+    this.addHouseTileBlock(208, 128, 6, 3, houseCoreFrames.mudroomFloor);
+
+    this.addHouseTileBlock(32, 40, 8, 1, houseCoreFrames.topWall);
+    this.addHouseTileBlock(176, 40, 2, 1, houseCoreFrames.topWall);
+    this.addHouseTileBlock(224, 40, 5, 1, houseCoreFrames.topWall);
+    this.addHouseTileBlock(32, 160, 17, 1, houseCoreFrames.bottomWall);
+    this.addHouseTileBlock(32, 56, 1, 7, houseCoreFrames.sideWall);
+    this.addHouseTileBlock(288, 56, 1, 7, houseCoreFrames.sideWall);
+    this.addHouseTileBlock(160, 40, 1, 2, houseCoreFrames.sideWall);
+    this.addHouseTileBlock(160, 112, 1, 4, houseCoreFrames.sideWall);
+    this.addHouseTileBlock(208, 40, 1, 2, houseCoreFrames.sideWall);
+    this.addHouseTileBlock(208, 112, 1, 1, houseCoreFrames.sideWall);
+    this.addHouseTileBlock(208, 144, 1, 2, houseCoreFrames.sideWall);
+    this.addHouseTileBlock(96, 128, 4, 1, houseCoreFrames.bottomWall);
+    this.addHouseTileBlock(208, 128, 6, 1, houseCoreFrames.bottomWall);
+
+    this.addHouseTileBlock(80, 40, 3, 1, houseCoreFrames.window);
+    this.addHouseTileBlock(240, 40, 3, 1, houseCoreFrames.window);
+    this.addHouseTileBlock(144, 112, 2, 1, houseCoreFrames.door);
+    this.addHouseTileBlock(256, 112, 2, 1, houseCoreFrames.door);
+    this.addHouseTileBlock(176, 136, 2, 2, houseCoreFrames.stairs);
+  }
+
+  private addHouseTileBlock(x: number, y: number, columns: number, rows: number, frame: number): void {
+    for (let row = 0; row < rows; row += 1) {
+      for (let column = 0; column < columns; column += 1) {
+        this.add.image(x + column * 16, y + row * 16, "house-core-16", frame).setOrigin(0, 0);
+      }
     }
   }
 

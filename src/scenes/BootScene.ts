@@ -28,6 +28,14 @@ export class BootScene extends Phaser.Scene {
         frameHeight: 16,
       },
     );
+    this.load.spritesheet(
+      "house-core-16",
+      "/assets-active/tilesets/Interiors_free/16x16/house_core_16x16.png",
+      {
+        frameWidth: 16,
+        frameHeight: 16,
+      },
+    );
     this.load.image("dryer-boss", "/assets-active/enemies/dryer_boss.png");
     this.load.image("dryer-boss-world", "/assets-active/enemies/dryer_boss_world.png");
     this.load.image("dust-bunny", "/assets-active/enemies/Dust_Bunny.png");
@@ -112,6 +120,9 @@ export class BootScene extends Phaser.Scene {
       .setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures
       .get("wife-amelia-idle")
+      .setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures
+      .get("house-core-16")
       .setFilter(Phaser.Textures.FilterMode.NEAREST);
     loadSavedGameState() ?? resetGameState();
     const nextScene = getGameState().player.name ? "StoryIntroScene" : "NameEntryScene";
