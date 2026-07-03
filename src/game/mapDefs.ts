@@ -5,7 +5,7 @@
  *
  * Adding a new room
  * ─────────────────
- * 1. Design the map in Tiled, export to public/assets/maps/<name>.json.
+ * 1. Design the map in Tiled, export to public/assets-active/maps/<name>.json.
  * 2. Run:  node scripts/process-maps.mjs
  *    → produces public/assets-active/maps/<name>.json with tilesets inlined.
  * 3. In BootScene.preload(), add:
@@ -21,7 +21,7 @@
  *   "ts-props"       →  props_interactables_16x16.png (6144 tiles)
  *   "ts-exterior"    →  suburb_exterior_16x16.png   (6144 tiles)
  *
- * Tileset → image path (public/assets/tilesets/Interiors_free/16x16/)
+ * Tileset → image path (public/assets-active/tilesets/Interiors_free/16x16/)
  * ─────────────────────────────────────────────────────────────────────────────
  */
 

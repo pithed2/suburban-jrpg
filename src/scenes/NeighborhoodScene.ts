@@ -8,7 +8,7 @@
  *   floors → full-set-int-a2  frame per room type
  *
  * Object positions (wife, dryer, exits) are taken directly from the values
- * in public/assets/maps/new-house.json Objects layer so they never drift.
+ * in public/assets-active/maps/new-house.json Objects layer so they never drift.
  *
  * Quest logic is identical to every previous version of this scene.
  */

@@ -16,7 +16,7 @@
  *   └──────────────────────────────────┘
  *     16px    16px    16px
  *
- * Sheet files in public/assets/characters/:
+ * Sheet files in public/assets-active/characters/:
  *
  *   File               Size      charsPerRow  total chars
  *   ─────────────────  ────────  ───────────  ───────────

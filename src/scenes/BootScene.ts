@@ -112,7 +112,7 @@ export class BootScene extends Phaser.Scene {
     );
 
     // ── Character sheets (16×16 px/frame, RPG Maker VX layout) ─────────────────
-    // Path: public/assets/characters/ → served at /assets/characters/
+    // Path: public/assets-active/characters/ → served at /assets-active/characters/
     // Layout per file: 3 walk-frames × 4 direction-rows per character block (48×64 px)
     // Multiple characters packed side-by-side — charSlot in characterDefs.ts picks the right one.
     // Garage tileset as a spritesheet so GarageScene can use individual frame indices.
@@ -123,7 +123,7 @@ export class BootScene extends Phaser.Scene {
       { frameWidth: 16, frameHeight: 16 },
     );
 
-    const CHAR_PATH = "/assets/characters";
+    const CHAR_PATH = "/assets-active/characters";
     const charSheet = (key: string, file: string) =>
       this.load.spritesheet(key, `${CHAR_PATH}/${file}`, { frameWidth: 16, frameHeight: 16 });
 
@@ -133,16 +133,16 @@ export class BootScene extends Phaser.Scene {
     charSheet("chars-scout",    "04-scout.png");      // 4 chars/row × 2 rows =  8 characters
     charSheet("chars-devout",   "05-devout.png");     // 4 chars/row × 2 rows =  8 characters
     charSheet("chars-conjurer", "06-conjurer.png");   // 4 chars/row × 2 rows =  8 characters
-    this.load.spritesheet("actors-4", "/assets/full_set/Characters/Actors_4.png", {
+    this.load.spritesheet("actors-4", "/assets-active/full_set/Characters/Actors_4.png", {
       frameWidth: 32,
       frameHeight: 48,
     });
 
     // Chest / treasure sprites (RPG Maker VX character sheet, 32×32 frames)
-    this.load.spritesheet("chests", "/assets/full_set/Characters/Chests.png", {
+    this.load.spritesheet("chests", "/assets-active/full_set/Characters/Chests.png", {
       frameWidth: 32, frameHeight: 32,
     });
-    this.load.spritesheet("full-set-doors", "/assets/full_set/Characters/!Doors.png", {
+    this.load.spritesheet("full-set-doors", "/assets-active/full_set/Characters/!Doors.png", {
       frameWidth: 32, frameHeight: 32,
     });
 
@@ -151,14 +151,14 @@ export class BootScene extends Phaser.Scene {
     // Circuit breaker panel: rows 5–8, cols 1–3 (RPG Maker 1-indexed)
     //   → row 5 col 1 = frame 48 (off)
     //   → row 7 col 3 = frame 74 (on)
-    this.load.spritesheet("obj-other", "/assets/full_set/Characters/!other.png", {
+    this.load.spritesheet("obj-other", "/assets-active/full_set/Characters/!other.png", {
       frameWidth: 32, frameHeight: 32,
     });
 
     // ── Interiors_free 16×16 tilesets (used by TiledRoom / new-house map) ───────
     // house-core-16 is already loaded above as a spritesheet; Phaser will use
     // the base texture for the tilemap so we don't need a second load.
-    const INT = "/assets/tilesets/Interiors_free/16x16";
+    const INT = "/assets-active/tilesets/Interiors_free/16x16";
     this.load.image("ts-garage",   `${INT}/garage_basement_16x16.png`);
     this.load.image("ts-props",    `${INT}/props_interactables_16x16.png`);
     this.load.image("ts-exterior", `${INT}/suburb_exterior_16x16.png`);
@@ -166,27 +166,27 @@ export class BootScene extends Phaser.Scene {
     // full_set RPG-Maker-style tilesets (32×32 tiles)
     this.load.spritesheet(
       "full-set-int-a2",
-      "/assets/full_set/Tilesets/Int-A2.png",
+      "/assets-active/full_set/Tilesets/Int-A2.png",
       { frameWidth: 32, frameHeight: 32 },
     );
     this.load.spritesheet(
       "full-set-int-a4",
-      "/assets/full_set/Tilesets/Int-A4.png",
+      "/assets-active/full_set/Tilesets/Int-A4.png",
       { frameWidth: 32, frameHeight: 32 },
     );
     this.load.spritesheet(
       "full-set-int-b",
-      "/assets/full_set/Tilesets/Int-B.png",
+      "/assets-active/full_set/Tilesets/Int-B.png",
       { frameWidth: 32, frameHeight: 32 },
     );
     this.load.spritesheet(
       "full-set-int-c",
-      "/assets/full_set/Tilesets/Int-C.png",
+      "/assets-active/full_set/Tilesets/Int-C.png",
       { frameWidth: 32, frameHeight: 32 },
     );
     this.load.spritesheet(
       "kitchen-props",
-      "/assets/tilesets/kitchen_LRK.png",
+      "/assets-active/tilesets/kitchen_LRK.png",
       { frameWidth: 16, frameHeight: 16 },
     );
   }
