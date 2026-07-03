@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { loadAudioOnce } from "../game/audioAssets";
 import { CharacterSprite } from "../game/CharacterSprite";
 import { DAD_DEF } from "../game/characterDefs";
 import { installDevShortcuts } from "../game/devShortcuts";
@@ -209,6 +210,10 @@ export class TileRoomScene extends Phaser.Scene {
 
   constructor() {
     super("TileRoomScene");
+  }
+
+  preload(): void {
+    loadAudioOnce(this, "comfort-bg", "/assets-active/audio/comfort-bg.mp3");
   }
 
   create(): void {

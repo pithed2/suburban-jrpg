@@ -49,11 +49,6 @@ export class BootScene extends Phaser.Scene {
     this.load.image("toothpaste-slime", "/assets-active/enemies/toothpaste_slime.png");
     this.load.image("mold-patch", "/assets-active/enemies/mold-patch.png");
     this.load.image("clogged-toilet-battle", "/assets-active/enemies/clogged_toilet_boss.png");
-    this.load.audio("dramatic-bg", "/assets-active/audio/dramatic-bg.mp3");
-    this.load.audio("overworld-bg", "/assets-active/audio/overworld-bg.mp3");
-    this.load.audio("home-bg", "/assets-active/audio/home-bg.mp3");
-    this.load.audio("comfort-bg", "/assets-active/audio/comfort-bg.mp3");
-    this.load.audio("mini-boss", "/assets-active/audio/mini-boss.mp3");
     this.load.image("intro-scene", "/assets-active/props/Intro.png");
     this.load.image("hd-cutscene", "/assets-active/props/HD_Cut_Scene.png");
     this.load.image("portrait-dad",        "/assets-active/portraits/dad.png");

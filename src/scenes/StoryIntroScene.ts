@@ -16,6 +16,7 @@
  */
 
 import Phaser from "phaser";
+import { loadAudioOnce } from "../game/audioAssets";
 import { installDevShortcuts } from "../game/devShortcuts";
 import { DialogueBox } from "../game/DialogueBox";
 import { DialogueRunner, type DialogueInput } from "../game/DialogueRunner";
@@ -34,6 +35,10 @@ export class StoryIntroScene extends Phaser.Scene {
 
   constructor() {
     super("StoryIntroScene");
+  }
+
+  preload(): void {
+    loadAudioOnce(this, "home-bg", "/assets-active/audio/home-bg.mp3");
   }
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────

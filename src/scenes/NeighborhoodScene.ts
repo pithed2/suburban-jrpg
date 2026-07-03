@@ -14,6 +14,7 @@
  */
 
 import Phaser from "phaser";
+import { loadAudioOnce } from "../game/audioAssets";
 import { CharacterSprite } from "../game/CharacterSprite";
 import { DAD_DEF, WIFE_DEF } from "../game/characterDefs";
 import { dialogue } from "../game/content";
@@ -181,6 +182,10 @@ export class NeighborhoodScene extends Phaser.Scene {
 
   init(data?: { spawn?: NeighborhoodSpawn }): void {
     this.spawn = data?.spawn ?? "default";
+  }
+
+  preload(): void {
+    loadAudioOnce(this, "comfort-bg", "/assets-active/audio/comfort-bg.mp3");
   }
 
   create(): void {

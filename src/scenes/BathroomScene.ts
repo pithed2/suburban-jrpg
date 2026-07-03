@@ -13,6 +13,7 @@
  */
 
 import Phaser from "phaser";
+import { loadAudioOnce } from "../game/audioAssets";
 import { BattleManager } from "../game/BattleManager";
 import { CharacterSprite } from "../game/CharacterSprite";
 import { DAD_DEF } from "../game/characterDefs";
@@ -118,6 +119,11 @@ export class BathroomScene extends Phaser.Scene {
   private questText!: Phaser.GameObjects.BitmapText;
 
   constructor() { super("BathroomScene"); }
+
+  preload(): void {
+    loadAudioOnce(this, "dramatic-bg", "/assets-active/audio/dramatic-bg.mp3");
+    loadAudioOnce(this, "mini-boss", "/assets-active/audio/mini-boss.mp3");
+  }
 
   // ── Lifecycle ────────────────────────────────────────────────────────────
 
