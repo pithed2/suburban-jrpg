@@ -1,6 +1,6 @@
 # Active Runtime Assets
 
-This folder contains the assets currently loaded by the game. Originals remain in `public/assets` for comparison.
+This folder contains the assets currently loaded by the game.
 
 ## Characters
 - `tilesets/Characters_free/Bob_idle_16x16.png`: Dad player sprite.
@@ -22,6 +22,3 @@ This folder contains the assets currently loaded by the game. Originals remain i
 ## Battle/Legacy Runtime
 - `enemies/dryer_boss.png`: Heating coil battle image.
 - `vendor/16Pixel/16 Pixel Assets.png`: Still supplies dryer, stairs, dust bunny, heating coil, and other placeholder sprites.
-
-## Not Yet Active
-The larger Modern Interiors sheets and extra character animation sheets are intentionally left in `public/assets` until they are wired into scenes.
