@@ -1,6 +1,6 @@
 # Tiled Layer Plan for New House
 
-This plan covers `public/assets/maps/new-house.json` and the four 16x16 sheets in `public/assets/tilesets/Interiors_free/16x16`. The map is 36x24 tiles, orthogonal, 16 px tiles, and uses external Tiled tileset JSON files so the sheets can be reused by later rooms.
+This plan covers `public/assets-active/maps/new-house.json` and the four 16x16 sheets in `public/assets-active/tilesets/Interiors_free/16x16`. The map is 36x24 tiles, orthogonal, 16 px tiles, and uses external Tiled tileset JSON files so the sheets can be reused by later rooms.
 
 ## Tilesets
 
