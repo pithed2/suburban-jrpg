@@ -1,0 +1,198 @@
+{
+  "id": "fix-bathroom",
+  "title": "Unclog the Bathroom",
+  "countdownLabel": "11 DAYS UNTIL ARRIVAL",
+  "steps": [
+    {
+      "id": "talk-to-wife-bathroom",
+      "label": "Talk to wife"
+    },
+    {
+      "id": "visit-home-depot",
+      "label": "Visit THEE Dome Hepot"
+    },
+    {
+      "id": "find-plunger",
+      "label": "Buy a plunger"
+    },
+    {
+      "id": "inspect-toilet",
+      "label": "Inspect the toilet"
+    },
+    {
+      "id": "defeat-clogged-toilet",
+      "label": "Defeat the Clogged Toilet"
+    },
+    {
+      "id": "mop-up",
+      "label": "Mop up the bathroom"
+    },
+    {
+      "id": "return-to-wife-bathroom",
+      "label": "Return to wife"
+    }
+  ],
+  "defeat": {
+    "lines": [
+      [
+        "WIFE",
+        "Why are you in the chair? The toilet is still clogged."
+      ]
+    ]
+  },
+  "events": {
+    "house:wife": [
+      {
+        "when": {
+          "flags": [
+            "bathroomFixed"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "WIFE",
+                "The bathroom is still working. I'm choosing to believe this is also permanent."
+              ]
+            ]
+          },
+          {
+            "checkIn": true
+          }
+        ]
+      },
+      {
+        "when": {
+          "flags": [
+            "clogBossDefeated"
+          ]
+        },
+        "do": [
+          {
+            "complete": [
+              "mop-up",
+              "return-to-wife-bathroom"
+            ]
+          },
+          {
+            "set": {
+              "bathroomFixed": true
+            }
+          },
+          {
+            "hud": "BATHROOM FIXED"
+          },
+          {
+            "save": true
+          },
+          {
+            "say": [
+              [
+                "DAD",
+                "The toilet has been... handled."
+              ],
+              [
+                "WIFE",
+                "Handled how?"
+              ],
+              [
+                "DAD",
+                "With confidence. And the Plunger of the Gods."
+              ],
+              [
+                "WIFE",
+                "We're going to need that receipt for our records."
+              ],
+              [
+                "NARRATOR",
+                "Somewhere upstairs, a toilet flushes with newfound dignity."
+              ]
+            ]
+          },
+          {
+            "checkIn": true
+          },
+          {
+            "say": [
+              {
+                "speaker": "DAD",
+                "voice": "dad:selfTalk:victory"
+              }
+            ]
+          },
+          {
+            "completeQuest": "fix-bathroom"
+          }
+        ]
+      },
+      {
+        "when": {
+          "notFlags": [
+            "toiletInspected"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "WIFE",
+                "Have you looked at the toilet yet?"
+              ],
+              [
+                "DAD",
+                "On my way. Building up courage."
+              ]
+            ]
+          },
+          {
+            "checkIn": true
+          }
+        ]
+      },
+      {
+        "when": {
+          "notFlags": [
+            "ownsPlunger"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "WIFE",
+                "Did you get a plunger yet?"
+              ],
+              [
+                "DAD",
+                "Working on it. Might need a Dome Hepot run."
+              ]
+            ]
+          },
+          {
+            "checkIn": true
+          }
+        ]
+      },
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "WIFE",
+                "How's the bathroom situation?"
+              ],
+              [
+                "DAD",
+                "Armed and ready. The clog has no idea what's coming."
+              ]
+            ]
+          },
+          {
+            "checkIn": true
+          }
+        ]
+      }
+    ]
+  }
+}

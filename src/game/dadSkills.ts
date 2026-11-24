@@ -1,3 +1,4 @@
+import skillsData from "../data/skills.json";
 import type { GameState } from "./state";
 
 export type DadSkillKind = "damage" | "heal";
@@ -15,12 +16,7 @@ export interface DadSkillDefinition {
   healMax?: number;
 }
 
-export const DAD_SKILLS: DadSkillDefinition[] = [
-  { id: "deep-sigh",          name: "Deep Sigh",          levelRequired: 1, cost: 3, kind: "damage", multiplier: 1 },
-  { id: "authoritative-sigh", name: "Authoritative Sigh", levelRequired: 2, cost: 3, kind: "damage", multiplier: 1.3 },
-  { id: "walk-it-off",        name: "Walk It Off",        levelRequired: 3, cost: 4, kind: "heal",   healMin: 10, healMax: 16 },
-  { id: "dad-glare",          name: "Dad Glare",          levelRequired: 4, cost: 5, kind: "damage", multiplier: 1.6 },
-];
+export const DAD_SKILLS = skillsData as DadSkillDefinition[];
 
 export function getUnlockedDadSkills(level: number): DadSkillDefinition[] {
   return DAD_SKILLS.filter((skill) => skill.levelRequired <= level);

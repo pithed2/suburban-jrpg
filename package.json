@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check": "esbuild scripts/check-quests.ts --bundle --platform=node --format=esm --log-level=warning --outfile=node_modules/.cache/check-quests.mjs && node node_modules/.cache/check-quests.mjs",
+    "balance": "esbuild scripts/balance-report.ts --bundle --platform=node --format=esm --log-level=warning --outfile=node_modules/.cache/balance-report.mjs && node node_modules/.cache/balance-report.mjs"
   },
   "dependencies": {
     "phaser": "^3.90.0"
@@ -14,6 +16,7 @@
   "devDependencies": {
     "sharp": "^0.35.1",
     "typescript": "^5.8.3",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "esbuild": "^0.25.0"
   }
 }

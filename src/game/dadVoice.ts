@@ -1,5 +1,5 @@
-import Phaser from "phaser";
 import { dialogue } from "./content";
+import { pick, random } from "./engine/rng";
 
 type DadDialogue = Record<string, Record<string, string[]>>;
 type DadBrainDialogue = Record<string, string[]>;
@@ -14,20 +14,20 @@ const enemyBanter = dialogue.enemyBanter as EnemyBanter | undefined;
 export function getDadLine(context: string, mood: string): string {
   const pool = dadDialogue?.[context]?.[mood];
   if (!pool || pool.length === 0) return "";
-  return Phaser.Utils.Array.GetRandom(pool);
+  return pick(pool);
 }
 
 export function getDadBrainLine(context: string): string {
   const pool = dadBrainDialogue?.[context];
   if (!pool || pool.length === 0) return "";
-  return Phaser.Utils.Array.GetRandom(pool);
+  return pick(pool);
 }
 
 /** Returns a dryer boss / enemy taunt line for the given enemy id key. */
 export function getEnemyBanter(enemyKey: string): string {
   const pool = enemyBanter?.[enemyKey];
   if (!pool || pool.length === 0) return "";
-  return Phaser.Utils.Array.GetRandom(pool);
+  return pick(pool);
 }
 
 /**
@@ -36,9 +36,9 @@ export function getEnemyBanter(enemyKey: string): string {
  * keeping the battle banter fresh across longer fights.
  */
 export function getDadCombatLine(mood: string): string {
-  if (Math.random() < 0.3) {
+  if (random() < 0.3) {
     const allQuotes = Object.values(movieQuotes ?? {}).flat();
-    if (allQuotes.length > 0) return Phaser.Utils.Array.GetRandom(allQuotes);
+    if (allQuotes.length > 0) return pick(allQuotes);
   }
   return getDadLine("toEnemy", mood);
 }
@@ -57,7 +57,7 @@ export function getDadMovieQuote(context: string): string {
   if (!pool || pool.length === 0) {
     const allQuotes = Object.values(movieQuotes ?? {}).flat();
     if (allQuotes.length === 0) return "";
-    return Phaser.Utils.Array.GetRandom(allQuotes);
+    return pick(allQuotes);
   }
-  return Phaser.Utils.Array.GetRandom(pool);
+  return pick(pool);
 }

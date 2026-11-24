@@ -1,0 +1,548 @@
+{
+  "id": "garage",
+  "label": "Garage",
+  "hud": "GARAGE",
+  "returnTo": {
+    "scene": "NeighborhoodScene",
+    "spawn": "garage"
+  },
+  "randomEncounters": {
+    "enabled": true,
+    "stepDistance": 80,
+    "baseChance": 0.2,
+    "cooldownRolls": 4,
+    "disabledWhen": {
+      "flags": [
+        "foundWrench"
+      ]
+    },
+    "introMessages": [
+      "Something shifts behind a cardboard box.",
+      "A box labeled TAXES 2017 begins to vibrate.",
+      "Dad pauses. The garage has chosen violence."
+    ],
+    "entries": [
+      {
+        "enemyId": "dust-bunny",
+        "weight": 3
+      },
+      {
+        "enemyId": "angry-dust-bunny",
+        "weight": 1,
+        "introMessages": [
+          "Something rolls out from behind the toolbox. It is not happy.",
+          "A dust bunny near the workbench stirs. It looks different. Angrier.",
+          "Dad disturbs something near the wrench rack. It disturbs him back."
+        ]
+      },
+      {
+        "enemyId": "icky-spider",
+        "weight": 3,
+        "introMessages": [
+          "A Freaky Icky Spider drops from the garage shelf!",
+          "A Freaky Icky Spider skitters out from behind the paint cans!",
+          "Something moves on the wall. It has too many legs. It knows."
+        ]
+      }
+    ]
+  },
+  "hotspots": [
+    {
+      "id": "toolbox",
+      "col": 25,
+      "row": 9,
+      "radius": 2,
+      "solid": true,
+      "chest": {
+        "id": "garage:toolbox",
+        "frame": 0,
+        "flag": "foundWrench"
+      }
+    },
+    {
+      "id": "chest:easter",
+      "col": 25,
+      "row": 1,
+      "radius": 2,
+      "solid": true,
+      "chest": {
+        "id": "garage:easter",
+        "frame": 0
+      }
+    },
+    {
+      "id": "chest:cards",
+      "col": 17,
+      "row": 6,
+      "radius": 2,
+      "solid": true,
+      "chest": {
+        "id": "garage:cards",
+        "frame": 4,
+        "tint": "#aaaaaa"
+      }
+    },
+    {
+      "id": "chest:taxes",
+      "col": 13,
+      "row": 16,
+      "radius": 2,
+      "solid": true,
+      "chest": {
+        "id": "garage:taxes",
+        "frame": 8,
+        "tint": "#94a3b8"
+      }
+    },
+    {
+      "id": "deadend:paint",
+      "col": 3,
+      "row": 1,
+      "radius": 3
+    },
+    {
+      "id": "deadend:xmas",
+      "col": 20,
+      "row": 1,
+      "radius": 3
+    },
+    {
+      "id": "deadend:power-tools",
+      "col": 10,
+      "row": 6,
+      "radius": 3
+    },
+    {
+      "id": "deadend:cords",
+      "col": 9,
+      "row": 9,
+      "radius": 3
+    },
+    {
+      "id": "deadend:exercise",
+      "col": 3,
+      "row": 17,
+      "radius": 3
+    }
+  ],
+  "events": {
+    "enter": [
+      {
+        "when": {
+          "notFlags": [
+            "foundWrench"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              {
+                "speaker": "DAD'S BRAIN",
+                "voice": "brain:garage"
+              },
+              [
+                "NARRATOR",
+                "The garage receives Dad with the quiet hostility of unfinished projects."
+              ],
+              [
+                "DAD",
+                "The wrench is in here somewhere. Probably."
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "default": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The garage smells like motor oil and abandoned intentions."
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "toolbox": [
+      {
+        "when": {
+          "any": [
+            {
+              "flags": [
+                "foundWrench"
+              ]
+            },
+            {
+              "opened": [
+                "garage:toolbox"
+              ]
+            }
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The toolbox is empty. The wrench has moved on to better things."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "do": [
+          {
+            "set": {
+              "foundWrench": true
+            }
+          },
+          {
+            "open": "garage:toolbox"
+          },
+          {
+            "equip": "adjustable-wrench"
+          },
+          {
+            "complete": "find-wrench"
+          },
+          {
+            "step": "flip-breaker"
+          },
+          {
+            "save": true
+          },
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Dad opens the toolbox. Inside, beneath a receipt for a drill he bought in 2019,"
+              ],
+              [
+                "NARRATOR",
+                "and never used, and a bag of mystery screws — the Adjustable Wrench."
+              ],
+              [
+                "SYSTEM",
+                "The Dad had found ADJUSTABLE WRENCH!"
+              ],
+              [
+                "SYSTEM",
+                "You can feel your kick ass immediately improve."
+              ],
+              [
+                "DAD'S BRAIN",
+                "Somewhere in the basement, you know the dryer is already worried its days of not drying shit are numbered."
+              ],
+              [
+                "DAD'S BRAIN",
+                "When you get around to actually fixing it."
+              ],
+              {
+                "speaker": "DAD'S BRAIN",
+                "voice": "brain:wrenchFound"
+              },
+              {
+                "speaker": "DAD",
+                "voice": "movie:findItem"
+              },
+              {
+                "speaker": "DAD",
+                "voice": "dad:selfTalk:victory"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "chest:easter": [
+      {
+        "do": [
+          {
+            "open": "garage:easter"
+          },
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "A purple Rubbermaid tub. Label: EASTER."
+              ],
+              [
+                "NARRATOR",
+                "Inside: one plastic egg with a desiccated jelly bean, a basket with no handle, seventeen feet of green plastic grass that will never fully leave this garage."
+              ],
+              [
+                "NARRATOR",
+                "And a 14-inch ceramic rabbit in a waistcoat."
+              ],
+              [
+                "DAD",
+                "The bunny."
+              ],
+              [
+                "NARRATOR",
+                "The bunny watches with painted eyes that suggest he has always been watching. He will always be watching."
+              ],
+              [
+                "DAD",
+                "He comes out for three weeks a year and judges the whole family."
+              ],
+              [
+                "DAD'S BRAIN",
+                "The bunny was in here before 2019. The bunny was in here before the house."
+              ],
+              [
+                "NARRATOR",
+                "Dad carefully closes the tub. Some things should stay in the garage."
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "chest:cards": [
+      {
+        "do": [
+          {
+            "open": "garage:cards"
+          },
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "A flat plastic case. Label in careful Sharpie: '1990 FLEER COMPLETE SET.'"
+              ],
+              [
+                "DAD",
+                "Oh. Oh wow."
+              ],
+              [
+                "NARRATOR",
+                "660 cards in protective sleeves. Dad spent three summers and most of his allowance on this."
+              ],
+              [
+                "DAD",
+                "These are in really good shape. Dad took care of these."
+              ],
+              [
+                "NARRATOR",
+                "Dad's kid mentioned last week that a PSA 10 Frank Thomas rookie from this exact set sold for two point five million dollars."
+              ],
+              [
+                "DAD",
+                "I have seventeen Frank Thomases."
+              ],
+              [
+                "DAD'S BRAIN",
+                "We do have seventeen Frank Thomases. We also have six hundred Vince Colemans and a checklist card in a magnetic holder."
+              ],
+              [
+                "DAD",
+                "I need the Beckett Baseball Card Monthly."
+              ],
+              [
+                "NARRATOR",
+                "Dad has seventeen copies of the Beckett from 1991 to 1993. They are somewhere in this garage."
+              ],
+              [
+                "DAD",
+                "This whole trip may have just paid for itself."
+              ],
+              [
+                "NARRATOR",
+                "It probably hasn't. But it might."
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "chest:taxes": [
+      {
+        "do": [
+          {
+            "open": "garage:taxes"
+          },
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "A manila folder. Label: TAXES 2017."
+              ],
+              [
+                "NARRATOR",
+                "Beneath it: TAXES 2016. TAXES 2015. A warranty card for a TV Dad no longer owns."
+              ],
+              [
+                "NARRATOR",
+                "A Bed Bath and Beyond coupon from 2011. Twenty percent off. No expiration date printed."
+              ],
+              [
+                "DAD",
+                "This coupon might still be good."
+              ],
+              [
+                "DAD'S BRAIN",
+                "The store is gone, Dad."
+              ],
+              [
+                "DAD",
+                "The coupon transcends the store."
+              ],
+              [
+                "NARRATOR",
+                "There is also an envelope labeled IMPORTANT with nothing inside, and a birthday card signed only by someone named Gerald."
+              ],
+              [
+                "DAD",
+                "Who is Gerald?"
+              ],
+              [
+                "NARRATOR",
+                "This question will never be answered."
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "deadend:paint": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Three cans of paint from 2008."
+              ],
+              [
+                "NARRATOR",
+                "Colors: 'Dusty Mauve', 'Regret Beige', and 'I Was Told This Was Cream'."
+              ],
+              [
+                "NARRATOR",
+                "Dad bought them for the garage. The garage remains unambiguously gray."
+              ],
+              {
+                "speaker": "DAD",
+                "voice": "movie:deadEnd"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "deadend:xmas": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "A box labeled XMAS STUFF. Another labeled XMAS STUFF 2."
+              ],
+              [
+                "NARRATOR",
+                "A third labeled XMAS (THE REAL ONE)."
+              ],
+              [
+                "NARRATOR",
+                "There is no telling which one has the lights."
+              ],
+              {
+                "speaker": "DAD",
+                "voice": "movie:deadEnd"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "deadend:power-tools": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "A drill press. A router still in its original box. A scroll saw."
+              ],
+              [
+                "NARRATOR",
+                "A belt sander Dad bought because he saw someone use one on YouTube."
+              ],
+              [
+                "NARRATOR",
+                "He watched the whole video. He has not used the sander."
+              ],
+              [
+                "NARRATOR",
+                "\"I'm getting to these,\" said Dad. He has been getting to these for six years."
+              ],
+              {
+                "speaker": "DAD",
+                "voice": "movie:deadEnd"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "deadend:cords": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Extension cords. Dozens of them. Tangled into a shape"
+              ],
+              [
+                "NARRATOR",
+                "that may be a cry for help or a reef knot."
+              ],
+              [
+                "NARRATOR",
+                "None of them are three-prong."
+              ],
+              {
+                "speaker": "DAD",
+                "voice": "movie:deadEnd"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "deadend:exercise": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "A treadmill. A stationary bike. A set of dumbbells rated for a man"
+              ],
+              [
+                "NARRATOR",
+                "who no longer exists. They all face the wall."
+              ],
+              [
+                "NARRATOR",
+                "\"I was going to start,\" said Dad. He did not start."
+              ],
+              {
+                "speaker": "DAD",
+                "voice": "movie:deadEnd"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

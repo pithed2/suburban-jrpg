@@ -1,12 +1,13 @@
-import Phaser from "phaser";
 import {
-  encounterAreas,
-  enemies,
-  type EncounterAreaDefinition,
+  getArea,
+  getEnemy,
+  type AreaDefinition,
   type EnemyDefinition,
   type RandomEncounterDefinition,
   type RandomEncounterEntry,
 } from "./content";
+import { matches } from "./engine/conditions";
+import { random } from "./engine/rng";
 import type { GameState } from "./state";
 
 export interface RandomEncounterResult {
@@ -14,37 +15,40 @@ export interface RandomEncounterResult {
   introMessages: string[];
 }
 
+interface Point {
+  x: number;
+  y: number;
+}
+
+/**
+ * Rolls random encounters as Dad walks. Rules come from the area file:
+ * src/data/areas/<id>.json -> randomEncounters.
+ */
 export class RandomEncounterTracker {
-  private lastPosition?: Phaser.Math.Vector2;
+  private lastPosition?: Point;
   private distanceSinceRoll = 0;
   private cooldownRollsRemaining = 0;
-  private readonly area: EncounterAreaDefinition;
+  private readonly area: AreaDefinition;
 
   constructor(areaId: string) {
-    const area = encounterAreas.find((candidate) => candidate.id === areaId);
-
-    if (!area) {
-      throw new Error(`Missing encounter area definition: ${areaId}`);
-    }
-
-    this.area = area;
+    this.area = getArea(areaId);
   }
 
-  update(position: Phaser.Math.Vector2, state: GameState): RandomEncounterResult | undefined {
+  update(position: Point, state: GameState): RandomEncounterResult | undefined {
     const randomEncounters = this.area.randomEncounters;
 
     if (!this.canRoll(randomEncounters, state)) {
-      this.lastPosition = position.clone();
+      this.lastPosition = { ...position };
       return undefined;
     }
 
     if (!this.lastPosition) {
-      this.lastPosition = position.clone();
+      this.lastPosition = { ...position };
       return undefined;
     }
 
-    this.distanceSinceRoll += Phaser.Math.Distance.BetweenPoints(this.lastPosition, position);
-    this.lastPosition = position.clone();
+    this.distanceSinceRoll += Math.hypot(position.x - this.lastPosition.x, position.y - this.lastPosition.y);
+    this.lastPosition = { ...position };
 
     if (this.distanceSinceRoll < randomEncounters.stepDistance) {
       return undefined;
@@ -57,30 +61,27 @@ export class RandomEncounterTracker {
       return undefined;
     }
 
-    if (Math.random() >= randomEncounters.baseChance) {
+    if (random() >= randomEncounters.baseChance) {
       return undefined;
     }
 
-    const enemy = this.pickEnemy(randomEncounters.entries, state);
+    const entry = this.pickEntry(randomEncounters.entries, state);
 
-    if (!enemy) {
+    if (!entry) {
       return undefined;
     }
 
     this.cooldownRollsRemaining = randomEncounters.cooldownRolls;
 
-    // Use per-enemy intro messages if the entry defines them;
-    // otherwise fall back to the area-wide intro messages.
-    const matchedEntry = randomEncounters.entries.find(
-      (e) => e.enemyId === enemy.id,
-    );
-    const introMessages = matchedEntry?.introMessages ?? randomEncounters.introMessages;
-
-    return { enemy, introMessages };
+    return {
+      enemy: getEnemy(entry.enemyId),
+      // Per-enemy intro lines win over the area-wide ones.
+      introMessages: entry.introMessages ?? randomEncounters.introMessages,
+    };
   }
 
-  resetPosition(position: Phaser.Math.Vector2): void {
-    this.lastPosition = position.clone();
+  resetPosition(position: Point): void {
+    this.lastPosition = { ...position };
     this.distanceSinceRoll = 0;
   }
 
@@ -96,14 +97,14 @@ export class RandomEncounterTracker {
       return false;
     }
 
-    return !randomEncounters.disabledWhenFlags?.some((flag) => state.flags[flag]);
+    return !(randomEncounters.disabledWhen && matches(state, randomEncounters.disabledWhen));
   }
 
-  private pickEnemy(entries: RandomEncounterEntry[], state: GameState): EnemyDefinition | undefined {
+  private pickEntry(entries: RandomEncounterEntry[], state: GameState): RandomEncounterEntry | undefined {
     const eligibleEntries = entries.filter((entry) => {
       const minimumMet = entry.minPlayerLevel === undefined || state.player.level >= entry.minPlayerLevel;
       const maximumMet = entry.maxPlayerLevel === undefined || state.player.level <= entry.maxPlayerLevel;
-      return minimumMet && maximumMet;
+      return minimumMet && maximumMet && matches(state, entry.when);
     });
 
     const totalWeight = eligibleEntries.reduce((sum, entry) => sum + entry.weight, 0);
@@ -112,13 +113,13 @@ export class RandomEncounterTracker {
       return undefined;
     }
 
-    let roll = Math.random() * totalWeight;
+    let roll = random() * totalWeight;
 
     for (const entry of eligibleEntries) {
       roll -= entry.weight;
 
       if (roll <= 0) {
-        return enemies.find((enemy) => enemy.id === entry.enemyId);
+        return entry;
       }
     }
 

@@ -1,4 +1,6 @@
+import balanceData from "../data/balance.json";
 import { items, type EnemyDefinition } from "./content";
+import { random, randomInt } from "./engine/rng";
 import { getDadSkillLearnedAtLevel } from "./dadSkills";
 import type { GameState } from "./state";
 
@@ -12,20 +14,22 @@ export interface LevelUpResult {
   message?: string;
 }
 
-export const levelTable = [
-  { level: 1, xp: 0, maxHp: 24, maxDadPoints: 8, strength: 8, agility: 5 },
-  { level: 2, xp: 8, maxHp: 30, maxDadPoints: 10, strength: 11, agility: 7 },
-  { level: 3, xp: 24, maxHp: 38, maxDadPoints: 12, strength: 14, agility: 9 },
-  { level: 4, xp: 48, maxHp: 46, maxDadPoints: 15, strength: 18, agility: 12 },
-];
+export interface LevelRow {
+  level: number;
+  xp: number;
+  maxHp: number;
+  maxDadPoints: number;
+  strength: number;
+  agility: number;
+}
+
+export const balance = balanceData;
+export const levelTable: LevelRow[] = balanceData.levels;
 
 export function getNextLevelXp(currentLevel: number): number | undefined {
   return levelTable.find((entry) => entry.level > currentLevel)?.xp;
 }
 
-function randomInt(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
 
 function getWeaponPower(state: GameState): number {
   const weapon = items.find((item) => item.id === state.player.equipment.weaponId);
@@ -37,15 +41,19 @@ function getArmorDefense(state: GameState): number {
   return armor?.defense ?? 0;
 }
 
-export function rollHeroDamage(state: GameState, enemy: EnemyDefinition): DamageRoll {
-  const dodgeChance = (enemy.dodgeChance ?? 1 / 64);
+/**
+ * Enemy defense against Fight. defenseScale comes from boss modifiers
+ * (for example a side-quest item that softens the boss).
+ */
+export function rollHeroDamage(state: GameState, enemy: EnemyDefinition, defenseScale = 1): DamageRoll {
+  const dodgeChance = enemy.dodgeChance ?? balance.combat.defaultDodgeChance;
 
-  if (Math.random() < dodgeChance) {
+  if (random() < dodgeChance) {
     return { amount: 0, dodged: true };
   }
 
   const attackPower = state.player.strength + getWeaponPower(state);
-  const enemyDefense = Math.floor((enemy.agility ?? enemy.level * 3) / 2);
+  const enemyDefense = Math.floor(((enemy.agility ?? enemy.level * 3) / 2) * defenseScale);
   const baseDamage = Math.max(1, Math.floor((attackPower - enemyDefense) / 2));
   const spread = Math.max(1, Math.floor(baseDamage / 4));
 
@@ -74,11 +82,15 @@ export function rollHealing(min = 23, max = 30): number {
   return randomInt(min, max);
 }
 
-export function rollRunSuccess(state: GameState, enemy: EnemyDefinition): boolean {
+export function getRunChance(state: GameState, enemy: EnemyDefinition): number {
+  const tuning = balance.combat.runChance;
   const heroAgility = state.player.agility;
   const enemyAgility = enemy.agility ?? enemy.level * 4;
-  const chance = Math.min(0.92, Math.max(0.18, 0.45 + (heroAgility - enemyAgility) * 0.04));
-  return Math.random() < chance;
+  return Math.min(tuning.max, Math.max(tuning.min, tuning.base + (heroAgility - enemyAgility) * tuning.perAgilityPoint));
+}
+
+export function rollRunSuccess(state: GameState, enemy: EnemyDefinition, fixedChance?: number): boolean {
+  return random() < (fixedChance ?? getRunChance(state, enemy));
 }
 
 export function applyExperienceAndLevelUps(state: GameState, xpReward: number): LevelUpResult {

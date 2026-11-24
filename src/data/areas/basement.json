@@ -1,0 +1,692 @@
+{
+  "id": "basement",
+  "label": "Basement",
+  "hud": "BASEMENT",
+  "returnTo": {
+    "scene": "NeighborhoodScene",
+    "spawn": "basement"
+  },
+  "randomEncounters": {
+    "enabled": true,
+    "stepDistance": 80,
+    "baseChance": 0.23,
+    "cooldownRolls": 3,
+    "disabledWhen": {
+      "flags": [
+        "bossDefeated"
+      ]
+    },
+    "introMessages": [
+      "Something shifts in the basement dark.",
+      "Dad pauses. The house has chosen violence."
+    ],
+    "entries": [
+      {
+        "enemyId": "dust-bunny",
+        "weight": 3
+      },
+      {
+        "enemyId": "angry-dust-bunny",
+        "weight": 1,
+        "introMessages": [
+          "Something rolls out from under the dryer. It is furious.",
+          "A dust bunny emerges from the dark. It does not look like a regular dust bunny.",
+          "The basement floor shifts. Whatever this is, it has been waiting."
+        ]
+      },
+      {
+        "enemyId": "icky-spider",
+        "weight": 1,
+        "introMessages": [
+          "A Freaky Icky Spider descends from the ceiling on a thread of web.",
+          "Something brushes Dad's shoulder in the dark. It has too many legs.",
+          "A Freaky Icky Spider emerges from behind the water heater."
+        ]
+      }
+    ]
+  },
+  "hotspots": [
+    {
+      "id": "coil",
+      "col": 32,
+      "row": 19,
+      "radius": 3
+    },
+    {
+      "id": "breaker",
+      "col": 14,
+      "row": 10,
+      "adjacent": true
+    },
+    {
+      "id": "sticker",
+      "col": 30,
+      "row": 20,
+      "radius": 3
+    },
+    {
+      "id": "chest:furnace-filters",
+      "col": 6,
+      "row": 11,
+      "radius": 1.75,
+      "solid": true,
+      "chest": {
+        "id": "basement:furnace-filters",
+        "frame": 0
+      }
+    },
+    {
+      "id": "chest:first-aid",
+      "col": 17,
+      "row": 17,
+      "radius": 1.75,
+      "solid": true,
+      "chest": {
+        "id": "basement:first-aid",
+        "frame": 4,
+        "tint": "#aaaaaa",
+        "flag": "basementFirstAidOpened"
+      }
+    },
+    {
+      "id": "chest:cables",
+      "col": 27,
+      "row": 13,
+      "radius": 1.75,
+      "solid": true,
+      "chest": {
+        "id": "basement:cables",
+        "frame": 8,
+        "tint": "#c084fc"
+      }
+    },
+    {
+      "id": "deadend:insulation",
+      "col": 4,
+      "row": 12,
+      "radius": 3
+    },
+    {
+      "id": "deadend:stain",
+      "col": 26,
+      "row": 13,
+      "radius": 3
+    },
+    {
+      "id": "deadend:shelf",
+      "col": 13,
+      "row": 21,
+      "radius": 3
+    },
+    {
+      "id": "deadend:noodles",
+      "col": 7,
+      "row": 21,
+      "radius": 3
+    }
+  ],
+  "events": {
+    "enter": [
+      {
+        "when": {
+          "notFlags": [
+            "bossDefeated"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              {
+                "speaker": "DAD'S BRAIN",
+                "voice": "brain:basement"
+              },
+              {
+                "narrate": "basementIntro"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "default": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The basement smells like cardboard, old paint, and obligation."
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "coil": [
+      {
+        "when": {
+          "flags": [
+            "bossDefeated"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The heating coil is quiet now. Almost smugly quiet."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "when": {
+          "notFlags": [
+            "foundWrench"
+          ]
+        },
+        "do": [
+          {
+            "step": "find-wrench"
+          },
+          {
+            "say": [
+              {
+                "speaker": "DAD'S BRAIN",
+                "voice": "brain:findWrench"
+              },
+              [
+                "NARRATOR",
+                "Dad sizes up the coil with his bare hands."
+              ],
+              [
+                "DAD",
+                "Nope. This is a wrench problem."
+              ],
+              {
+                "speaker": "DAD",
+                "voice": "dad:selfTalk:frustrated"
+              },
+              [
+                "NARRATOR",
+                "The garage waits."
+              ]
+            ]
+          },
+          {
+            "home": true
+          }
+        ]
+      },
+      {
+        "do": [
+          {
+            "if": {
+              "notFlags": [
+                "circuitBreakerOff"
+              ]
+            },
+            "then": [
+              {
+                "say": [
+                  [
+                    "DAD'S BRAIN",
+                    "The breaker is still on. Certified Zap is very much on the menu."
+                  ],
+                  [
+                    "NARRATOR",
+                    "The coil crackles with live current. Dad can still try, technically."
+                  ]
+                ]
+              }
+            ]
+          },
+          {
+            "say": [
+              {
+                "narrate": "battleIntro"
+              },
+              {
+                "speaker": "DAD'S BRAIN",
+                "voice": "brain:battle"
+              },
+              {
+                "speaker": "DAD",
+                "voice": "dad:toEnemy:battleStart"
+              }
+            ]
+          },
+          {
+            "battle": "evil-heating-coil",
+            "victory": [
+              {
+                "set": {
+                  "bossDefeated": true
+                }
+              },
+              {
+                "complete": "defeat-heating-coil"
+              },
+              {
+                "if": {
+                  "flags": [
+                    "circuitBreakerOff"
+                  ]
+                },
+                "then": [
+                  {
+                    "step": "restore-power"
+                  }
+                ],
+                "else": [
+                  {
+                    "step": "return-to-wife"
+                  }
+                ]
+              },
+              {
+                "hud": "VICTORY"
+              },
+              {
+                "if": {
+                  "flags": [
+                    "circuitBreakerOff"
+                  ]
+                },
+                "then": [
+                  {
+                    "say": [
+                      [
+                        "NARRATOR",
+                        "The vent stops rattling. The breaker, however, is still off."
+                      ],
+                      [
+                        "DAD'S BRAIN",
+                        "One last heroic act: turn the power back on."
+                      ]
+                    ]
+                  }
+                ],
+                "else": [
+                  {
+                    "say": [
+                      [
+                        "NARRATOR",
+                        "The vent stops rattling. Upstairs, a towel may yet become dry."
+                      ]
+                    ]
+                  }
+                ]
+              },
+              {
+                "home": true
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "breaker": [
+      {
+        "when": {
+          "flags": [
+            "circuitBreakerOff",
+            "bossDefeated"
+          ]
+        },
+        "do": [
+          {
+            "set": {
+              "circuitBreakerOff": false
+            }
+          },
+          {
+            "complete": "restore-power"
+          },
+          {
+            "step": "return-to-wife"
+          },
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Dad flips the breaker back on. The house wakes up with a chorus of appliance beeps."
+              ],
+              [
+                "DAD'S BRAIN",
+                "Dryers don't work without power."
+              ],
+              [
+                "DAD",
+                "I knew that. I was creating suspense."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "when": {
+          "flags": [
+            "circuitBreakerOff"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The breaker is off. Good. Leave it off until the angry coil is not angry."
+              ],
+              [
+                "DAD",
+                "Already handled."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "do": [
+          {
+            "set": {
+              "circuitBreakerOff": true
+            }
+          },
+          {
+            "complete": "flip-breaker"
+          },
+          {
+            "step": "defeat-heating-coil"
+          },
+          {
+            "say": [
+              [
+                "DAD'S BRAIN",
+                "Kill the power before poking the angry appliance. Revolutionary."
+              ],
+              [
+                "NARRATOR",
+                "Dad flips the circuit breaker. The dryer coil loses its worst idea."
+              ],
+              [
+                "DAD",
+                "Okay. Now the wrench gets to be the bad cop."
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "sticker": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "A faded sticker: TURN OFF POWER BEFORE SERVICING ELECTRICAL APPLIANCE."
+              ],
+              [
+                "DAD'S BRAIN",
+                "A lesser man would ignore that. Dad is occasionally not a lesser man."
+              ],
+              [
+                "DAD",
+                "Fine. Breaker first. Heroics after."
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "chest:furnace-filters": [
+      {
+        "when": {
+          "opened": [
+            "basement:furnace-filters"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The box contains only the echo of Dad's previous curiosity."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "do": [
+          {
+            "open": "basement:furnace-filters"
+          },
+          {
+            "save": true
+          },
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Dad opens a plastic tote and finds three furnace filters, all different sizes."
+              ],
+              [
+                "DAD",
+                "One of these is definitely correct for something."
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "chest:first-aid": [
+      {
+        "when": {
+          "any": [
+            {
+              "opened": [
+                "basement:first-aid"
+              ]
+            },
+            {
+              "flags": [
+                "basementFirstAidOpened"
+              ]
+            }
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The box contains only the echo of Dad's previous curiosity."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "do": [
+          {
+            "open": "basement:first-aid"
+          },
+          {
+            "set": {
+              "basementFirstAidOpened": true
+            }
+          },
+          {
+            "give": "ibuprofen"
+          },
+          {
+            "save": true
+          },
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "A dented metal first-aid tin. Inside: one travel bottle of ibuprofen."
+              ],
+              [
+                "SYSTEM",
+                "YOU GAINED IBUPROFEN"
+              ],
+              [
+                "DAD'S BRAIN",
+                "Treasure, by suburban dungeon standards."
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "chest:cables": [
+      {
+        "when": {
+          "opened": [
+            "basement:cables"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The box contains only the echo of Dad's previous curiosity."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "do": [
+          {
+            "open": "basement:cables"
+          },
+          {
+            "save": true
+          },
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "A cardboard box of coax cables, speaker wire, and one charger for a device nobody remembers."
+              ],
+              [
+                "DAD",
+                "Can't throw these out. What if the mystery device comes back?"
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "deadend:insulation": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Old insulation, partially detached from the pipe."
+              ],
+              [
+                "NARRATOR",
+                "Dad has been meaning to reattach it since 2020."
+              ],
+              [
+                "NARRATOR",
+                "He means it still. He will keep meaning it."
+              ],
+              {
+                "speaker": "DAD",
+                "voice": "movie:deadEnd"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "deadend:stain": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "A water stain on the north wall in the shape of South America."
+              ],
+              [
+                "NARRATOR",
+                "There was 'an incident' in 2018. Insurance 'handled it'."
+              ],
+              [
+                "NARRATOR",
+                "The stain remains. The stain is not handled."
+              ],
+              {
+                "speaker": "DAD",
+                "voice": "movie:deadEnd"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "deadend:shelf": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "A wire-rack shelving unit. Completely empty."
+              ],
+              [
+                "NARRATOR",
+                "Dad purchased it during an organizational phase in 2019."
+              ],
+              [
+                "NARRATOR",
+                "The organizational phase lasted eleven days. The shelf has been empty since."
+              ],
+              {
+                "speaker": "DAD",
+                "voice": "movie:deadEnd"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "deadend:noodles": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Pool noodles. Seven of them. Dad does not own a pool."
+              ],
+              [
+                "NARRATOR",
+                "\"You never know,\" said Dad, in 2017, at a garage sale."
+              ],
+              [
+                "NARRATOR",
+                "He has since known. He does not need pool noodles."
+              ],
+              {
+                "speaker": "DAD",
+                "voice": "movie:deadEnd"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

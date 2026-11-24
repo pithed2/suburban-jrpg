@@ -1,0 +1,404 @@
+{
+  "id": "bathroom",
+  "label": "Bathroom",
+  "hud": "BATHROOM",
+  "returnTo": {
+    "scene": "NeighborhoodScene",
+    "spawn": "bathroom"
+  },
+  "randomEncounters": {
+    "enabled": true,
+    "stepDistance": 80,
+    "baseChance": 0.22,
+    "cooldownRolls": 3,
+    "disabledWhen": {
+      "flags": [
+        "clogBossDefeated"
+      ]
+    },
+    "introMessages": [
+      "Something shifts behind the shower curtain.",
+      "Dad pauses. The bathroom has chosen violence."
+    ],
+    "entries": [
+      {
+        "enemyId": "single-ply-sam",
+        "weight": 3,
+        "introMessages": [
+          "A roll of suspiciously thin toilet paper unspools itself menacingly.",
+          "Single-Ply Sam tumbles out from under the cabinet.",
+          "Something flimsy but determined blocks the path."
+        ]
+      },
+      {
+        "enemyId": "toothpaste-slime",
+        "weight": 2,
+        "introMessages": [
+          "A glob of toothpaste oozes off the sink with intent.",
+          "The Toothpaste Slime drops from the medicine cabinet.",
+          "Something minty and hostile blocks the sink."
+        ]
+      },
+      {
+        "enemyId": "mold-patch",
+        "weight": 2,
+        "introMessages": [
+          "The grout near the shower has been waiting for this moment.",
+          "A Mold Patch unsticks itself from the tile.",
+          "Something green and patient stirs behind the curtain."
+        ]
+      },
+      {
+        "enemyId": "olfactory-ninja",
+        "weight": 1,
+        "introMessages": [
+          "The Olfactory Ninja strikes before Dad registers the smell.",
+          "A cloud of pure offense materializes near the exhaust fan.",
+          "Something silent, deadly, and airborne has entered the room."
+        ]
+      }
+    ]
+  },
+  "hotspots": [
+    {
+      "id": "toilet",
+      "col": 11,
+      "row": 13,
+      "radius": 2,
+      "solid": true
+    },
+    {
+      "id": "linen",
+      "col": 3,
+      "row": 5,
+      "radius": 2
+    },
+    {
+      "id": "shower",
+      "col": 18,
+      "row": 6,
+      "radius": 2
+    },
+    {
+      "id": "sink",
+      "col": 11,
+      "row": 5,
+      "radius": 2
+    }
+  ],
+  "events": {
+    "enter": [
+      {
+        "when": {
+          "step": "talk-to-wife-bathroom"
+        },
+        "continue": true,
+        "do": [
+          {
+            "complete": "talk-to-wife-bathroom"
+          },
+          {
+            "step": "visit-home-depot"
+          }
+        ]
+      },
+      {
+        "when": {
+          "notFlags": [
+            "toiletInspected"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "DAD'S BRAIN",
+                "The smell got here before we did."
+              ],
+              [
+                "NARRATOR",
+                "The bathroom waits, tiled and unforgiving."
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "default": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The bathroom holds its breath, which is generous given the smell."
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "sink": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The sink drips. It has always dripped. It will outlive everyone in this house."
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "toilet": [
+      {
+        "when": {
+          "notFlags": [
+            "toiletInspected"
+          ]
+        },
+        "continue": true,
+        "do": [
+          {
+            "set": {
+              "toiletInspected": true
+            }
+          },
+          {
+            "complete": "inspect-toilet"
+          },
+          {
+            "step": "defeat-clogged-toilet"
+          },
+          {
+            "save": true
+          }
+        ]
+      },
+      {
+        "when": {
+          "flags": [
+            "clogBossDefeated"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The toilet flushes proudly. Order has been restored to this small porcelain kingdom."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "when": {
+          "notFlags": [
+            "ownsPlunger"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The clog gurgles ominously. Dad's bare hands are not going to be enough this time."
+              ],
+              [
+                "DAD'S BRAIN",
+                "We need a plunger. A real one. THEE Dome Hepot has what we need."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The Clogged Toilet rumbles, sensing the plunger in Dad's hand."
+              ],
+              [
+                "DAD",
+                "We're gonna need a bigger plunger."
+              ],
+              {
+                "speaker": "DAD'S BRAIN",
+                "voice": "brain:battle"
+              },
+              {
+                "speaker": "DAD",
+                "voice": "dad:toEnemy:battleStart"
+              }
+            ]
+          },
+          {
+            "battle": "clogged-toilet",
+            "victory": [
+              {
+                "set": {
+                  "clogBossDefeated": true
+                }
+              },
+              {
+                "complete": "defeat-clogged-toilet"
+              },
+              {
+                "step": "mop-up"
+              },
+              {
+                "save": true
+              },
+              {
+                "hud": "VICTORY"
+              },
+              {
+                "say": [
+                  [
+                    "DAD",
+                    "That'll do, toilet. That'll do."
+                  ],
+                  [
+                    "NARRATOR",
+                    "The toilet flushes clean. Somewhere, plumbing angels sing."
+                  ]
+                ]
+              },
+              {
+                "home": true
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "linen": [
+      {
+        "when": {
+          "flags": [
+            "toiletPaperFound"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The linen closet is fully stocked. The quilted double-ply stands tall and trustworthy."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "do": [
+          {
+            "set": {
+              "toiletPaperFound": true
+            }
+          },
+          {
+            "cash": 3
+          },
+          {
+            "save": true
+          },
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Dad opens the linen closet. A lone roll of single-ply teeters on the shelf, thin and untrustworthy."
+              ],
+              [
+                "DAD",
+                "Gotta get that quilted double-ply."
+              ],
+              [
+                "DAD'S BRAIN",
+                "Single-ply might not stick to the bottom. It has shady ulterior motives. No one can trust it. It leaves you hurtin'."
+              ],
+              [
+                "NARRATOR",
+                "Behind it: a fresh twelve-pack of quilted double-ply, hoarded for exactly this emergency."
+              ],
+              [
+                "SYSTEM",
+                "Dad restocked the toilet paper. +3 Love Points."
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "shower": [
+      {
+        "when": {
+          "flags": [
+            "rubberDuckFound"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The shower curtain hangs there, fully accounted for. No more ducks to find."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "do": [
+          {
+            "set": {
+              "rubberDuckFound": true
+            }
+          },
+          {
+            "cash": 5
+          },
+          {
+            "xp": 3
+          },
+          {
+            "save": true
+          },
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Dad pulls back the shower curtain. Something small and yellow stares back."
+              ],
+              [
+                "DAD",
+                "There you are."
+              ],
+              [
+                "NARRATOR",
+                "The kids' missing rubber ducky. Last seen during an incident Dad has chosen not to remember."
+              ],
+              [
+                "DAD'S BRAIN",
+                "Find that so the kids can be happy. Also so that Ernie's stupid song stops running through your head."
+              ],
+              [
+                "DAD",
+                "Rubber Duckie, you're the one... no. NO. Get out of my head."
+              ],
+              [
+                "SYSTEM",
+                "Dad found the RUBBER DUCKY! +5 Love Points. +3 XP.{levelUp}"
+              ]
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,219 @@
+{
+  "_doc": "Tuning sheet. Change numbers here (and in enemies.json), then run `npm run balance` to see win rates and grind time per area. Levels 1-4 match the original quests 1-2 tuning; 5-20 are a first guess for quests 3-10.",
+  "levels": [
+    {
+      "level": 1,
+      "xp": 0,
+      "maxHp": 24,
+      "maxDadPoints": 8,
+      "strength": 8,
+      "agility": 5
+    },
+    {
+      "level": 2,
+      "xp": 8,
+      "maxHp": 30,
+      "maxDadPoints": 10,
+      "strength": 11,
+      "agility": 7
+    },
+    {
+      "level": 3,
+      "xp": 24,
+      "maxHp": 38,
+      "maxDadPoints": 12,
+      "strength": 14,
+      "agility": 9
+    },
+    {
+      "level": 4,
+      "xp": 48,
+      "maxHp": 46,
+      "maxDadPoints": 15,
+      "strength": 18,
+      "agility": 12
+    },
+    {
+      "level": 5,
+      "xp": 100,
+      "maxHp": 54,
+      "maxDadPoints": 18,
+      "strength": 22,
+      "agility": 15
+    },
+    {
+      "level": 6,
+      "xp": 190,
+      "maxHp": 62,
+      "maxDadPoints": 20,
+      "strength": 26,
+      "agility": 17
+    },
+    {
+      "level": 7,
+      "xp": 340,
+      "maxHp": 70,
+      "maxDadPoints": 23,
+      "strength": 30,
+      "agility": 20
+    },
+    {
+      "level": 8,
+      "xp": 580,
+      "maxHp": 78,
+      "maxDadPoints": 25,
+      "strength": 34,
+      "agility": 22
+    },
+    {
+      "level": 9,
+      "xp": 950,
+      "maxHp": 86,
+      "maxDadPoints": 28,
+      "strength": 38,
+      "agility": 25
+    },
+    {
+      "level": 10,
+      "xp": 1450,
+      "maxHp": 94,
+      "maxDadPoints": 30,
+      "strength": 41,
+      "agility": 27
+    },
+    {
+      "level": 11,
+      "xp": 2100,
+      "maxHp": 102,
+      "maxDadPoints": 33,
+      "strength": 44,
+      "agility": 30
+    },
+    {
+      "level": 12,
+      "xp": 2950,
+      "maxHp": 109,
+      "maxDadPoints": 35,
+      "strength": 47,
+      "agility": 32
+    },
+    {
+      "level": 13,
+      "xp": 4000,
+      "maxHp": 116,
+      "maxDadPoints": 38,
+      "strength": 50,
+      "agility": 35
+    },
+    {
+      "level": 14,
+      "xp": 5300,
+      "maxHp": 123,
+      "maxDadPoints": 40,
+      "strength": 53,
+      "agility": 37
+    },
+    {
+      "level": 15,
+      "xp": 6900,
+      "maxHp": 130,
+      "maxDadPoints": 43,
+      "strength": 56,
+      "agility": 40
+    },
+    {
+      "level": 16,
+      "xp": 8800,
+      "maxHp": 137,
+      "maxDadPoints": 45,
+      "strength": 59,
+      "agility": 42
+    },
+    {
+      "level": 17,
+      "xp": 11000,
+      "maxHp": 144,
+      "maxDadPoints": 48,
+      "strength": 62,
+      "agility": 45
+    },
+    {
+      "level": 18,
+      "xp": 13600,
+      "maxHp": 151,
+      "maxDadPoints": 50,
+      "strength": 65,
+      "agility": 47
+    },
+    {
+      "level": 19,
+      "xp": 16600,
+      "maxHp": 158,
+      "maxDadPoints": 53,
+      "strength": 68,
+      "agility": 50
+    },
+    {
+      "level": 20,
+      "xp": 20000,
+      "maxHp": 165,
+      "maxDadPoints": 55,
+      "strength": 71,
+      "agility": 52
+    }
+  ],
+  "defeat": {
+    "cashLoss": 2,
+    "restoreHp": true,
+    "restoreDadPoints": true
+  },
+  "combat": {
+    "defaultDodgeChance": 0.015625,
+    "runChance": {
+      "base": 0.45,
+      "perAgilityPoint": 0.04,
+      "min": 0.18,
+      "max": 0.92
+    }
+  },
+  "areas": {
+    "garage": {
+      "quest": "fix-dryer",
+      "targetLevel": [
+        1,
+        2
+      ],
+      "gear": {
+        "weapon": "two-hands",
+        "armor": "dads-cardigan"
+      },
+      "note": "Wrench dungeon. Short and gentle."
+    },
+    "basement": {
+      "quest": "fix-dryer",
+      "targetLevel": [
+        2,
+        3
+      ],
+      "gear": {
+        "weapon": "adjustable-wrench",
+        "armor": "dads-cardigan"
+      },
+      "boss": "evil-heating-coil",
+      "note": "Coil boss. Breaker off makes it fair."
+    },
+    "bathroom": {
+      "quest": "fix-bathroom",
+      "targetLevel": [
+        3,
+        4
+      ],
+      "gear": {
+        "weapon": "plunger-of-the-gods",
+        "armor": "tool-belt"
+      },
+      "boss": "clogged-toilet",
+      "note": "Toilet boss. Needs a plumbing weapon."
+    }
+  }
+}

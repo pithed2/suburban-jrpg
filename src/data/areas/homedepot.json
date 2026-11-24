@@ -1,0 +1,144 @@
+{
+  "id": "homedepot",
+  "label": "THEE Dome Hepot",
+  "hud": "DOME HEPOT",
+  "returnTo": {
+    "scene": "NeighborhoodScene",
+    "spawn": "homedepot"
+  },
+  "shop": [
+    "plumbing-snake",
+    "plunger-of-the-gods",
+    "tool-belt",
+    "steel-toe-boots",
+    "cold-coffee",
+    "energy-drink"
+  ],
+  "hotspots": [
+    {
+      "id": "clerk",
+      "col": 13,
+      "row": 6,
+      "radius": 1.8
+    }
+  ],
+  "events": {
+    "enter": [
+      {
+        "when": {
+          "step": "visit-home-depot"
+        },
+        "continue": true,
+        "do": [
+          {
+            "complete": "visit-home-depot"
+          },
+          {
+            "step": "find-plunger"
+          }
+        ]
+      },
+      {
+        "do": [
+          {
+            "set": {
+              "visitedHomeDepot": true
+            }
+          },
+          {
+            "save": true
+          },
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The automatic doors part. Fluorescent lights hum. Somewhere, a forklift beeps authoritatively."
+              ],
+              [
+                "NARRATOR",
+                "This is Dad's cathedral. He could walk this place blind. He basically already does."
+              ],
+              [
+                "DAD'S BRAIN",
+                "Talk to the clerk. Aisle 7. He has seen things. All of them."
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "default": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Aisle after aisle of solutions to problems Dad doesn't have yet. And a few he does."
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "exit": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Dad drives home, plunder secured. The cruiser smells like possibility. And lumber."
+              ]
+            ]
+          },
+          {
+            "home": true
+          }
+        ]
+      }
+    ],
+    "buy:plumbing-snake": [
+      {
+        "do": [
+          {
+            "run": "got-plumbing-weapon"
+          }
+        ]
+      }
+    ],
+    "buy:plunger-of-the-gods": [
+      {
+        "do": [
+          {
+            "run": "got-plumbing-weapon"
+          }
+        ]
+      }
+    ],
+    "got-plumbing-weapon": [
+      {
+        "do": [
+          {
+            "set": {
+              "ownsPlunger": true
+            }
+          },
+          {
+            "if": {
+              "step": "find-plunger"
+            },
+            "then": [
+              {
+                "complete": "find-plunger"
+              },
+              {
+                "step": "inspect-toilet"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

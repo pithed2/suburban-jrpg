@@ -58,7 +58,11 @@ npm install
 npm run dev        # dev server at http://127.0.0.1:5174
 npm run build      # production build → dist/
 npm run preview    # preview production build
+npm run check      # validate data files and play quests 1-2 headless
+npm run balance    # simulate fights: win rates and grind time per area
 ```
+
+Quests, areas, enemies and tuning live in `src/data/`. See [docs/engine.md](docs/engine.md) for how to add content.
 
 After editing a Tiled map:
 

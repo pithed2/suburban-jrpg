@@ -1,7 +1,7 @@
 /**
  * NeighborhoodScene
  * ─────────────────────────────────────────────────────────────────────────────
- * Main house-interior hub — Dragon Warrior–style tile rendering.
+ * Main house-interior hub, Dragon Warrior style tile rendering.
  *
  * Tiles drawn from the full_set RPG-Maker sheets (same as TileRoomScene):
  *   walls  → full-set-int-a4  frame WALL_FRAME
@@ -10,29 +10,16 @@
  * Object positions (wife, dryer, exits) are taken directly from the values
  * in public/assets-active/maps/new-house.json Objects layer so they never drift.
  *
- * Quest logic is identical to every previous version of this scene.
+ * Talk-to-wife and dryer beats live in data: src/data/areas/house.json and the
+ * "house:wife" event of each quest in src/data/quests/.
  */
 
 import Phaser from "phaser";
 import { loadAudioOnce } from "../game/audioAssets";
 import { CharacterSprite } from "../game/CharacterSprite";
 import { DAD_DEF, WIFE_DEF } from "../game/characterDefs";
-import { dialogue } from "../game/content";
-import { installDevShortcuts } from "../game/devShortcuts";
-import { DialogueBox } from "../game/DialogueBox";
-import { getDadBrainLine, getDadLine } from "../game/dadVoice";
-import { DialogueRunner, type DialogueInput, type DialogueLine } from "../game/DialogueRunner";
-import { GameMenu } from "../game/GameMenu";
+import { FieldKit } from "../game/FieldKit";
 import { GridMover } from "../game/GridMover";
-import { getNextLevelXp } from "../game/dragonWarriorMath";
-import { getQuest, getQuestStepLabel } from "../game/quests";
-import { getGameState, resetGameState, saveGameState } from "../game/session";
-import { addPixelText, setPixelText } from "../game/uiText";
-import {
-  completeQuestStep,
-  setActiveQuestStep,
-  type GameState,
-} from "../game/state";
 
 // ── Tile constants ─────────────────────────────────────────────────────────
 const TILE = 16;
@@ -127,11 +114,9 @@ function px(col: number, row: number) {
 }
 
 const WIFE_PX     = px(7,  6);   // living room centre
+const TILEROOM_PX = px(28, 14);  // hallway right-centre (utility room door)
 const WIFE_COL    = 7;
 const WIFE_ROW    = 6;
-const DRYER_PX    = px(27, 6);   // kitchen right-of-centre
-const GARAGE_PX   = px(7,  21);  // bottom wall opening (garage)
-const TILEROOM_PX = px(28, 14);  // hallway right-centre (utility room door)
 const SPAWN_COL   = 8;
 const SPAWN_ROW   = 20;
 const BASEMENT_RETURN_COL = 13;
@@ -143,7 +128,6 @@ const BATHROOM_RETURN_ROW = 13;
 const HOMEDEPOT_RETURN_COL = 11;
 const HOMEDEPOT_RETURN_ROW = 3;
 
-const INTERACT_PX     = 36; // proximity threshold in world pixels
 
 // ── Floor frame lookup (house-core-16 texture) ────────────────────────────
 const FLOOR_FRAME: Record<number, number> = {
@@ -154,25 +138,15 @@ const FLOOR_FRAME: Record<number, number> = {
 };
 
 // ── Scene ─────────────────────────────────────────────────────────────────
-type SceneMode = "explore" | "dialogue" | "complete";
 type NeighborhoodSpawn = "default" | "basement" | "garage" | "bathroom" | "homedepot";
 
 export class NeighborhoodScene extends Phaser.Scene {
-  private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
-  private interactKey!: Phaser.Input.Keyboard.Key;
-  private questKey!: Phaser.Input.Keyboard.Key;
   private mover!: GridMover;
+  private kit!: FieldKit;
   private wifeChar!: CharacterSprite;
   // Tiles occupied by solid NPCs — player cannot walk into them
   private npcTiles = new Set<string>();
-  private mode: SceneMode = "explore";
-  private dialogueBox!: DialogueBox;
-  private menu!: GameMenu;
-  private questBox!: Phaser.GameObjects.Rectangle;
-  private questText!: Phaser.GameObjects.BitmapText;
-  private state!: GameState;
   private spawn: NeighborhoodSpawn = "default";
-  private readonly dialogueRunner = new DialogueRunner();
 
   constructor() {
     super("NeighborhoodScene");
@@ -189,20 +163,13 @@ export class NeighborhoodScene extends Phaser.Scene {
   }
 
   create(): void {
-    installDevShortcuts(this);
-
-    this.state   = getGameState();
-    this.mode    = "explore";
-    this.cursors     = this.input.keyboard!.createCursorKeys();
-    this.interactKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    this.questKey    = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+    this.kit = new FieldKit(this, { areaId: "house", mover: () => this.mover });
+    this.npcTiles.clear();
 
     this.drawTiles();
     this.placeDecorations();
     this.placeCharacters();
-    this.createUi();
-    this.menu = new GameMenu(this, () => this.state);
-    this.updateQuestText();
+    this.kit.create();
 
     this.cameras.main.setBounds(0, 0, WORLD_W, WORLD_H);
     this.cameras.main.startFollow(this.mover.phaserSprite, true, 0.1, 0.1);
@@ -210,23 +177,15 @@ export class NeighborhoodScene extends Phaser.Scene {
     const bgMusic = this.sound.add("comfort-bg", { loop: true, volume: 0.4 });
     bgMusic.play();
     this.events.once("shutdown", () => bgMusic.stop());
+
+    this.kit.enter();
   }
 
   update(_time: number, delta: number): void {
-    this.dialogueBox.update(delta);
-    this.menu.update();
-    this.updateQuestPrompt();
-
-    if (this.menu.isOpen()) return;
-
-    if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
-      this.handleInteract();
-    }
-
-    if (this.mode !== "explore") return;
+    if (!this.kit.update(delta)) return;
 
     this.mover.update(
-      this.cursors,
+      this.kit.cursors,
       delta,
       (col, row) => this.canWalkTo(col, row),
       (col, row) => this.onLand(col, row),
@@ -368,8 +327,9 @@ export class NeighborhoodScene extends Phaser.Scene {
       bathroom: { col: BATHROOM_RETURN_COL, row: BATHROOM_RETURN_ROW },
       homedepot: { col: HOMEDEPOT_RETURN_COL, row: HOMEDEPOT_RETURN_ROW },
     };
-    const spawnCol = spawnTable[this.spawn].col;
-    const spawnRow = spawnTable[this.spawn].row;
+    const spawn = spawnTable[this.spawn] ?? spawnTable.default;
+    const spawnCol = spawn.col;
+    const spawnRow = spawn.row;
     this.mover = new GridMover(this, dadChar, TILE, spawnCol, spawnRow);
 
     this.wifeChar = new CharacterSprite(this, WIFE_PX.x, WIFE_PX.y, WIFE_DEF);
@@ -389,294 +349,19 @@ export class NeighborhoodScene extends Phaser.Scene {
 
   private onLand(col: number, row: number): void {
     if (MAP[row]?.[col] === S) {
-      this.scene.start("BasementScene");
+      this.kit.goto("BasementScene");
     }
     if (MAP[row]?.[col] === U) {
-      this.scene.start("BathroomScene");
+      this.kit.goto("BathroomScene");
     }
   }
 
   private onBump(col: number, row: number): void {
     if (MAP[row]?.[col] === D) {
-      this.scene.start("GarageScene");
+      this.kit.goto("GarageScene");
     }
     if (MAP[row]?.[col] === P) {
-      this.scene.start("HDCutScene");
+      this.kit.goto("HDCutScene");
     }
-  }
-
-  // ── Interaction ────────────────────────────────────────────────────────────
-
-  private handleInteract(): void {
-    if (this.mode === "dialogue") {
-      this.advanceDialogue();
-      return;
-    }
-
-    if (this.mode === "complete") {
-      if (this.dialogueBox.advance() !== "done") return;
-      resetGameState();
-      this.scene.restart();
-      return;
-    }
-
-    const px = this.mover.x;
-    const py = this.mover.y;
-    const near = (pos: { x: number; y: number }) =>
-      Math.hypot(px - pos.x, py - pos.y) < INTERACT_PX;
-
-    if (near(WIFE_PX))     { this.interactWithWife();            return; }
-    if (near(DRYER_PX))    { this.interactWithDryer();           return; }
-    if (near(TILEROOM_PX)) { this.scene.start("TileRoomScene");  return; }
-
-    this.startDialogue(["No crisis within reach. This is suspicious."]);
-  }
-
-  // ── Quest dialogues ────────────────────────────────────────────────────────
-
-  private interactWithWife(): void {
-    const wifeCheckIn = this.getWifeCheckInLines();
-
-    if (this.state.quest.questId === "fix-bathroom") {
-      this.interactWithWifeBathroomQuest(wifeCheckIn);
-      return;
-    }
-
-    if (this.state.flags.dryerFixed) {
-      this.startDialogue([
-        { speaker: "WIFE", text: "The dryer is still working. I am choosing to believe this is permanent." },
-        { speaker: "DAD", text: "That's wise. Also brave." },
-        ...wifeCheckIn,
-      ]);
-      return;
-    }
-
-    if (this.state.flags.bossDefeated) {
-      if (this.state.flags.circuitBreakerOff) {
-        setActiveQuestStep(this.state, "restore-power");
-        this.updateQuestText("POWER OUT");
-        this.startDialogue([
-          { speaker: "WIFE",       text: "Now, nothing works! What did you do??" },
-          { speaker: "DAD'S BRAIN", text: "Dude. Dryers don't work without power." },
-          { speaker: "DAD",        text: "Small administrative follow-up. Totally under control." },
-          { speaker: "NARRATOR",   text: "The basement breaker waits for Dad's victory lap." },
-          ...wifeCheckIn,
-        ]);
-        return;
-      }
-
-      completeQuestStep(this.state, "return-to-wife");
-      this.state.flags.dryerFixed = true;
-      this.updateQuestText("DRYER FIXED");
-      saveGameState(this.state);
-      this.startDialogue([
-        { speaker: "DAD",      text: getDadLine("toWife", "greeting") },
-        { speaker: "WIFE",     text: "You fixed it? The towels are actually dry?" },
-        ...dialogue.victory.map((text) => ({ speaker: "NARRATOR", text })),
-        { speaker: "DAD",      text: "What can I say? The Dad shows up, identifies the problem, defeats the problem, and restores domestic order." },
-        { speaker: "WIFE",     text: "It only took you one garage expedition, one basement expedition, and a full appliance duel." },
-        { speaker: "DAD",      text: "That's called commitment. Also, I got a pretty good arm workout in. Honestly? Feeling a little swole." },
-        { speaker: "DAD",      text: "You should feel these arms right now. Big flex." },
-        { speaker: "WIFE",     text: "Aw. Look at you." },
-        { speaker: "WIFE",     text: "You wish. Your to-do list is way too long." },
-        { speaker: "WIFE",     text: "Thank you. Sincerely. I will be impressed for at least the next ninety seconds." },
-        { speaker: "KID",      text: "Hey Dad, the toilet is doing that thing again." },
-        { speaker: "DAD",      text: "That's not vague at all." },
-        { speaker: "WIFE",     text: "Now... about the upstairs toilet." },
-        { speaker: "DAD",      text: "..." },
-        { speaker: "WIFE",     text: "It's been making that sound again." },
-        { speaker: "DAD'S BRAIN", text: "There is always another sound." },
-        { speaker: "DAD",      text: "I handled a live heating coil today. The toilet doesn't scare me." },
-        { speaker: "WIFE",     text: "It should." },
-        { speaker: "NARRATOR", text: "The Dad's brief moment of peace ends. Upstairs, something gurgles." },
-        { speaker: "DAD'S BRAIN", text: "One disaster at a time. That's the code." },
-        ...wifeCheckIn,
-        { speaker: "DAD",      text: getDadLine("selfTalk", "victory") },
-      ], () => {
-        this.state.quest = { questId: "fix-bathroom", activeStepId: "talk-to-wife-bathroom", completedStepIds: [] };
-        completeQuestStep(this.state, "talk-to-wife-bathroom");
-        setActiveQuestStep(this.state, "visit-home-depot");
-        saveGameState(this.state);
-        this.updateQuestText();
-        this.mode = "explore";
-        this.dialogueBox.hide();
-      });
-      return;
-    }
-
-    // talkedToWife is set by the opening cutscene — no replay needed.
-    // In-game wife dialogue is the "check-in / nag" branch.
-    this.startDialogue([
-      { speaker: "DAD'S BRAIN", text: getDadBrainLine("talkToWife") },
-      { speaker: "DAD",  text: getDadLine("toWife", "greeting") },
-      { speaker: "WIFE", text: "How's the dryer coming?" },
-      { speaker: "DAD",  text: getDadLine("toWife", "questReceived") },
-      ...wifeCheckIn,
-    ]);
-  }
-
-  private interactWithWifeBathroomQuest(wifeCheckIn: DialogueLine[]): void {
-    if (this.state.flags.bathroomFixed) {
-      this.startDialogue([
-        { speaker: "WIFE", text: "The bathroom is still working. I'm choosing to believe this is also permanent." },
-        ...wifeCheckIn,
-      ]);
-      return;
-    }
-
-    if (this.state.flags.clogBossDefeated) {
-      completeQuestStep(this.state, "mop-up");
-      completeQuestStep(this.state, "return-to-wife-bathroom");
-      this.state.flags.bathroomFixed = true;
-      this.updateQuestText("BATHROOM FIXED");
-      saveGameState(this.state);
-      this.startDialogue([
-        { speaker: "DAD",      text: "The toilet has been... handled." },
-        { speaker: "WIFE",     text: "Handled how?" },
-        { speaker: "DAD",      text: "With confidence. And the Plunger of the Gods." },
-        { speaker: "WIFE",     text: "We're going to need that receipt for our records." },
-        { speaker: "NARRATOR", text: "Somewhere upstairs, a toilet flushes with newfound dignity." },
-        ...wifeCheckIn,
-        { speaker: "DAD",      text: getDadLine("selfTalk", "victory") },
-      ]);
-      return;
-    }
-
-    if (!this.state.flags.toiletInspected) {
-      this.startDialogue([
-        { speaker: "WIFE", text: "Have you looked at the toilet yet?" },
-        { speaker: "DAD",  text: "On my way. Building up courage." },
-        ...wifeCheckIn,
-      ]);
-      return;
-    }
-
-    if (!this.state.flags.ownsPlunger) {
-      this.startDialogue([
-        { speaker: "WIFE", text: "Did you get a plunger yet?" },
-        { speaker: "DAD",  text: "Working on it. Might need a Dome Hepot run." },
-        ...wifeCheckIn,
-      ]);
-      return;
-    }
-
-    this.startDialogue([
-      { speaker: "WIFE", text: "How's the bathroom situation?" },
-      { speaker: "DAD",  text: "Armed and ready. The clog has no idea what's coming." },
-      ...wifeCheckIn,
-    ]);
-  }
-
-  private getWifeCheckInLines(): DialogueLine[] {
-    const player = this.state.player;
-    const nextLevelXp = getNextLevelXp(player.level);
-    const xpLine = nextLevelXp === undefined
-      ? "You're already at peak Dad, statistically speaking. I am as surprised as you are."
-      : `You need ${Math.max(0, nextLevelXp - player.xp)} XP before your next level.`;
-
-    const wasHurt = player.hp < player.maxHp;
-    player.hp = player.maxHp;
-    saveGameState(this.state);
-
-    return [
-      { speaker: "WIFE", text: xpLine },
-      {
-        speaker: "WIFE",
-        text: wasHurt
-          ? "Come here. Kiss. There. Try not to lose a fight to lint."
-          : "You still get a kiss. Preventative maintenance.",
-      },
-      { speaker: "SYSTEM", text: `HP RESTORED TO ${player.maxHp}.` },
-    ];
-  }
-
-  private interactWithDryer(): void {
-    if (!this.state.flags.inspectedDryer) {
-      this.state.flags.inspectedDryer = true;
-      completeQuestStep(this.state, "inspect-dryer");
-      setActiveQuestStep(this.state, "defeat-heating-coil");
-      this.updateQuestText();
-    }
-
-    if (this.state.flags.bossDefeated) {
-      if (this.state.flags.circuitBreakerOff) {
-        setActiveQuestStep(this.state, "restore-power");
-        this.updateQuestText("POWER OUT");
-        this.startDialogue([
-          { speaker: "NARRATOR",   text: "The dryer is repaired, but completely lifeless." },
-          { speaker: "DAD'S BRAIN", text: "Dude. Dryers don't work without power." },
-          { speaker: "DAD",        text: "Right. Basement. Breaker. Victory, but with paperwork." },
-        ]);
-        return;
-      }
-      this.startDialogue([
-        { speaker: "NARRATOR", text: "The dryer radiates the calm authority of a repaired appliance." },
-        { speaker: "DAD",      text: getDadLine("selfTalk", "victory") },
-      ]);
-      return;
-    }
-
-    this.startDialogue([
-      { speaker: "DAD'S BRAIN", text: getDadBrainLine("inspectDryer") },
-      ...dialogue.dryer.map((text) => ({ speaker: "NARRATOR", text })),
-      { speaker: "DAD",      text: getDadLine("selfTalk", "frustrated") },
-      { speaker: "NARRATOR", text: "The basement stairs are in the centre hallway." },
-    ]);
-  }
-
-  // ── Dialogue helpers ───────────────────────────────────────────────────────
-
-  private startDialogue(lines: DialogueInput[], onComplete?: () => void): void {
-    this.mode = "dialogue";
-    this.showMessage(this.dialogueRunner.start(lines, onComplete));
-  }
-
-  private advanceDialogue(): void {
-    if (this.dialogueBox.advance() !== "done") return;
-    const next = this.dialogueRunner.advance();
-    if (next) { this.showMessage(next); return; }
-    if (this.mode === "dialogue") {
-      this.mode = "explore";
-      this.dialogueRunner.clear();
-      this.dialogueBox.hide();
-    }
-  }
-
-  // ── UI ─────────────────────────────────────────────────────────────────────
-
-  private createUi(): void {
-    this.questBox = this.add.rectangle(8, 8, 260, 16, 0xfacc15)
-      .setOrigin(0, 0)
-      .setScrollFactor(0)
-      .setVisible(false);
-    this.questText = addPixelText(this, 12, 11, "", 8)
-      .setTint(0x111827)
-      .setScrollFactor(0)
-      .setVisible(false);
-    this.dialogueBox = new DialogueBox(this);
-  }
-
-  private updateQuestPrompt(): void {
-    const visible = this.questKey.isDown;
-    this.questBox.setVisible(visible);
-    this.questText.setVisible(visible);
-  }
-
-  private updateQuestText(prefix?: string): void {
-    const quest     = getQuest(this.state.quest.questId);
-    const stepLabel = getQuestStepLabel(this.state.quest.questId, this.state.quest.activeStepId);
-    const label     = prefix
-      ? `${prefix} - ${stepLabel}`
-      : `${quest.countdownLabel} - ${stepLabel}`;
-    setPixelText(this.questText, label);
-  }
-
-  private showMessage(message: DialogueLine | string): void {
-    const line = typeof message === "string" ? { speaker: "DAD", text: message } : message;
-    this.dialogueBox.show(line.text, this.getSpeakerLabel(line.speaker), line.speaker);
-  }
-
-  private getSpeakerLabel(speaker: string): string {
-    return speaker === "DAD" ? this.state.player.name || "DAD" : speaker;
   }
 }
