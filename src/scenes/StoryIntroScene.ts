@@ -175,11 +175,14 @@ export class StoryIntroScene extends Phaser.Scene {
 
     // Mark the opening quest beat as complete so NeighborhoodScene
     // starts in the correct state without replaying the wife's intro.
+    // Only on a new game. A loaded save is already past this beat.
     const state = getGameState();
-    state.flags.talkedToWife = true;
-    completeQuestStep(state, "talk-to-wife");
-    setActiveQuestStep(state, "inspect-dryer");
-    saveGameState(state);
+    if (state.quest.questId === "fix-dryer" && !state.quest.completedStepIds.includes("talk-to-wife")) {
+      state.flags.talkedToWife = true;
+      completeQuestStep(state, "talk-to-wife");
+      setActiveQuestStep(state, "inspect-dryer");
+      saveGameState(state);
+    }
 
     this.cameras.main.fadeOut(800, 5, 10, 15);
     this.cameras.main.once("camerafadeoutcomplete", () => {

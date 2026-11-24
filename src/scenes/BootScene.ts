@@ -295,7 +295,10 @@ export class BootScene extends Phaser.Scene {
     generatePlaceholders(this);
 
     loadSavedGameState() ?? resetGameState();
-    const nextScene = getGameState().player.name ? "StoryIntroScene" : "NameEntryScene";
+    // New game: name entry, then the intro. A save past the intro continues in the house.
+    const saved = getGameState();
+    const pastIntro = saved.flags.talkedToWife || saved.quest.completedStepIds.includes("talk-to-wife") || saved.completedQuestIds.length > 0;
+    const nextScene = !saved.player.name ? "NameEntryScene" : pastIntro ? "NeighborhoodScene" : "StoryIntroScene";
     this.scene.start(nextScene);
   }
 }
