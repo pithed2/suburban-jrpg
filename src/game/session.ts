@@ -62,6 +62,8 @@ function normalizeGameState(state: GameState): GameState {
   state.flags.devRandomEncountersDisabled ??= fallback.flags.devRandomEncountersDisabled;
   state.flags.basementFirstAidOpened ??= fallback.flags.basementFirstAidOpened;
   state.openedChestIds ??= fallback.openedChestIds;
+  state.completedQuestIds ??= inferCompletedQuests(state);
+  state.flags = { ...fallback.flags, ...state.flags };
 
   if (state.player.equipment.weaponId === "percussive-maintenance") {
     state.player.equipment.weaponId = "two-hands";
@@ -72,4 +74,12 @@ function normalizeGameState(state: GameState): GameState {
   }
 
   return state;
+}
+
+/** Saves from before completedQuestIds existed: infer from the old flags. */
+function inferCompletedQuests(state: GameState): string[] {
+  const done: string[] = [];
+  if (state.flags.dryerFixed) done.push("fix-dryer");
+  if (state.flags.bathroomFixed) done.push("fix-bathroom");
+  return done;
 }

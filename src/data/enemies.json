@@ -97,7 +97,7 @@
       }
     },
     "initiative": {
-      "baseAmbushChance": 0.10,
+      "baseAmbushChance": 0.1,
       "levelAdvantageBonus": 0.03,
       "maxAmbushChance": 0.22,
       "ambushMessage": "An Angry Dust Bunny launches itself from beneath the dryer before Dad can react."
@@ -153,8 +153,15 @@
     "initiative": {
       "baseAmbushChance": 0.25,
       "levelAdvantageBonus": 0.03,
-      "maxAmbushChance": 0.40,
+      "maxAmbushChance": 0.4,
       "ambushMessage": "The Freaky Icky Spider drops from the ceiling directly above Dad."
+    },
+    "battleStartMood": "spider",
+    "battleView": {
+      "backdrop": "#1a0a2e",
+      "width": 60,
+      "height": 52,
+      "y": 88
     }
   },
   {
@@ -171,16 +178,22 @@
     "emotionalMeaning": "Appliance dread",
     "attackPattern": [
       {
-        "message": "Radiates warranty anxiety",
-        "damage": 3
+        "message": "casts Badass Zap",
+        "damage": 12,
+        "damageMin": 10,
+        "damageMax": 15
       },
       {
-        "message": "Snaps with static judgment",
-        "damage": 4
+        "message": "surges with fully powered appliance hatred",
+        "damage": 12,
+        "damageMin": 10,
+        "damageMax": 15
       },
       {
-        "message": "Whispers about installation fees",
-        "damage": 2
+        "message": "throws live current like it pays the mortgage",
+        "damage": 12,
+        "damageMin": 10,
+        "damageMax": 15
       }
     ],
     "actionResponses": {
@@ -205,7 +218,53 @@
       "levelAdvantageBonus": 0.03,
       "maxAmbushChance": 0.12,
       "ambushMessage": "The Evil Heating Coil glows before you can brace yourself."
-    }
+    },
+    "boss": true,
+    "music": "mini-boss",
+    "banter": "dryerBoss",
+    "battleView": {
+      "width": 48,
+      "height": 42,
+      "y": 95
+    },
+    "runChance": 0.38,
+    "runMessages": {
+      "success": "Dad dives away from the live dryer.\nSomehow, dignity escapes too.",
+      "fail": "Dad looks for an exit.\nThe coil blocks the retreat."
+    },
+    "modifiers": [
+      {
+        "when": {
+          "flags": [
+            "circuitBreakerOff"
+          ]
+        },
+        "attackPattern": [
+          {
+            "message": "casts Static Shock of a Random Sock",
+            "damage": 7,
+            "damageMin": 6,
+            "damageMax": 8
+          },
+          {
+            "message": "crackles with low-power spite",
+            "damage": 7,
+            "damageMin": 6,
+            "damageMax": 8
+          },
+          {
+            "message": "snaps with unplugged-but-still-angry static",
+            "damage": 7,
+            "damageMin": 6,
+            "damageMax": 8
+          }
+        ],
+        "runChance": 0.65,
+        "runMessages": {
+          "success": "Dad retreats with uncommon wisdom.\nThe powered-down coil cannot stop him."
+        }
+      }
+    ]
   },
   {
     "id": "single-ply-sam",
@@ -465,6 +524,15 @@
       "levelAdvantageBonus": 0.03,
       "maxAmbushChance": 0.12,
       "ambushMessage": "The Clogged Toilet groans ominously before Dad can brace himself."
+    },
+    "boss": true,
+    "music": "mini-boss",
+    "banter": "cloggedToilet",
+    "battleView": {
+      "backdrop": "#1e3a5f",
+      "width": 48,
+      "height": 42,
+      "y": 95
     }
   }
 ]

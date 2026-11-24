@@ -1,0 +1,152 @@
+{
+  "id": "house",
+  "label": "House",
+  "hud": "countdown",
+  "returnTo": {
+    "scene": "NeighborhoodScene"
+  },
+  "hotspots": [
+    {
+      "id": "wife",
+      "col": 7,
+      "row": 6,
+      "radius": 2.25
+    },
+    {
+      "id": "dryer",
+      "col": 27,
+      "row": 6,
+      "radius": 2.25
+    },
+    {
+      "id": "tileroom",
+      "col": 28,
+      "row": 14,
+      "radius": 2.25
+    }
+  ],
+  "events": {
+    "default": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "DAD",
+                "No crisis within reach. This is suspicious."
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "tileroom": [
+      {
+        "do": [
+          {
+            "goto": "TileRoomScene"
+          }
+        ]
+      }
+    ],
+    "dryer": [
+      {
+        "when": {
+          "notFlags": [
+            "inspectedDryer"
+          ]
+        },
+        "continue": true,
+        "do": [
+          {
+            "set": {
+              "inspectedDryer": true
+            }
+          },
+          {
+            "complete": "inspect-dryer"
+          },
+          {
+            "step": "defeat-heating-coil"
+          }
+        ]
+      },
+      {
+        "when": {
+          "flags": [
+            "bossDefeated",
+            "circuitBreakerOff"
+          ]
+        },
+        "do": [
+          {
+            "step": "restore-power"
+          },
+          {
+            "hud": "POWER OUT"
+          },
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The dryer is repaired, but completely lifeless."
+              ],
+              [
+                "DAD'S BRAIN",
+                "Dude. Dryers don't work without power."
+              ],
+              [
+                "DAD",
+                "Right. Basement. Breaker. Victory, but with paperwork."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "when": {
+          "flags": [
+            "bossDefeated"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The dryer radiates the calm authority of a repaired appliance."
+              ],
+              {
+                "speaker": "DAD",
+                "voice": "dad:selfTalk:victory"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "do": [
+          {
+            "say": [
+              {
+                "speaker": "DAD'S BRAIN",
+                "voice": "brain:inspectDryer"
+              },
+              {
+                "narrate": "dryer"
+              },
+              {
+                "speaker": "DAD",
+                "voice": "dad:selfTalk:frustrated"
+              },
+              [
+                "NARRATOR",
+                "The basement stairs are in the centre hallway."
+              ]
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

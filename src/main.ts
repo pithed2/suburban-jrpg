@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import { BasementScene } from "./scenes/BasementScene";
 import { BathroomScene } from "./scenes/BathroomScene";
+import { BattleScene } from "./scenes/BattleScene";
 import { BootScene } from "./scenes/BootScene";
 import { GarageScene } from "./scenes/GarageScene";
 import { HDCutScene } from "./scenes/HDCutScene";
@@ -33,8 +34,13 @@ const config: Phaser.Types.Core.GameConfig = {
     height: 180,
     zoom: 3,
   },
-  scene: [BootScene, NameEntryScene, StoryIntroScene, NeighborhoodScene, BasementScene, GarageScene, TileRoomScene, HDCutScene, HardwareStoreScene, BathroomScene],
+  scene: [BootScene, NameEntryScene, StoryIntroScene, NeighborhoodScene, BasementScene, GarageScene, TileRoomScene, HDCutScene, HardwareStoreScene, BathroomScene, BattleScene],
 };
 
 logger.info("starting game", { width: 320, height: 180, zoom: 3 });
-new Phaser.Game(config);
+const game = new Phaser.Game(config);
+
+// Dev builds expose the game for console poking and automated playtests.
+if (import.meta.env.DEV) {
+  (window as unknown as { __game: Phaser.Game }).__game = game;
+}

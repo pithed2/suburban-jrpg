@@ -1,15 +1,10 @@
 import Phaser from "phaser";
 import { CharacterSprite } from "../game/CharacterSprite";
 import { DAD_DEF, NPC8_DEF } from "../game/characterDefs";
-import { items } from "../game/content";
-import { installDevShortcuts } from "../game/devShortcuts";
-import { DialogueBox } from "../game/DialogueBox";
-import { DialogueRunner, type DialogueInput, type DialogueLine } from "../game/DialogueRunner";
-import { GameMenu } from "../game/GameMenu";
+import { getArea, items } from "../game/content";
+import { equipItem } from "../game/engine/script";
+import { FieldKit } from "../game/FieldKit";
 import { GridMover } from "../game/GridMover";
-import { PlayerStatsPanel } from "../game/PlayerStatsPanel";
-import { getGameState, saveGameState } from "../game/session";
-import { completeQuestStep, setActiveQuestStep, type GameState } from "../game/state";
 import { addPixelText, setPixelText } from "../game/uiText";
 
 const TILE = 16;
@@ -57,14 +52,8 @@ const CLERK_ROW =  6;
 const SPAWN_COL = 13;
 const SPAWN_ROW =  1;
 
-const SHOP_ITEMS = [
-  "plumbing-snake",
-  "plunger-of-the-gods",
-  "tool-belt",
-  "steel-toe-boots",
-  "cold-coffee",
-  "energy-drink",
-] as const;
+/** Stock comes from src/data/areas/homedepot.json -> shop. */
+const SHOP_ITEMS: string[] = getArea("homedepot").shop ?? [];
 
 // Dept sign data: [centerCol, label, rowY]
 const DEPT_SIGNS: [number, string][] = [
@@ -76,20 +65,13 @@ const DEPT_SIGNS: [number, string][] = [
   [24.5, "ELECT."],
 ];
 
-type SceneMode = "explore" | "dialogue" | "shop";
 
 export class HardwareStoreScene extends Phaser.Scene {
-  private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
-  private interactKey!: Phaser.Input.Keyboard.Key;
   private escapeKey!: Phaser.Input.Keyboard.Key;
   private mover!: GridMover;
+  private kit!: FieldKit;
   private clerkChar!: CharacterSprite;
-  private dialogueBox!: DialogueBox;
-  private statsPanel!: PlayerStatsPanel;
-  private menu!: GameMenu;
-  private mode: SceneMode = "explore";
-  private state!: GameState;
-  private readonly dialogueRunner = new DialogueRunner();
+  private shopOpen = false;
 
   // Shop UI elements
   private shopPanel!: Phaser.GameObjects.Rectangle;
@@ -106,69 +88,46 @@ export class HardwareStoreScene extends Phaser.Scene {
   }
 
   create(): void {
-    installDevShortcuts(this);
-
-    this.state = getGameState();
-    this.mode  = "explore";
-    this.cursors    = this.input.keyboard!.createCursorKeys();
-    this.interactKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    this.escapeKey   = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+    this.kit = new FieldKit(this, {
+      areaId: "homedepot",
+      mover: () => this.mover,
+      statsPanel: true,
+      onHotspot: (id) => {
+        if (id !== "clerk") return false;
+        this.openShop();
+        return true;
+      },
+    });
+    this.shopOpen = false;
+    this.escapeKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
 
     this.drawTiles();
     this.placeDecorations();
     this.placeClerk();
     this.placePlayer();
+    this.kit.create();
     this.createUi();
-    this.menu = new GameMenu(this, () => this.state);
 
     this.cameras.main.setBounds(0, 0, WORLD_W, WORLD_H);
     this.cameras.main.startFollow(this.mover.phaserSprite, true, 0.1, 0.1);
 
-    if (this.state.quest.activeStepId === "visit-home-depot") {
-      completeQuestStep(this.state, "visit-home-depot");
-      setActiveQuestStep(this.state, "find-plunger");
-    }
-    this.state.flags.visitedHomeDepot = true;
-    saveGameState(this.state);
-
-    this.startDialogue([
-      { speaker: "NARRATOR",    text: "The automatic doors part. Fluorescent lights hum. Somewhere, a forklift beeps authoritatively." },
-      { speaker: "NARRATOR",    text: "This is Dad's cathedral. He could walk this place blind. He basically already does." },
-      { speaker: "DAD'S BRAIN", text: "Talk to the clerk. Aisle 7. He has seen things. All of them." },
-    ]);
+    this.kit.enter();
   }
 
   update(_time: number, delta: number): void {
-    this.dialogueBox.update(delta);
-    this.menu.update();
-
-    if (this.menu.isOpen()) {
-      this.statsPanel.hide();
-      return;
-    }
-
-    if (this.mode === "shop") {
+    if (this.shopOpen) {
       this.handleShopInput();
       return;
     }
 
-    if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
-      this.handleInteract();
-    }
-
-    if (this.mode !== "explore") {
-      this.statsPanel.hide();
-      return;
-    }
+    if (!this.kit.update(delta)) return;
 
     this.mover.update(
-      this.cursors,
+      this.kit.cursors,
       delta,
       (col, row) => this.canWalkTo(col, row),
       (col, row) => this.onPlayerLand(col, row),
     );
-
-    this.statsPanel.update(delta, !this.mover.isMoving, this.state);
   }
 
   // ── Tiles ──────────────────────────────────────────────────────────────────
@@ -334,49 +293,23 @@ export class HardwareStoreScene extends Phaser.Scene {
   }
 
   private onPlayerLand(col: number, row: number): void {
-    if (MAP[row][col] === EXIT && this.mode === "explore") {
-      this.startDialogue(
-        [{ speaker: "NARRATOR", text: "Dad drives home, plunder secured. The cruiser smells like possibility. And lumber." }],
-        () => this.scene.start("NeighborhoodScene", { spawn: "homedepot" }),
-      );
+    if (MAP[row][col] === EXIT) {
+      void this.kit.run("exit");
     }
-  }
-
-  // ── Interaction ────────────────────────────────────────────────────────────
-
-  private handleInteract(): void {
-    if (this.mode === "dialogue") {
-      this.advanceDialogue();
-      return;
-    }
-
-    const px = this.mover.x;
-    const py = this.mover.y;
-    const clerkX = CLERK_COL * TILE + TILE / 2;
-    const clerkY = CLERK_ROW * TILE + TILE / 2;
-    const dist = Math.hypot(px - clerkX, py - clerkY);
-
-    if (dist < TILE * 1.8) {
-      this.openShop();
-      return;
-    }
-
-    this.startDialogue([
-      { speaker: "NARRATOR", text: "Aisle after aisle of solutions to problems Dad doesn't have yet. And a few he does." },
-    ]);
   }
 
   // ── Shop ───────────────────────────────────────────────────────────────────
 
   private openShop(): void {
-    this.mode = "shop";
+    this.shopOpen = true;
     this.shopSelected = 0;
     this.setShopVisible(true);
     this.renderShop();
   }
 
   private closeShop(): void {
-    this.mode = "explore";
+    this.shopOpen = false;
+    this.input.keyboard?.resetKeys();
     this.setShopVisible(false);
   }
 
@@ -395,15 +328,15 @@ export class HardwareStoreScene extends Phaser.Scene {
       this.closeShop();
       return;
     }
-    if (Phaser.Input.Keyboard.JustDown(this.cursors.up)) {
+    if (Phaser.Input.Keyboard.JustDown(this.kit.cursors.up)) {
       this.shopSelected = Phaser.Math.Wrap(this.shopSelected - 1, 0, SHOP_ITEMS.length + 1);
       this.renderShop();
     }
-    if (Phaser.Input.Keyboard.JustDown(this.cursors.down)) {
+    if (Phaser.Input.Keyboard.JustDown(this.kit.cursors.down)) {
       this.shopSelected = Phaser.Math.Wrap(this.shopSelected + 1, 0, SHOP_ITEMS.length + 1);
       this.renderShop();
     }
-    if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
+    if (Phaser.Input.Keyboard.JustDown(this.kit.interactKey)) {
       if (this.shopSelected === SHOP_ITEMS.length) {
         this.closeShop();
         return;
@@ -413,39 +346,34 @@ export class HardwareStoreScene extends Phaser.Scene {
   }
 
   private buyItem(itemId: string): void {
+    const state = this.kit.state;
     const item = items.find((i) => i.id === itemId);
     if (!item || item.price === undefined) return;
 
     const isConsumable = item.kind === "consumable";
 
-    if (!isConsumable && this.state.player.inventory.includes(itemId)) {
+    if (!isConsumable && state.player.inventory.includes(itemId)) {
       setPixelText(this.shopDetailText, `ALREADY OWNED.\nDAD DOESN'T NEED TWO.`);
       return;
     }
-    if (this.state.player.cash < item.price) {
-      setPixelText(this.shopDetailText, `NOT ENOUGH LOVE POINTS.\n\nNEED ${item.price - this.state.player.cash} MORE.\nGO FIGHT SOMETHING.`);
+    if (state.player.cash < item.price) {
+      setPixelText(this.shopDetailText, `NOT ENOUGH LOVE POINTS.\n\nNEED ${item.price - state.player.cash} MORE.\nGO FIGHT SOMETHING.`);
       return;
     }
 
-    this.state.player.cash -= item.price;
-    this.state.player.inventory.push(itemId);
-
+    state.player.cash -= item.price;
     let resultLine = `PURCHASED.\n\n"${item.description}"`;
 
-    if (item.kind === "weapon") {
-      this.state.player.equipment.weaponId = itemId;
-      this.state.flags.ownsPlunger = true;
-      if (this.state.quest.activeStepId === "find-plunger") {
-        completeQuestStep(this.state, "find-plunger");
-        setActiveQuestStep(this.state, "inspect-toilet");
-      }
+    if (item.kind === "weapon" || item.kind === "armor") {
+      equipItem(state, itemId);
       resultLine = `PURCHASED + EQUIPPED.\n\n"${item.description}"`;
-    } else if (item.kind === "armor") {
-      this.state.player.equipment.armorId = itemId;
-      resultLine = `PURCHASED + EQUIPPED.\n\n"${item.description}"`;
+    } else {
+      state.player.inventory.push(itemId);
     }
 
-    saveGameState(this.state);
+    // Quest hooks such as "buying a plunger completes the step" live in data.
+    void this.kit.run(`buy:${itemId}`).then(() => this.kit.save());
+    this.kit.save();
     setPixelText(this.shopDetailText, resultLine);
     this.renderShop();
   }
@@ -454,7 +382,7 @@ export class HardwareStoreScene extends Phaser.Scene {
     // Item list
     const lines = SHOP_ITEMS.map((id, i) => {
       const item = items.find((it) => it.id === id);
-      const owned   = item?.kind !== "consumable" && this.state.player.inventory.includes(id);
+      const owned   = item?.kind !== "consumable" && this.kit.state.player.inventory.includes(id);
       const cursor  = i === this.shopSelected ? ">" : " ";
       const priceTag = owned ? "(OWNED)" : `${item?.price} ♥`;
       return `${cursor} ${item?.name?.padEnd(22, " ")}${priceTag}`;
@@ -464,12 +392,12 @@ export class HardwareStoreScene extends Phaser.Scene {
     setPixelText(this.shopItemsText, lines.join("\n"));
 
     // Balance
-    setPixelText(this.shopBalanceText, `BALANCE: ${this.state.player.cash} ♥`);
+    setPixelText(this.shopBalanceText, `BALANCE: ${this.kit.state.player.cash} ♥`);
 
     // Detail for selected item
     if (this.shopSelected < SHOP_ITEMS.length) {
       const item = items.find((it) => it.id === SHOP_ITEMS[this.shopSelected]);
-      const owned = item?.kind !== "consumable" && this.state.player.inventory.includes(SHOP_ITEMS[this.shopSelected]);
+      const owned = item?.kind !== "consumable" && this.kit.state.player.inventory.includes(SHOP_ITEMS[this.shopSelected]);
       if (!owned) {
         setPixelText(this.shopDetailText, item?.description ?? "");
       }
@@ -478,27 +406,9 @@ export class HardwareStoreScene extends Phaser.Scene {
     }
   }
 
-  // ── Dialogue ───────────────────────────────────────────────────────────────
-
-  private startDialogue(lines: DialogueInput[], onComplete?: () => void): void {
-    this.mode = "dialogue";
-    this.showMessage(this.dialogueRunner.start(lines, onComplete));
-  }
-
-  private advanceDialogue(): void {
-    if (this.dialogueBox.advance() !== "done") return;
-    const next = this.dialogueRunner.advance();
-    if (next) { this.showMessage(next); return; }
-    this.mode = "explore";
-    this.dialogueRunner.clear();
-    this.dialogueBox.hide();
-  }
-
   // ── UI ─────────────────────────────────────────────────────────────────────
 
   private createUi(): void {
-    this.dialogueBox = new DialogueBox(this);
-    this.statsPanel  = new PlayerStatsPanel(this);
 
     // Panel: 244 wide × 156 tall, screen-centered at (160, 90)
     // → left=38, top=12, right=282, bottom=168
@@ -555,14 +465,5 @@ export class HardwareStoreScene extends Phaser.Scene {
       .setScrollFactor(0)
       .setVisible(false)
       .setDepth(102);
-  }
-
-  private showMessage(message: DialogueLine | string): void {
-    const line = typeof message === "string" ? { speaker: "NARRATOR", text: message } : message;
-    this.dialogueBox.show(line.text, this.getSpeakerLabel(line.speaker), line.speaker);
-  }
-
-  private getSpeakerLabel(speaker: string): string {
-    return speaker === "DAD" ? this.state.player.name || "DAD" : speaker;
   }
 }

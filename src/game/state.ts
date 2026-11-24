@@ -1,18 +1,5 @@
-export type QuestStepId =
-  | "talk-to-wife"
-  | "inspect-dryer"
-  | "find-wrench"
-  | "flip-breaker"
-  | "defeat-heating-coil"
-  | "restore-power"
-  | "return-to-wife"
-  | "talk-to-wife-bathroom"
-  | "visit-home-depot"
-  | "find-plunger"
-  | "inspect-toilet"
-  | "defeat-clogged-toilet"
-  | "mop-up"
-  | "return-to-wife-bathroom";
+/** Quest step ids live in src/data/quests/*.json. */
+export type QuestStepId = string;
 
 export interface QuestProgress {
   questId: string;
@@ -39,29 +26,18 @@ export interface PlayerState {
   };
 }
 
-export interface GameFlags {
-  talkedToWife: boolean;
-  inspectedDryer: boolean;
-  foundWrench: boolean;
-  circuitBreakerOff: boolean;
-  bossDefeated: boolean;
-  dryerFixed: boolean;
-  devRandomEncountersDisabled: boolean;
-  basementFirstAidOpened: boolean;
-  visitedHomeDepot: boolean;
-  ownsPlunger: boolean;
-  toiletInspected: boolean;
-  clogBossDefeated: boolean;
-  bathroomFixed: boolean;
-  toiletPaperFound: boolean;
-  rubberDuckFound: boolean;
-}
+/**
+ * Story flags. Quest data can read and write any flag name, so this is an open
+ * map. Unknown flags read as undefined (false).
+ */
+export type GameFlags = Record<string, boolean>;
 
 export interface GameState {
   player: PlayerState;
   quest: QuestProgress;
   flags: GameFlags;
   openedChestIds: string[];
+  completedQuestIds: string[];
 }
 
 export function createInitialGameState(): GameState {
@@ -107,6 +83,7 @@ export function createInitialGameState(): GameState {
       rubberDuckFound: false,
     },
     openedChestIds: [],
+    completedQuestIds: [],
   };
 }
 

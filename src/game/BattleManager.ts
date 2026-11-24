@@ -1,5 +1,4 @@
-import Phaser from "phaser";
-import { items, type EnemyActionResponse, type EnemyAttack, type EnemyDefinition } from "./content";
+import { getItem, type EnemyActionResponse, type EnemyAttack, type EnemyDefinition, type EnemyModifier } from "./content";
 import { chooseDadSkill, type DadSkillDefinition } from "./dadSkills";
 import {
   applyExperienceAndLevelUps,
@@ -9,6 +8,8 @@ import {
   rollHeroDamage,
   rollRunSuccess,
 } from "./dragonWarriorMath";
+import { matches } from "./engine/conditions";
+import { clamp, pick, random, randomInt } from "./engine/rng";
 import type { GameState } from "./state";
 
 export interface BattleSnapshot {
@@ -37,31 +38,89 @@ export interface BattleStartResult extends BattleSnapshot {
   ambushed: boolean;
   message?: string;
   defeated?: boolean;
+  /** Lines from active modifiers, e.g. "The coil is powered down." */
+  modifierMessages: string[];
 }
 
+/** The enemy as it fights right now: base data plus every active modifier. */
+export interface ResolvedEnemy {
+  attackPattern: EnemyAttack[];
+  attackScale: number;
+  defenseScale: number;
+  heroDamageScale: number;
+  runChance?: number;
+  runMessages: { success?: string; fail?: string };
+  banter?: string;
+  startMessages: string[];
+}
+
+export function resolveEnemy(enemy: EnemyDefinition, state: GameState): ResolvedEnemy {
+  const resolved: ResolvedEnemy = {
+    attackPattern: enemy.attackPattern,
+    attackScale: 1,
+    defenseScale: 1,
+    heroDamageScale: 1,
+    runChance: enemy.runChance,
+    runMessages: { ...enemy.runMessages },
+    banter: enemy.banter,
+    startMessages: [],
+  };
+
+  for (const modifier of enemy.modifiers ?? []) {
+    if (!matches(state, modifier.when)) continue;
+    applyModifier(resolved, modifier);
+  }
+
+  return resolved;
+}
+
+function applyModifier(target: ResolvedEnemy, modifier: EnemyModifier): void {
+  if (modifier.attackPattern) target.attackPattern = modifier.attackPattern;
+  if (modifier.attackScale !== undefined) target.attackScale *= modifier.attackScale;
+  if (modifier.defenseScale !== undefined) target.defenseScale *= modifier.defenseScale;
+  if (modifier.heroDamageScale !== undefined) target.heroDamageScale *= modifier.heroDamageScale;
+  if (modifier.runChance !== undefined) target.runChance = modifier.runChance;
+  if (modifier.runMessages) target.runMessages = { ...target.runMessages, ...modifier.runMessages };
+  if (modifier.banter) target.banter = modifier.banter;
+  if (modifier.startMessage) target.startMessages.push(modifier.startMessage);
+}
+
+/**
+ * Turn logic for one battle. No Phaser and no drawing: BattleScene draws it,
+ * and the balance simulator runs it headless.
+ */
 export class BattleManager {
   private enemy?: EnemyDefinition;
+  private resolved?: ResolvedEnemy;
   private enemyHp = 0;
 
   start(enemy: EnemyDefinition, state: GameState): BattleStartResult {
     this.enemy = enemy;
     this.enemyHp = enemy.hp;
+    this.resolved = resolveEnemy(enemy, state);
+    const modifierMessages = this.resolved.startMessages;
     const ambushChance = this.getAmbushChance(enemy, state);
 
-    if (Math.random() < ambushChance) {
+    if (random() < ambushChance) {
       const enemyTurn = this.useEnemyTurn(state);
 
       return {
         ...enemyTurn,
         ambushed: true,
         message: `${enemy.initiative.ambushMessage}\n${enemyTurn.message}`,
+        modifierMessages,
       };
     }
 
     return {
       ...this.getSnapshot(state),
       ambushed: false,
+      modifierMessages,
     };
+  }
+
+  get banter(): string | undefined {
+    return this.resolved?.banter;
   }
 
   useFight(state: GameState): BattleTurnResult {
@@ -94,10 +153,10 @@ export class BattleManager {
     return this.resolveHeroAction(state, "dadSkill", skill);
   }
 
-  useItem(state: GameState, itemId: string): BattleTurnResult {
-    const itemIndex = state.player.inventory.indexOf(itemId);
+  useItem(state: GameState, itemId: string | undefined): BattleTurnResult {
+    const itemIndex = itemId ? state.player.inventory.indexOf(itemId) : -1;
 
-    if (itemIndex === -1) {
+    if (!itemId || itemIndex === -1) {
       return {
         ...this.getSnapshot(state),
         message: "You pat every cargo pocket.\nNo useful items answer the call.",
@@ -106,7 +165,7 @@ export class BattleManager {
     }
 
     state.player.inventory.splice(itemIndex, 1);
-    const item = items.find((candidate) => candidate.id === itemId);
+    const item = getItem(itemId);
 
     if (item?.restoreDp) {
       const restored = Math.min(state.player.maxDadPoints - state.player.dadPoints, item.restoreDp);
@@ -130,32 +189,12 @@ export class BattleManager {
 
   useRun(state: GameState): BattleTurnResult {
     const enemy = this.requireEnemy();
+    const resolved = this.requireResolved();
 
-    if (enemy.id === "evil-heating-coil") {
-      const retreatChance = state.flags.circuitBreakerOff ? 0.65 : 0.38;
-
-      if (Math.random() < retreatChance) {
-        return {
-          ...this.getSnapshot(state),
-          message: state.flags.circuitBreakerOff
-            ? "Dad retreats with uncommon wisdom.\nThe powered-down coil cannot stop him."
-            : "Dad dives away from the live dryer.\nSomehow, dignity escapes too.",
-          victory: false,
-          escaped: true,
-        };
-      }
-
+    if (rollRunSuccess(state, enemy, resolved.runChance)) {
       return {
         ...this.getSnapshot(state),
-        message: "Dad looks for an exit.\nThe coil blocks the retreat.",
-        victory: false,
-      };
-    }
-
-    if (rollRunSuccess(state, enemy)) {
-      return {
-        ...this.getSnapshot(state),
-        message: "Dad backs away with heroic caution.\nThe threat loses interest.",
+        message: resolved.runMessages.success ?? "Dad backs away with heroic caution.\nThe threat loses interest.",
         victory: false,
         escaped: true,
       };
@@ -163,14 +202,14 @@ export class BattleManager {
 
     return {
       ...this.getSnapshot(state),
-      message: "Dad looks for a clean exit.\nNo dice.",
+      message: resolved.runMessages.fail ?? "Dad looks for a clean exit.\nNo dice.",
       victory: false,
     };
   }
 
   useEnemyTurn(state: GameState): EnemyTurnResult {
     const enemy = this.requireEnemy();
-    const attack = this.getEnemyAttack(enemy, state);
+    const attack = pick(this.requireResolved().attackPattern);
     const damage = this.applyEnemyAttack(state, enemy, attack);
 
     return {
@@ -210,7 +249,6 @@ export class BattleManager {
       state.player.cash += enemy.cashReward;
       const levelUp = applyExperienceAndLevelUps(state, enemy.xpReward);
       const levelUpMessage = levelUp.message ? `\n${levelUp.message}` : "";
-      const rewardLabel = enemy.cashReward === 1 ? "Love Point" : "Love Points";
 
       return {
         ...this.getSnapshot(state),
@@ -236,7 +274,7 @@ export class BattleManager {
     damage: number,
     skill?: DadSkillDefinition,
   ): string {
-    const weapon = items.find((item) => item.id === state.player.equipment.weaponId);
+    const weapon = getItem(state.player.equipment.weaponId);
     let message = action === "fight" && weapon
       ? this.getWeaponBattleMessage(weapon, response.message)
       : response.message;
@@ -254,7 +292,7 @@ export class BattleManager {
     fallback: string,
   ): string {
     if (weapon.battleMessages?.length) {
-      return Phaser.Utils.Array.GetRandom(weapon.battleMessages);
+      return pick(weapon.battleMessages);
     }
 
     return weapon.battleMessage ?? fallback;
@@ -267,44 +305,31 @@ export class BattleManager {
     enemy: EnemyDefinition,
     skill?: DadSkillDefinition,
   ): { amount: number; dodged: boolean } {
+    const resolved = this.requireResolved();
+    const scale = (amount: number) => Math.max(1, Math.round(amount * resolved.heroDamageScale));
+
     if (action === "fight") {
-      const roll = rollHeroDamage(state, enemy);
+      const roll = rollHeroDamage(state, enemy, resolved.defenseScale);
       const tunedDamage = response.damageByWeapon?.[state.player.equipment.weaponId] ?? response.damage;
       return {
-        amount: roll.dodged ? 0 : Math.max(1, Math.round((roll.amount + tunedDamage) / 2)),
+        amount: roll.dodged ? 0 : scale(Math.max(1, Math.round((roll.amount + tunedDamage) / 2))),
         dodged: roll.dodged,
       };
     }
 
     const multiplier = skill?.multiplier ?? 1;
     return {
-      amount: Math.max(response.damage, Math.round(rollDadSkillDamage(state, enemy) * multiplier)),
+      amount: scale(Math.max(response.damage, Math.round(rollDadSkillDamage(state, enemy) * multiplier))),
       dodged: false,
     };
   }
 
-  private getEnemyAttack(enemy: EnemyDefinition, state: GameState): EnemyAttack {
-    if (enemy.id === "evil-heating-coil") {
-      if (state.flags.circuitBreakerOff) {
-        return Phaser.Utils.Array.GetRandom([
-          { message: "casts Static Shock of a Random Sock", damage: Phaser.Math.Between(6, 8) },
-          { message: "crackles with low-power spite", damage: Phaser.Math.Between(6, 8) },
-          { message: "snaps with unplugged-but-still-angry static", damage: Phaser.Math.Between(6, 8) },
-        ]);
-      }
-
-      return Phaser.Utils.Array.GetRandom([
-        { message: "casts Badass Zap", damage: Phaser.Math.Between(10, 15) },
-        { message: "surges with fully powered appliance hatred", damage: Phaser.Math.Between(10, 15) },
-        { message: "throws live current like it pays the mortgage", damage: Phaser.Math.Between(10, 15) },
-      ]);
-    }
-
-    return Phaser.Utils.Array.GetRandom(enemy.attackPattern);
-  }
-
   private applyEnemyAttack(state: GameState, enemy: EnemyDefinition, attack: EnemyAttack): number {
-    const damage = rollEnemyDamage(state, enemy, attack.damage);
+    const listed = attack.damageMin !== undefined && attack.damageMax !== undefined
+      ? randomInt(attack.damageMin, attack.damageMax)
+      : attack.damage;
+    const raw = rollEnemyDamage(state, enemy, listed);
+    const damage = Math.max(1, Math.round(raw * this.requireResolved().attackScale));
     state.player.hp = Math.max(0, state.player.hp - damage);
     return damage;
   }
@@ -314,7 +339,7 @@ export class BattleManager {
     const rawChance = enemy.initiative.baseAmbushChance +
       levelAdvantage * enemy.initiative.levelAdvantageBonus;
 
-    return Phaser.Math.Clamp(rawChance, 0, enemy.initiative.maxAmbushChance);
+    return clamp(rawChance, 0, enemy.initiative.maxAmbushChance);
   }
 
   private requireEnemy(): EnemyDefinition {
@@ -323,5 +348,13 @@ export class BattleManager {
     }
 
     return this.enemy;
+  }
+
+  private requireResolved(): ResolvedEnemy {
+    if (!this.resolved) {
+      throw new Error("Battle has not started.");
+    }
+
+    return this.resolved;
   }
 }
