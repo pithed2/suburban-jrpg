@@ -11,11 +11,6 @@
     "stepDistance": 80,
     "baseChance": 0.2,
     "cooldownRolls": 4,
-    "disabledWhen": {
-      "flags": [
-        "foundWrench"
-      ]
-    },
     "introMessages": [
       "Something shifts behind a cardboard box.",
       "A box labeled TAXES 2017 begins to vibrate.",
@@ -42,6 +37,58 @@
           "A Freaky Icky Spider drops from the garage shelf!",
           "A Freaky Icky Spider skitters out from behind the paint cans!",
           "Something moves on the wall. It has too many legs. It knows."
+        ]
+      },
+      {
+        "enemyId": "stink-bug",
+        "weight": 2
+      },
+      {
+        "enemyId": "rusty-spider",
+        "weight": 3,
+        "regions": [
+          [
+            29,
+            3,
+            43,
+            15
+          ],
+          [
+            22,
+            15,
+            24,
+            21
+          ],
+          [
+            5,
+            22,
+            43,
+            27
+          ]
+        ]
+      },
+      {
+        "enemyId": "angry-dust-bunny",
+        "weight": 2,
+        "regions": [
+          [
+            29,
+            3,
+            43,
+            15
+          ],
+          [
+            22,
+            15,
+            24,
+            21
+          ],
+          [
+            5,
+            22,
+            43,
+            27
+          ]
         ]
       }
     ]
@@ -123,6 +170,152 @@
       "col": 3,
       "row": 17,
       "radius": 3
+    },
+    {
+      "id": "chest:workshop",
+      "col": 41,
+      "row": 13,
+      "radius": 1.75,
+      "solid": true,
+      "chest": {
+        "id": "garage:workshop",
+        "frame": 0,
+        "loot": [
+          {
+            "weight": 4,
+            "cash": [
+              3,
+              8
+            ]
+          },
+          {
+            "weight": 2,
+            "item": "cold-coffee"
+          },
+          {
+            "weight": 2,
+            "item": "ibuprofen"
+          },
+          {
+            "weight": 1,
+            "item": "energy-drink"
+          }
+        ]
+      }
+    },
+    {
+      "id": "chest:storage-west",
+      "col": 5,
+      "row": 22,
+      "radius": 1.75,
+      "solid": true,
+      "chest": {
+        "id": "garage:storage-west",
+        "frame": 0,
+        "loot": [
+          {
+            "weight": 4,
+            "cash": [
+              3,
+              8
+            ]
+          },
+          {
+            "weight": 2,
+            "item": "cold-coffee"
+          },
+          {
+            "weight": 2,
+            "item": "ibuprofen"
+          },
+          {
+            "weight": 1,
+            "item": "energy-drink"
+          }
+        ]
+      }
+    },
+    {
+      "id": "chest:storage-east",
+      "col": 40,
+      "row": 26,
+      "radius": 1.75,
+      "solid": true,
+      "chest": {
+        "id": "garage:storage-east",
+        "frame": 0,
+        "loot": [
+          {
+            "weight": 4,
+            "cash": [
+              3,
+              8
+            ]
+          },
+          {
+            "weight": 2,
+            "item": "cold-coffee"
+          },
+          {
+            "weight": 2,
+            "item": "ibuprofen"
+          },
+          {
+            "weight": 1,
+            "item": "energy-drink"
+          }
+        ]
+      }
+    },
+    {
+      "id": "chest:storage-mid",
+      "col": 28,
+      "row": 26,
+      "radius": 1.75,
+      "solid": true,
+      "chest": {
+        "id": "garage:storage-mid",
+        "frame": 0,
+        "loot": [
+          {
+            "weight": 4,
+            "cash": [
+              3,
+              8
+            ]
+          },
+          {
+            "weight": 2,
+            "item": "cold-coffee"
+          },
+          {
+            "weight": 2,
+            "item": "ibuprofen"
+          },
+          {
+            "weight": 1,
+            "item": "energy-drink"
+          }
+        ]
+      }
+    },
+    {
+      "id": "chest:gloves",
+      "col": 36,
+      "row": 13,
+      "radius": 1.75,
+      "solid": true,
+      "chest": {
+        "id": "garage:gloves",
+        "frame": 8,
+        "tint": "#94a3b8"
+      }
+    },
+    {
+      "id": "deadend:birdhouse",
+      "col": 40,
+      "row": 5,
+      "radius": 2
     }
   ],
   "events": {
@@ -224,7 +417,7 @@
               ],
               [
                 "NARRATOR",
-                "and never used, and a bag of mystery screws — the Adjustable Wrench."
+                "and never used, and a bag of mystery screws \u2014 the Adjustable Wrench."
               ],
               [
                 "SYSTEM",
@@ -538,6 +731,107 @@
               {
                 "speaker": "DAD",
                 "voice": "movie:deadEnd"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "deadend:birdhouse": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "A half-built birdhouse from 2015."
+              ],
+              [
+                "NARRATOR",
+                "It has a roof, one wall, and a tiny welcome mat."
+              ],
+              [
+                "NARRATOR",
+                "Dad bought the welcome mat first. Priorities."
+              ],
+              {
+                "speaker": "DAD",
+                "voice": "movie:deadEnd"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "chest:gloves": [
+      {
+        "when": {
+          "opened": [
+            "garage:gloves"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Empty. Dad checks twice anyway."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "do": [
+          {
+            "open": "garage:gloves"
+          },
+          {
+            "give": "garden-gloves"
+          },
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Under a tarp: a pair of Garden Gloves, never worn."
+              ],
+              [
+                "SYSTEM",
+                "YOU FOUND GARDEN GLOVES!"
+              ]
+            ]
+          },
+          {
+            "if": {
+              "any": [
+                {
+                  "equipped": [
+                    "dads-cardigan"
+                  ]
+                }
+              ]
+            },
+            "then": [
+              {
+                "equip": "garden-gloves"
+              },
+              {
+                "say": [
+                  [
+                    "NARRATOR",
+                    "Dad puts on the Garden Gloves. Upgrade."
+                  ]
+                ]
+              }
+            ],
+            "else": [
+              {
+                "say": [
+                  [
+                    "NARRATOR",
+                    "Dad already has better. It goes in the bag."
+                  ]
+                ]
               }
             ]
           }

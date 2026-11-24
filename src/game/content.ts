@@ -35,6 +35,8 @@ export interface EnemyDefinition {
   runMessages?: { success?: string; fail?: string };
   /** Look of the enemy window. */
   battleView?: BattleView;
+  /** Items the enemy may leave behind. Each entry rolls on its own. */
+  drops?: Array<{ item: string; chance: number }>;
   /**
    * State-dependent changes, checked in order. Every matching modifier
    * applies; later ones override earlier ones field by field. This is how a
@@ -49,6 +51,8 @@ export interface BattleView {
   width?: number;
   height?: number;
   y?: number;
+  /** Hex tint for palette-swapped enemies that share art, e.g. "#ffd54a". */
+  tint?: string;
 }
 
 export interface EnemyModifier {
@@ -131,6 +135,11 @@ export interface RandomEncounterEntry {
   maxPlayerLevel?: number;
   /** Entry only rolls while this passes. */
   when?: Condition;
+  /**
+   * Entry only rolls while Dad stands inside one of these [col0, row0, col1, row1]
+   * rectangles (inclusive). Use it for deeper, tougher zones.
+   */
+  regions?: Array<[number, number, number, number]>;
   /** Per-enemy intro lines. Falls back to the area's introMessages if absent. */
   introMessages?: string[];
 }

@@ -11,11 +11,6 @@
     "stepDistance": 80,
     "baseChance": 0.22,
     "cooldownRolls": 3,
-    "disabledWhen": {
-      "flags": [
-        "clogBossDefeated"
-      ]
-    },
     "introMessages": [
       "Something shifts behind the shower curtain.",
       "Dad pauses. The bathroom has chosen violence."
@@ -56,6 +51,60 @@
           "A cloud of pure offense materializes near the exhaust fan.",
           "Something silent, deadly, and airborne has entered the room."
         ]
+      },
+      {
+        "enemyId": "black-mold",
+        "weight": 3,
+        "regions": [
+          [
+            21,
+            2,
+            35,
+            25
+          ],
+          [
+            0,
+            17,
+            21,
+            25
+          ]
+        ]
+      },
+      {
+        "enemyId": "golden-roll",
+        "weight": 1,
+        "regions": [
+          [
+            21,
+            2,
+            35,
+            25
+          ],
+          [
+            0,
+            17,
+            21,
+            25
+          ]
+        ]
+      },
+      {
+        "enemyId": "olfactory-ninja",
+        "weight": 1,
+        "regions": [
+          [
+            21,
+            2,
+            35,
+            25
+          ],
+          [
+            0,
+            17,
+            21,
+            25
+          ]
+        ]
       }
     ]
   },
@@ -83,6 +132,172 @@
       "id": "sink",
       "col": 11,
       "row": 5,
+      "radius": 2
+    },
+    {
+      "id": "chest:hamper",
+      "col": 33,
+      "row": 3,
+      "radius": 1.75,
+      "solid": true,
+      "chest": {
+        "id": "bathroom:hamper",
+        "frame": 0,
+        "loot": [
+          {
+            "weight": 4,
+            "cash": [
+              10,
+              22
+            ]
+          },
+          {
+            "weight": 2,
+            "item": "cold-coffee"
+          },
+          {
+            "weight": 2,
+            "item": "energy-drink"
+          },
+          {
+            "weight": 2,
+            "item": "leftover-pizza"
+          }
+        ]
+      }
+    },
+    {
+      "id": "chest:hamper-2",
+      "col": 27,
+      "row": 9,
+      "radius": 1.75,
+      "solid": true,
+      "chest": {
+        "id": "bathroom:hamper-2",
+        "frame": 0,
+        "loot": [
+          {
+            "weight": 4,
+            "cash": [
+              10,
+              22
+            ]
+          },
+          {
+            "weight": 2,
+            "item": "cold-coffee"
+          },
+          {
+            "weight": 2,
+            "item": "energy-drink"
+          },
+          {
+            "weight": 2,
+            "item": "leftover-pizza"
+          }
+        ]
+      }
+    },
+    {
+      "id": "chest:cavern",
+      "col": 33,
+      "row": 23,
+      "radius": 1.75,
+      "solid": true,
+      "chest": {
+        "id": "bathroom:cavern",
+        "frame": 0,
+        "loot": [
+          {
+            "weight": 4,
+            "cash": [
+              10,
+              22
+            ]
+          },
+          {
+            "weight": 2,
+            "item": "cold-coffee"
+          },
+          {
+            "weight": 2,
+            "item": "energy-drink"
+          },
+          {
+            "weight": 2,
+            "item": "leftover-pizza"
+          }
+        ]
+      }
+    },
+    {
+      "id": "chest:tub",
+      "col": 2,
+      "row": 23,
+      "radius": 1.75,
+      "solid": true,
+      "chest": {
+        "id": "bathroom:tub",
+        "frame": 0,
+        "loot": [
+          {
+            "weight": 4,
+            "cash": [
+              10,
+              22
+            ]
+          },
+          {
+            "weight": 2,
+            "item": "cold-coffee"
+          },
+          {
+            "weight": 2,
+            "item": "energy-drink"
+          },
+          {
+            "weight": 2,
+            "item": "leftover-pizza"
+          }
+        ]
+      }
+    },
+    {
+      "id": "chest:tub-2",
+      "col": 10,
+      "row": 19,
+      "radius": 1.75,
+      "solid": true,
+      "chest": {
+        "id": "bathroom:tub-2",
+        "frame": 0,
+        "loot": [
+          {
+            "weight": 4,
+            "cash": [
+              10,
+              22
+            ]
+          },
+          {
+            "weight": 2,
+            "item": "cold-coffee"
+          },
+          {
+            "weight": 2,
+            "item": "energy-drink"
+          },
+          {
+            "weight": 2,
+            "item": "leftover-pizza"
+          }
+        ]
+      }
+    },
+    {
+      "id": "deadend:hamper",
+      "col": 30,
+      "row": 2,
       "radius": 2
     }
   ],
@@ -395,6 +610,32 @@
                 "SYSTEM",
                 "Dad found the RUBBER DUCKY! +5 Love Points. +3 XP.{levelUp}"
               ]
+            ]
+          }
+        ]
+      }
+    ],
+    "deadend:hamper": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The laundry hamper. It has achieved geological layers."
+              ],
+              [
+                "NARRATOR",
+                "Somewhere near the bottom: a sock from the Obama administration."
+              ],
+              [
+                "NARRATOR",
+                "Dad closes the lid with respect."
+              ],
+              {
+                "speaker": "DAD",
+                "voice": "movie:deadEnd"
+              }
             ]
           }
         ]

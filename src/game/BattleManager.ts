@@ -249,10 +249,11 @@ export class BattleManager {
       state.player.cash += enemy.cashReward;
       const levelUp = applyExperienceAndLevelUps(state, enemy.xpReward);
       const levelUpMessage = levelUp.message ? `\n${levelUp.message}` : "";
+      const dropMessage = this.rollDrops(enemy, state);
 
       return {
         ...this.getSnapshot(state),
-        message: `${actionMessage}\n${enemy.name} gives one last ominous click.\nYOU GAINED ${enemy.xpReward} XP.\nDAD LOVE +${enemy.cashReward}.${levelUpMessage}`,
+        message: `${actionMessage}\n${enemy.name} gives one last ominous click.\nYOU GAINED ${enemy.xpReward} XP.\nDAD LOVE +${enemy.cashReward}.${dropMessage}${levelUpMessage}`,
         victory: true,
         xpReward: enemy.xpReward,
         cashReward: enemy.cashReward,
@@ -265,6 +266,16 @@ export class BattleManager {
       message: actionMessage,
       victory: false,
     };
+  }
+
+  private rollDrops(enemy: EnemyDefinition, state: GameState): string {
+    const found: string[] = [];
+    for (const drop of enemy.drops ?? []) {
+      if (random() >= drop.chance) continue;
+      state.player.inventory.push(drop.item);
+      found.push((getItem(drop.item)?.name ?? drop.item).toUpperCase());
+    }
+    return found.length ? `\nIT DROPPED ${found.join(" AND ")}!` : "";
   }
 
   private formatActionMessage(

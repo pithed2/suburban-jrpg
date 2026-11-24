@@ -20,35 +20,11 @@ import { CharacterSprite } from "../game/CharacterSprite";
 import { DAD_DEF } from "../game/characterDefs";
 import { FieldKit } from "../game/FieldKit";
 import { GridMover } from "../game/GridMover";
+import { F, MAP, W, X } from "../game/maps/bathroom";
 import { addPixelText } from "../game/uiText";
 
 const TILE = 16;
 const WALL_FRAME = 140; // warm cream plaster — matches the house interior
-
-const W = 1; // wall
-const F = 2; // floor
-const X = 3; // exit (to house)
-
-/* prettier-ignore */
-const MAP: number[][] = [
-  [W,W,W,W,W,W,W,W,W,W,W,X,X,W,W,W,W,W,W,W,W,W,W,W], //  0  exit 11-12
-  [W,W,W,W,W,W,W,W,W,W,W,F,F,W,W,W,W,W,W,W,W,W,W,W], //  1  entry corridor
-  [W,W,W,W,W,W,W,W,W,W,W,F,F,W,W,W,W,W,W,W,W,W,W,W], //  2
-  [W,W,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,W,W], //  3  wide junction
-  [W,W,F,F,F,F,W,W,W,F,F,F,F,F,W,W,W,F,F,F,F,W,W,W], //  4  linen closet | vanity | shower
-  [W,W,F,F,F,F,W,W,W,F,F,F,F,F,W,W,W,F,F,F,F,W,W,W], //  5
-  [W,W,F,F,F,F,W,W,W,F,F,F,F,F,W,W,W,F,F,F,F,W,W,W], //  6
-  [W,W,F,F,F,F,W,W,W,F,F,F,F,F,W,W,W,F,F,F,F,W,W,W], //  7
-  [W,W,W,W,W,W,W,W,W,F,F,F,F,F,W,W,W,W,W,W,W,W,W,W], //  8  south corridor begins
-  [W,W,W,W,W,W,W,W,W,F,F,F,F,F,W,W,W,W,W,W,W,W,W,W], //  9
-  [W,W,W,W,W,W,W,W,W,F,F,F,F,F,W,W,W,W,W,W,W,W,W,W], // 10
-  [W,W,W,W,W,W,W,W,W,F,F,F,F,F,W,W,W,W,W,W,W,W,W,W], // 11  toilet nook begins
-  [W,W,W,W,W,W,W,W,W,F,F,F,F,F,W,W,W,W,W,W,W,W,W,W], // 12
-  [W,W,W,W,W,W,W,W,W,F,F,F,F,F,W,W,W,W,W,W,W,W,W,W], // 13  TOILET at col 11
-  [W,W,W,W,W,W,W,W,W,F,F,F,F,F,W,W,W,W,W,W,W,W,W,W], // 14
-  [W,W,W,W,W,W,W,W,W,F,F,F,F,F,W,W,W,W,W,W,W,W,W,W], // 15
-  [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W], // 16  bottom wall
-];
 
 const ROWS    = MAP.length;
 const COLS    = MAP[0].length;

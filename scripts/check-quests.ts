@@ -8,8 +8,9 @@ import { areas } from "../src/game/areaData";
 import { enemies, items } from "../src/game/content";
 import type { Condition } from "../src/game/engine/conditions";
 import { ScriptRunner, type Action, type BattleOutcome, type DialogueLine, type Rule, type ScriptHost } from "../src/game/engine/script";
-import { quests } from "../src/game/quests";
+import { quests, repairQuestProgress } from "../src/game/quests";
 import { createInitialGameState, type GameState } from "../src/game/state";
+import { checkMaps } from "./check-maps";
 import { validateContent } from "./validate-data";
 
 let failures = 0;
@@ -62,6 +63,22 @@ async function main(): Promise<void> {
   problems.forEach((problem) => check(problem, false));
   check(`${quests.length} quests, ${areas.length} areas, ${enemies.length} enemies, ${items.length} items load`, problems.length === 0);
 
+  console.log("Maps");
+  const mapProblems = checkMaps();
+  mapProblems.forEach((problem) => check(problem, false));
+  check("dungeon maps: every hotspot reachable, solids on floor", mapProblems.length === 0);
+
+  console.log("Save repair");
+  {
+    const bad = createInitialGameState();
+    bad.quest = { questId: "fix-bathroom", activeStepId: "inspect-dryer", completedStepIds: ["talk-to-wife-bathroom", "talk-to-wife", "visit-home-depot"] };
+    repairQuestProgress(bad);
+    check("quest 2 save with a quest 1 step repairs to the next open step", bad.quest.activeStepId === "find-plunger" && !bad.quest.completedStepIds.includes("talk-to-wife"), JSON.stringify(bad.quest));
+    const good = createInitialGameState();
+    good.quest = { questId: "fix-dryer", activeStepId: "flip-breaker", completedStepIds: ["talk-to-wife", "inspect-dryer", "find-wrench"] };
+    check("valid save is left alone", !repairQuestProgress(good) && good.quest.activeStepId === "flip-breaker");
+  }
+
   console.log("Quest 1: Fix the Dryer");
   // StoryIntroScene completes talk-to-wife and sets inspect-dryer.
   state.flags.talkedToWife = true;
@@ -89,6 +106,15 @@ async function main(): Promise<void> {
   check("first-aid gives ibuprofen once", state.player.inventory.filter((id) => id === "ibuprofen").length === 1);
   await at("basement", "chest:first-aid");
   check("first-aid second time is empty", said("echo of Dad's previous curiosity"));
+
+  const cashBefore = state.player.cash;
+  const bagBefore = state.player.inventory.length;
+  await at("garage", "chest:workshop");
+  check("loot chest pays cash or an item", said("YOU FOUND") && (state.player.cash > cashBefore || state.player.inventory.length > bagBefore));
+  await at("garage", "chest:workshop");
+  check("loot chest second time is empty", said("Empty."));
+  await at("garage", "chest:gloves");
+  check("gloves chest gives and equips over the cardigan", said("YOU FOUND GARDEN GLOVES!") && state.player.equipment.armorId === "garden-gloves");
 
   host.nextOutcome = "defeat";
   await at("basement", "coil");

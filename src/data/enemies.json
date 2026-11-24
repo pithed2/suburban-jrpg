@@ -169,31 +169,31 @@
     "name": "Evil Heating Coil",
     "battleTexture": "heating-coil-battle",
     "level": 2,
-    "hp": 26,
+    "hp": 54,
     "attack": 3,
-    "agility": 8,
+    "agility": 10,
     "dodgeChance": 0.0625,
-    "xpReward": 14,
-    "cashReward": 9,
+    "xpReward": 40,
+    "cashReward": 30,
     "emotionalMeaning": "Appliance dread",
     "attackPattern": [
       {
         "message": "casts Badass Zap",
-        "damage": 12,
-        "damageMin": 10,
-        "damageMax": 15
+        "damage": 15,
+        "damageMin": 13,
+        "damageMax": 17
       },
       {
         "message": "surges with fully powered appliance hatred",
-        "damage": 12,
-        "damageMin": 10,
-        "damageMax": 15
+        "damage": 15,
+        "damageMin": 13,
+        "damageMax": 17
       },
       {
         "message": "throws live current like it pays the mortgage",
-        "damage": 12,
-        "damageMin": 10,
-        "damageMax": 15
+        "damage": 15,
+        "damageMin": 13,
+        "damageMax": 17
       }
     ],
     "actionResponses": {
@@ -242,21 +242,21 @@
         "attackPattern": [
           {
             "message": "casts Static Shock of a Random Sock",
-            "damage": 7,
-            "damageMin": 6,
-            "damageMax": 8
+            "damage": 8,
+            "damageMin": 7,
+            "damageMax": 10
           },
           {
             "message": "crackles with low-power spite",
-            "damage": 7,
-            "damageMin": 6,
-            "damageMax": 8
+            "damage": 8,
+            "damageMin": 7,
+            "damageMax": 10
           },
           {
             "message": "snaps with unplugged-but-still-angry static",
-            "damage": 7,
-            "damageMin": 6,
-            "damageMax": 8
+            "damage": 8,
+            "damageMin": 7,
+            "damageMax": 10
           }
         ],
         "runChance": 0.65,
@@ -270,26 +270,26 @@
     "id": "single-ply-sam",
     "name": "Single-Ply Sam",
     "battleTexture": "single-ply-sam",
-    "level": 2,
-    "hp": 14,
-    "attack": 3,
-    "agility": 6,
+    "level": 5,
+    "hp": 28,
+    "attack": 10,
+    "agility": 10,
     "dodgeChance": 0.15,
-    "xpReward": 6,
-    "cashReward": 3,
+    "xpReward": 16,
+    "cashReward": 8,
     "emotionalMeaning": "Cheapskate college days, unresolved",
     "attackPattern": [
       {
         "message": "Unspools dramatically and gets everywhere",
-        "damage": 2
+        "damage": 6
       },
       {
         "message": "Disintegrates ominously mid-fight, which is somehow worse",
-        "damage": 3
+        "damage": 7
       },
       {
         "message": "Rolls under the cabinet, daring Dad to chase it",
-        "damage": 2
+        "damage": 5
       }
     ],
     "actionResponses": {
@@ -322,26 +322,26 @@
     "id": "olfactory-ninja",
     "name": "Olfactory Ninja",
     "battleTexture": "olfactory-ninja",
-    "level": 3,
-    "hp": 16,
-    "attack": 6,
-    "agility": 11,
+    "level": 6,
+    "hp": 30,
+    "attack": 12,
+    "agility": 22,
     "dodgeChance": 0.32,
-    "xpReward": 9,
-    "cashReward": 5,
+    "xpReward": 24,
+    "cashReward": 11,
     "emotionalMeaning": "A stink bomb waiting to happen",
     "attackPattern": [
       {
         "message": "Vanishes in a cloud of pure offense",
-        "damage": 4
+        "damage": 8
       },
       {
         "message": "Deploys a silent-but-deadly smoke bomb",
-        "damage": 6
+        "damage": 10
       },
       {
         "message": "Strikes from the shadows of the exhaust fan",
-        "damage": 4
+        "damage": 7
       }
     ],
     "actionResponses": {
@@ -374,26 +374,26 @@
     "id": "toothpaste-slime",
     "name": "Toothpaste Slime",
     "battleTexture": "toothpaste-slime",
-    "level": 2,
-    "hp": 22,
-    "attack": 5,
-    "agility": 4,
+    "level": 5,
+    "hp": 38,
+    "attack": 10,
+    "agility": 6,
     "dodgeChance": 0.05,
-    "xpReward": 8,
-    "cashReward": 5,
+    "xpReward": 19,
+    "cashReward": 9,
     "emotionalMeaning": "Sticky, minty resentment",
     "attackPattern": [
       {
         "message": "Oozes onto Dad's shoe with minty menace",
-        "damage": 3
+        "damage": 7
       },
       {
         "message": "Sticks Dad's fingers together in a show of dominance",
-        "damage": 5
+        "damage": 8
       },
       {
         "message": "Sprays a fine mist of fluoride-scented contempt",
-        "damage": 3
+        "damage": 6
       }
     ],
     "actionResponses": {
@@ -426,26 +426,26 @@
     "id": "mold-patch",
     "name": "Mold Patch",
     "battleTexture": "mold-patch",
-    "level": 4,
-    "hp": 32,
-    "attack": 6,
-    "agility": 3,
+    "level": 6,
+    "hp": 48,
+    "attack": 12,
+    "agility": 8,
     "dodgeChance": 0.03,
-    "xpReward": 13,
-    "cashReward": 7,
+    "xpReward": 26,
+    "cashReward": 12,
     "emotionalMeaning": "Creeping, patient grime",
     "attackPattern": [
       {
         "message": "Spreads slightly, somehow making the grout worse",
-        "damage": 4
+        "damage": 8
       },
       {
         "message": "Releases a spore cloud of pure landlord-deposit dread",
-        "damage": 6
+        "damage": 9
       },
       {
         "message": "Just sits there, multiplying, judging",
-        "damage": 3
+        "damage": 7
       }
     ],
     "actionResponses": {
@@ -478,26 +478,32 @@
     "id": "clogged-toilet",
     "name": "Clogged Toilet",
     "battleTexture": "clogged-toilet-battle",
-    "level": 4,
-    "hp": 70,
+    "level": 8,
+    "hp": 102,
     "attack": 8,
-    "agility": 6,
+    "agility": 14,
     "dodgeChance": 0.07,
-    "xpReward": 30,
-    "cashReward": 20,
+    "xpReward": 120,
+    "cashReward": 80,
     "emotionalMeaning": "Plumbing dread",
     "attackPattern": [
       {
         "message": "Gurgles with rising, deeply concerning pressure",
-        "damage": 6
+        "damage": 11,
+        "damageMin": 9,
+        "damageMax": 13
       },
       {
         "message": "Threatens to overflow with biblical confidence",
-        "damage": 8
+        "damage": 13,
+        "damageMin": 11,
+        "damageMax": 15
       },
       {
         "message": "Backs up in a way that voids several warranties",
-        "damage": 5
+        "damage": 10,
+        "damageMin": 8,
+        "damageMax": 12
       }
     ],
     "actionResponses": {
@@ -533,6 +539,383 @@
       "width": 48,
       "height": 42,
       "y": 95
+    }
+  },
+  {
+    "id": "stink-bug",
+    "name": "Stink Bug",
+    "battleTexture": "stink-bug",
+    "level": 2,
+    "hp": 14,
+    "attack": 6,
+    "agility": 5,
+    "dodgeChance": 0.05,
+    "xpReward": 6,
+    "cashReward": 4,
+    "emotionalMeaning": "Something smells and nobody will admit it",
+    "attackPattern": [
+      {
+        "message": "releases a defensive odor of overwhelming confidence",
+        "damage": 3
+      },
+      {
+        "message": "bonks into Dad's forehead on purpose",
+        "damage": 3
+      },
+      {
+        "message": "clings to Dad's shirt and refuses to leave",
+        "damage": 4
+      }
+    ],
+    "actionResponses": {
+      "fight": {
+        "damage": 7,
+        "message": "Dad flicks it with practiced suburban disdain.",
+        "effectLabel": "flicked"
+      },
+      "dadSkill": {
+        "damage": 5,
+        "message": "The bug is unmoved by sighing. It smells worse now.",
+        "effectLabel": "resisted"
+      }
+    },
+    "initiative": {
+      "baseAmbushChance": 0.08,
+      "levelAdvantageBonus": 0.03,
+      "maxAmbushChance": 0.2,
+      "ambushMessage": "A Stink Bug drops from the light fixture onto Dad's neck."
+    },
+    "battleView": {
+      "width": 40,
+      "height": 42,
+      "y": 92
+    },
+    "drops": [
+      {
+        "item": "ibuprofen",
+        "chance": 0.08
+      }
+    ]
+  },
+  {
+    "id": "rusty-spider",
+    "name": "Rusty Garage Spider",
+    "battleTexture": "icky-spider",
+    "level": 3,
+    "hp": 18,
+    "attack": 7,
+    "agility": 9,
+    "dodgeChance": 0.2,
+    "xpReward": 9,
+    "cashReward": 5,
+    "emotionalMeaning": "The spider that has outlived three owners",
+    "attackPattern": [
+      {
+        "message": "bites with tetanus-adjacent energy",
+        "damage": 4
+      },
+      {
+        "message": "rappels down and lands on Dad's face",
+        "damage": 5
+      },
+      {
+        "message": "stares with eight disappointed eyes",
+        "damage": 3
+      }
+    ],
+    "actionResponses": {
+      "fight": {
+        "damage": 7,
+        "message": "Dad swats. The spider respects the effort.",
+        "effectLabel": "swatted"
+      },
+      "dadSkill": {
+        "damage": 5,
+        "message": "The spider has heard worse sighs. From the previous owner.",
+        "effectLabel": "shrugged"
+      }
+    },
+    "initiative": {
+      "baseAmbushChance": 0.1,
+      "levelAdvantageBonus": 0.03,
+      "maxAmbushChance": 0.22,
+      "ambushMessage": "Something rust-colored was already on Dad's shoulder."
+    },
+    "battleView": {
+      "backdrop": "#1a0a2e",
+      "width": 60,
+      "height": 52,
+      "y": 88,
+      "tint": "#e07b39"
+    },
+    "battleStartMood": "spider"
+  },
+  {
+    "id": "damp-spider",
+    "name": "Damp Basement Spider",
+    "battleTexture": "icky-spider",
+    "level": 3,
+    "hp": 20,
+    "attack": 8,
+    "agility": 10,
+    "dodgeChance": 0.2,
+    "xpReward": 10,
+    "cashReward": 6,
+    "emotionalMeaning": "Moisture with legs",
+    "attackPattern": [
+      {
+        "message": "drips on Dad from directly above",
+        "damage": 4
+      },
+      {
+        "message": "scuttles up Dad's pant leg",
+        "damage": 5
+      },
+      {
+        "message": "weaves a web across the only light switch",
+        "damage": 3
+      }
+    ],
+    "actionResponses": {
+      "fight": {
+        "damage": 7,
+        "message": "Dad swings. It is wet, which makes everything worse.",
+        "effectLabel": "squelch"
+      },
+      "dadSkill": {
+        "damage": 5,
+        "message": "The spider is too damp to be emotionally reached.",
+        "effectLabel": "resisted"
+      }
+    },
+    "initiative": {
+      "baseAmbushChance": 0.12,
+      "levelAdvantageBonus": 0.03,
+      "maxAmbushChance": 0.24,
+      "ambushMessage": "A Damp Basement Spider lands in Dad's hair. It is cold."
+    },
+    "battleView": {
+      "backdrop": "#1a0a2e",
+      "width": 60,
+      "height": 52,
+      "y": 88,
+      "tint": "#6fa8dc"
+    },
+    "drops": [
+      {
+        "item": "cold-coffee",
+        "chance": 0.08
+      }
+    ],
+    "battleStartMood": "spider"
+  },
+  {
+    "id": "lint-lord",
+    "name": "Lint Lord",
+    "battleTexture": "angry-dust-bunny",
+    "level": 4,
+    "hp": 32,
+    "attack": 9,
+    "agility": 6,
+    "dodgeChance": 0.04,
+    "xpReward": 15,
+    "cashReward": 9,
+    "emotionalMeaning": "Every dryer cycle you skipped cleaning the trap",
+    "attackPattern": [
+      {
+        "message": "smothers Dad in a fluffy gray tide",
+        "damage": 5
+      },
+      {
+        "message": "summons the lint of a thousand socks",
+        "damage": 6
+      },
+      {
+        "message": "radiates a dry, static resentment",
+        "damage": 4
+      }
+    ],
+    "actionResponses": {
+      "fight": {
+        "damage": 8,
+        "message": "Dad punches the lint. Some of it is now in his mouth.",
+        "effectLabel": "fluffy"
+      },
+      "dadSkill": {
+        "damage": 6,
+        "message": "The Lint Lord absorbs the sigh. It grows slightly.",
+        "effectLabel": "absorbed"
+      }
+    },
+    "initiative": {
+      "baseAmbushChance": 0.1,
+      "levelAdvantageBonus": 0.03,
+      "maxAmbushChance": 0.22,
+      "ambushMessage": "The Lint Lord rises from behind the water heater, crowned in dryer fuzz."
+    },
+    "battleView": {
+      "tint": "#b388ff"
+    },
+    "drops": [
+      {
+        "item": "ibuprofen",
+        "chance": 0.15
+      }
+    ]
+  },
+  {
+    "id": "sump-slime",
+    "name": "Sump Slime",
+    "battleTexture": "toothpaste-slime",
+    "level": 5,
+    "hp": 44,
+    "attack": 11,
+    "agility": 4,
+    "dodgeChance": 0.03,
+    "xpReward": 22,
+    "cashReward": 12,
+    "emotionalMeaning": "The sump pump's quiet failure",
+    "attackPattern": [
+      {
+        "message": "gurgles a wave of mystery water at Dad's socks",
+        "damage": 6
+      },
+      {
+        "message": "splashes a smell that will follow Dad upstairs",
+        "damage": 7
+      },
+      {
+        "message": "engulfs one of Dad's slippers forever",
+        "damage": 5
+      }
+    ],
+    "actionResponses": {
+      "fight": {
+        "damage": 9,
+        "message": "Dad hits it. It hits back with the texture of regret.",
+        "effectLabel": "splorch"
+      },
+      "dadSkill": {
+        "damage": 7,
+        "message": "The slime does not know what a sigh is.",
+        "effectLabel": "ignored"
+      }
+    },
+    "initiative": {
+      "baseAmbushChance": 0.06,
+      "levelAdvantageBonus": 0.03,
+      "maxAmbushChance": 0.18,
+      "ambushMessage": "Something in the sump pit lurches up the wall."
+    },
+    "battleView": {
+      "backdrop": "#0b2a1a",
+      "tint": "#7cb342"
+    },
+    "drops": [
+      {
+        "item": "leftover-pizza",
+        "chance": 0.1
+      }
+    ]
+  },
+  {
+    "id": "black-mold",
+    "name": "Black Mold",
+    "battleTexture": "mold-patch",
+    "level": 7,
+    "hp": 70,
+    "attack": 14,
+    "agility": 10,
+    "dodgeChance": 0.03,
+    "xpReward": 40,
+    "cashReward": 18,
+    "emotionalMeaning": "The spot behind the toilet you pretend is grout",
+    "attackPattern": [
+      {
+        "message": "releases spores of quiet dread",
+        "damage": 10
+      },
+      {
+        "message": "spreads across Dad's confidence",
+        "damage": 12
+      },
+      {
+        "message": "whispers about the cost of remediation",
+        "damage": 9
+      }
+    ],
+    "actionResponses": {
+      "fight": {
+        "damage": 10,
+        "message": "Dad scrubs with his fist. The mold feels seen.",
+        "effectLabel": "scrubbed"
+      },
+      "dadSkill": {
+        "damage": 8,
+        "message": "The mold has been ignored for years. A sigh changes nothing.",
+        "effectLabel": "resisted"
+      }
+    },
+    "initiative": {
+      "baseAmbushChance": 0.06,
+      "levelAdvantageBonus": 0.03,
+      "maxAmbushChance": 0.18,
+      "ambushMessage": "The dark corner of the tub was never grout. It was waiting."
+    },
+    "battleView": {
+      "tint": "#455a64",
+      "backdrop": "#0f172a"
+    },
+    "drops": [
+      {
+        "item": "leftover-pizza",
+        "chance": 0.12
+      }
+    ]
+  },
+  {
+    "id": "golden-roll",
+    "name": "Golden Roll",
+    "battleTexture": "single-ply-sam",
+    "level": 5,
+    "hp": 9,
+    "attack": 4,
+    "agility": 40,
+    "dodgeChance": 0.55,
+    "xpReward": 70,
+    "cashReward": 40,
+    "emotionalMeaning": "The last roll of the good stuff. It knows its worth.",
+    "attackPattern": [
+      {
+        "message": "unrolls a single quilted sheet of pure condescension",
+        "damage": 2
+      },
+      {
+        "message": "rolls just out of reach, smugly",
+        "damage": 2
+      }
+    ],
+    "actionResponses": {
+      "fight": {
+        "damage": 9,
+        "message": "Dad lunges. Somehow, contact.",
+        "effectLabel": "lucky"
+      },
+      "dadSkill": {
+        "damage": 3,
+        "message": "The Golden Roll has never needed Dad's approval.",
+        "effectLabel": "unimpressed"
+      }
+    },
+    "initiative": {
+      "baseAmbushChance": 0,
+      "levelAdvantageBonus": 0,
+      "maxAmbushChance": 0,
+      "ambushMessage": "The Golden Roll was never in a hurry."
+    },
+    "battleView": {
+      "tint": "#ffd54a",
+      "backdrop": "#3b2f0b"
     }
   }
 ]

@@ -181,39 +181,39 @@
       "quest": "fix-dryer",
       "targetLevel": [
         1,
-        2
+        3
       ],
       "gear": {
         "weapon": "two-hands",
         "armor": "dads-cardigan"
       },
-      "note": "Wrench dungeon. Short and gentle."
+      "note": "Wrench dungeon. Gloves chest in the workshop. Grind to LV3 here."
     },
     "basement": {
       "quest": "fix-dryer",
       "targetLevel": [
-        2,
-        3
+        3,
+        5
       ],
       "gear": {
         "weapon": "adjustable-wrench",
-        "armor": "dads-cardigan"
+        "armor": "garden-gloves"
       },
       "boss": "evil-heating-coil",
-      "note": "Coil boss. Breaker off makes it fair."
+      "note": "Coil boss. Breaker off and LV4-5 makes it fair. Mallet in the crawlspace helps."
     },
     "bathroom": {
       "quest": "fix-bathroom",
       "targetLevel": [
-        3,
-        4
+        5,
+        8
       ],
       "gear": {
         "weapon": "plunger-of-the-gods",
         "armor": "tool-belt"
       },
       "boss": "clogged-toilet",
-      "note": "Toilet boss. Needs a plumbing weapon."
+      "note": "Toilet boss. Needs a plumbing weapon and LV7-8."
     }
   }
 }

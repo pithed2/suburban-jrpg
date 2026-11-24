@@ -1,3 +1,4 @@
+import { repairQuestProgress } from "./quests";
 import { createInitialGameState, type GameState } from "./state";
 
 const saveKey = "the-in-laws-are-coming-save";
@@ -64,6 +65,7 @@ function normalizeGameState(state: GameState): GameState {
   state.openedChestIds ??= fallback.openedChestIds;
   state.completedQuestIds ??= inferCompletedQuests(state);
   state.flags = { ...fallback.flags, ...state.flags };
+  repairQuestProgress(state);
 
   if (state.player.equipment.weaponId === "percussive-maintenance") {
     state.player.equipment.weaponId = "two-hands";

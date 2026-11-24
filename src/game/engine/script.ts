@@ -15,6 +15,7 @@ import { applyExperienceAndLevelUps, getNextLevelXp } from "../dragonWarriorMath
 import { getQuest } from "../quests";
 import { completeQuestStep, setActiveQuestStep, type GameState } from "../state";
 import { matches, type Condition } from "./conditions";
+import { random, randomInt } from "./rng";
 
 export interface DialogueLine {
   speaker: string;
@@ -35,6 +36,13 @@ export type LineSpec =
   | { speaker: string; text?: string; voice?: string }
   | { narrate: string; speaker?: string };
 
+/** One row of a loot table. Give either cash [min, max] or an item id. */
+export interface LootEntry {
+  weight: number;
+  cash?: [number, number];
+  item?: string;
+}
+
 export type Action =
   | { say: LineSpec[] }
   | { set: Record<string, boolean> }
@@ -48,6 +56,7 @@ export type Action =
   | { cash: number }
   | { xp: number }
   | { open: string }
+  | { loot: LootEntry[] }
   | { heal: "hp" | "all" }
   | { checkIn: true }
   | { hud: string | null }
@@ -81,7 +90,7 @@ export interface HotspotDefinition {
   /** Only active while this passes. */
   when?: Condition;
   /** Draw a chest here. Opened when its id is in openedChestIds or `flag` is set. */
-  chest?: { id: string; frame: number; tint?: string; flag?: string };
+  chest?: { id: string; frame: number; tint?: string; flag?: string; loot?: LootEntry[] };
 }
 
 export type BattleOutcome = "victory" | "defeat" | "escape";
@@ -103,7 +112,11 @@ class StopScript extends Error {}
 
 export function findRules(state: GameState, areaId: string, key: string): Rule[] | undefined {
   const quest = getQuest(state.quest.questId);
-  return quest.events?.[`${areaId}:${key}`] ?? getArea(areaId).events?.[key];
+  const area = getArea(areaId);
+  const explicit = quest.events?.[`${areaId}:${key}`] ?? area.events?.[key];
+  if (explicit) return explicit;
+  const chest = area.hotspots?.find((spot) => spot.id === key)?.chest;
+  return chest?.loot ? lootChestRules(chest) : undefined;
 }
 
 export function hasEvent(state: GameState, areaId: string, key: string): boolean {
@@ -216,6 +229,10 @@ export class ScriptRunner {
       host.refresh();
       return;
     }
+    if ("loot" in action) {
+      await host.say([rollLoot(state, action.loot)]);
+      return;
+    }
     if ("heal" in action) {
       state.player.hp = state.player.maxHp;
       if (action.heal === "all") state.player.dadPoints = state.player.maxDadPoints;
@@ -277,6 +294,33 @@ export class ScriptRunner {
     this.host.goto(scene, spawn);
     throw new StopScript();
   }
+}
+
+/** Rolls a loot table, applies the result, and returns the line to show. */
+export function rollLoot(state: GameState, table: LootEntry[]): DialogueLine {
+  const total = table.reduce((sum, entry) => sum + entry.weight, 0);
+  let roll = random() * total;
+  const entry = table.find((candidate) => (roll -= candidate.weight) <= 0) ?? table[table.length - 1];
+
+  if (entry.item) {
+    state.player.inventory.push(entry.item);
+    const name = items.find((item) => item.id === entry.item)?.name ?? entry.item;
+    return { speaker: "SYSTEM", text: `YOU FOUND ${name.toUpperCase()}!` };
+  }
+
+  const [min, max] = entry.cash ?? [1, 1];
+  const amount = randomInt(min, max);
+  state.player.cash += amount;
+  return { speaker: "SYSTEM", text: `YOU FOUND ${amount} LOVE POINTS.` };
+}
+
+/** Event for a chest that only holds loot, so area files need no event for it. */
+export function lootChestRules(chest: NonNullable<HotspotDefinition["chest"]>): Rule[] {
+  const opened = { any: [{ opened: [chest.id] }, ...(chest.flag ? [{ flags: [chest.flag] }] : [])] };
+  return [
+    { when: opened, do: [{ say: [["NARRATOR", "Empty. Dad checks twice anyway."]] }] },
+    { do: [{ open: chest.id }, { say: [["NARRATOR", "Dad pries open the box."]] }, { loot: chest.loot ?? [] }] },
+  ];
 }
 
 export function equipItem(state: GameState, itemId: string): void {
