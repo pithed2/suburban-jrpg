@@ -18,6 +18,15 @@ export interface RandomEncounterResult {
 interface Point {
   x: number;
   y: number;
+  col?: number;
+  row?: number;
+}
+
+function inRegion(entry: RandomEncounterEntry, at?: Point): boolean {
+  if (!entry.regions) return true;
+  const { col, row } = at ?? {};
+  if (col === undefined || row === undefined) return false;
+  return entry.regions.some(([c0, r0, c1, r1]) => col >= c0 && col <= c1 && row >= r0 && row <= r1);
 }
 
 /**
@@ -104,7 +113,7 @@ export class RandomEncounterTracker {
     const eligibleEntries = entries.filter((entry) => {
       const minimumMet = entry.minPlayerLevel === undefined || state.player.level >= entry.minPlayerLevel;
       const maximumMet = entry.maxPlayerLevel === undefined || state.player.level <= entry.maxPlayerLevel;
-      return minimumMet && maximumMet && matches(state, entry.when);
+      return minimumMet && maximumMet && matches(state, entry.when) && inRegion(entry, this.lastPosition);
     });
 
     const totalWeight = eligibleEntries.reduce((sum, entry) => sum + entry.weight, 0);

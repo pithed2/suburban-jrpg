@@ -6,7 +6,14 @@ import { areas } from "../src/game/areaData";
 import { dialogue, enemies, items } from "../src/game/content";
 import type { Condition } from "../src/game/engine/conditions";
 import { voiceLine, type Action, type LineSpec, type Rule } from "../src/game/engine/script";
+import { readFileSync } from "node:fs";
+import type { LootEntry } from "../src/game/engine/script";
 import { quests } from "../src/game/quests";
+
+/** Texture keys BootScene loads, read from its source. */
+const textures = new Set(
+  [...readFileSync("src/scenes/BootScene.ts", "utf8").matchAll(/load\.(?:image|spritesheet)\(\s*"([^"]+)"/g)].map((m) => m[1]),
+);
 
 const SCENES = [
   "NeighborhoodScene", "BasementScene", "GarageScene", "BathroomScene", "HardwareStoreScene",
@@ -60,6 +67,16 @@ export function validateContent(): string[] {
     }
   };
 
+  const checkLoot = (where: string, table: LootEntry[]) => {
+    if (table.length === 0) problems.push(`${where}: empty loot table`);
+    for (const entry of table) {
+      if (!(entry.weight > 0)) problems.push(`${where}: loot weight must be > 0`);
+      if (entry.item && !itemIds.has(entry.item)) problems.push(`${where}: unknown loot item ${entry.item}`);
+      if (!entry.item && !entry.cash) problems.push(`${where}: loot entry gives nothing`);
+      if (entry.cash && entry.cash[0] > entry.cash[1]) problems.push(`${where}: loot cash range is reversed`);
+    }
+  };
+
   const checkActions = (where: string, actions: Action[], eventKeys: Set<string>) => {
     for (const action of actions) {
       if ("say" in action) checkLines(where, action.say);
@@ -88,6 +105,7 @@ export function validateContent(): string[] {
         checkActions(where, action.then, eventKeys);
         checkActions(where, action.else ?? [], eventKeys);
       }
+      if ("loot" in action) checkLoot(where, action.loot);
       if ("run" in action && !eventKeys.has(action.run)) problems.push(`${where}: run of missing event ${action.run}`);
     }
   };
@@ -108,7 +126,8 @@ export function validateContent(): string[] {
     if (!SCENES.includes(area.returnTo.scene)) problems.push(`area ${area.id}: unknown returnTo scene ${area.returnTo.scene}`);
     for (const spot of area.hotspots ?? []) {
       const questHas = quests.some((quest) => quest.events?.[`${area.id}:${spot.id}`]);
-      if (!keys.has(spot.id) && !questHas && spot.id !== "clerk") problems.push(`area ${area.id}: hotspot ${spot.id} has no event`);
+      if (spot.chest?.loot) checkLoot(`area ${area.id} chest ${spot.id}`, spot.chest.loot);
+      if (!keys.has(spot.id) && !questHas && !spot.chest?.loot && spot.id !== "clerk") problems.push(`area ${area.id}: hotspot ${spot.id} has no event`);
       checkCondition(`area ${area.id} hotspot ${spot.id}`, spot.when);
     }
     for (const [key, rules] of Object.entries(area.events ?? {})) checkRules(`area ${area.id}:${key}`, rules, keys);
@@ -136,6 +155,11 @@ export function validateContent(): string[] {
   }
 
   for (const enemy of enemies) {
+    enemy.drops?.forEach((drop) => {
+      if (!itemIds.has(drop.item)) problems.push(`enemy ${enemy.id}: unknown drop item ${drop.item}`);
+      if (!(drop.chance > 0 && drop.chance <= 1)) problems.push(`enemy ${enemy.id}: drop chance must be in (0, 1]`);
+    });
+    if (enemy.battleTexture && !textures.has(enemy.battleTexture)) problems.push(`enemy ${enemy.id}: texture ${enemy.battleTexture} is not loaded in BootScene`);
     enemy.modifiers?.forEach((modifier) => checkCondition(`enemy ${enemy.id} modifier`, modifier.when));
     if (enemy.banter && !voiceLine(`banter:${enemy.banter}`)) problems.push(`enemy ${enemy.id}: banter pool ${enemy.banter} is empty`);
   }

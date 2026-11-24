@@ -11,11 +11,6 @@
     "stepDistance": 80,
     "baseChance": 0.23,
     "cooldownRolls": 3,
-    "disabledWhen": {
-      "flags": [
-        "bossDefeated"
-      ]
-    },
     "introMessages": [
       "Something shifts in the basement dark.",
       "Dad pauses. The house has chosen violence."
@@ -41,6 +36,50 @@
           "A Freaky Icky Spider descends from the ceiling on a thread of web.",
           "Something brushes Dad's shoulder in the dark. It has too many legs.",
           "A Freaky Icky Spider emerges from behind the water heater."
+        ]
+      },
+      {
+        "enemyId": "stink-bug",
+        "weight": 2
+      },
+      {
+        "enemyId": "damp-spider",
+        "weight": 2
+      },
+      {
+        "enemyId": "lint-lord",
+        "weight": 3,
+        "regions": [
+          [
+            34,
+            6,
+            47,
+            31
+          ],
+          [
+            13,
+            23,
+            35,
+            31
+          ]
+        ]
+      },
+      {
+        "enemyId": "sump-slime",
+        "weight": 2,
+        "regions": [
+          [
+            34,
+            6,
+            47,
+            31
+          ],
+          [
+            13,
+            23,
+            35,
+            31
+          ]
         ]
       }
     ]
@@ -123,6 +162,168 @@
       "col": 7,
       "row": 21,
       "radius": 3
+    },
+    {
+      "id": "chest:furnace",
+      "col": 45,
+      "row": 7,
+      "radius": 1.75,
+      "solid": true,
+      "chest": {
+        "id": "basement:furnace",
+        "frame": 0,
+        "loot": [
+          {
+            "weight": 4,
+            "cash": [
+              6,
+              14
+            ]
+          },
+          {
+            "weight": 2,
+            "item": "cold-coffee"
+          },
+          {
+            "weight": 2,
+            "item": "ibuprofen"
+          },
+          {
+            "weight": 2,
+            "item": "energy-drink"
+          },
+          {
+            "weight": 1,
+            "item": "leftover-pizza"
+          }
+        ]
+      }
+    },
+    {
+      "id": "chest:furnace-2",
+      "col": 38,
+      "row": 13,
+      "radius": 1.75,
+      "solid": true,
+      "chest": {
+        "id": "basement:furnace-2",
+        "frame": 0,
+        "loot": [
+          {
+            "weight": 4,
+            "cash": [
+              6,
+              14
+            ]
+          },
+          {
+            "weight": 2,
+            "item": "cold-coffee"
+          },
+          {
+            "weight": 2,
+            "item": "ibuprofen"
+          },
+          {
+            "weight": 2,
+            "item": "energy-drink"
+          },
+          {
+            "weight": 1,
+            "item": "leftover-pizza"
+          }
+        ]
+      }
+    },
+    {
+      "id": "chest:sump",
+      "col": 46,
+      "row": 29,
+      "radius": 1.75,
+      "solid": true,
+      "chest": {
+        "id": "basement:sump",
+        "frame": 0,
+        "loot": [
+          {
+            "weight": 4,
+            "cash": [
+              6,
+              14
+            ]
+          },
+          {
+            "weight": 2,
+            "item": "cold-coffee"
+          },
+          {
+            "weight": 2,
+            "item": "ibuprofen"
+          },
+          {
+            "weight": 2,
+            "item": "energy-drink"
+          },
+          {
+            "weight": 1,
+            "item": "leftover-pizza"
+          }
+        ]
+      }
+    },
+    {
+      "id": "chest:crawl",
+      "col": 14,
+      "row": 30,
+      "radius": 1.75,
+      "solid": true,
+      "chest": {
+        "id": "basement:crawl",
+        "frame": 0,
+        "loot": [
+          {
+            "weight": 4,
+            "cash": [
+              6,
+              14
+            ]
+          },
+          {
+            "weight": 2,
+            "item": "cold-coffee"
+          },
+          {
+            "weight": 2,
+            "item": "ibuprofen"
+          },
+          {
+            "weight": 2,
+            "item": "energy-drink"
+          },
+          {
+            "weight": 1,
+            "item": "leftover-pizza"
+          }
+        ]
+      }
+    },
+    {
+      "id": "chest:mallet",
+      "col": 22,
+      "row": 30,
+      "radius": 1.75,
+      "solid": true,
+      "chest": {
+        "id": "basement:mallet",
+        "frame": 4,
+        "tint": "#facc15"
+      }
+    },
+    {
+      "id": "deadend:furnace",
+      "col": 41,
+      "row": 8,
+      "radius": 2
     }
   ],
   "events": {
@@ -682,6 +883,126 @@
               {
                 "speaker": "DAD",
                 "voice": "movie:deadEnd"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "deadend:furnace": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The old furnace. Decommissioned in 2011."
+              ],
+              [
+                "NARRATOR",
+                "It still makes a noise at night."
+              ],
+              [
+                "NARRATOR",
+                "Nobody has told it."
+              ],
+              {
+                "speaker": "DAD",
+                "voice": "movie:deadEnd"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "chest:mallet": [
+      {
+        "when": {
+          "opened": [
+            "basement:mallet"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Empty. Dad checks twice anyway."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "do": [
+          {
+            "open": "basement:mallet"
+          },
+          {
+            "give": "rubber-mallet"
+          },
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Behind a stack of paint trays: a Rubber Mallet."
+              ],
+              [
+                "NARRATOR",
+                "It feels right in Dad's hand. Like it was waiting for him."
+              ],
+              [
+                "SYSTEM",
+                "YOU FOUND RUBBER MALLET!"
+              ]
+            ]
+          },
+          {
+            "if": {
+              "any": [
+                {
+                  "equipped": [
+                    "two-hands"
+                  ]
+                },
+                {
+                  "equipped": [
+                    "percussive-maintenance"
+                  ]
+                },
+                {
+                  "equipped": [
+                    "adjustable-wrench"
+                  ]
+                },
+                {
+                  "equipped": [
+                    "plumbing-snake"
+                  ]
+                }
+              ]
+            },
+            "then": [
+              {
+                "equip": "rubber-mallet"
+              },
+              {
+                "say": [
+                  [
+                    "NARRATOR",
+                    "Dad puts on the Rubber Mallet. Upgrade."
+                  ]
+                ]
+              }
+            ],
+            "else": [
+              {
+                "say": [
+                  [
+                    "NARRATOR",
+                    "Dad already has better. It goes in the bag."
+                  ]
+                ]
               }
             ]
           }

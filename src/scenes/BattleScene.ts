@@ -338,6 +338,7 @@ export class BattleScene extends Phaser.Scene {
       .setDisplaySize(view.width ?? 42, view.height ?? 42)
       .setDepth(DEPTH + 1)
       .setVisible(Boolean(this.enemy.battleTexture));
+    if (view.tint) this.enemySprite.setTint(Phaser.Display.Color.HexStringToColor(view.tint).color);
     this.enemyText = addPixelText(this, 108, 56, "", 6).setMaxWidth(96).setDepth(DEPTH + 2);
 
     this.commandBox = panel(256, 58, 120, 58).setVisible(false);

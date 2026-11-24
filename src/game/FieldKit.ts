@@ -224,7 +224,7 @@ export class FieldKit implements ScriptHost {
   onStep(): void {
     if (!this.encounters || !this.isIdle) return;
     const mover = this.options.mover();
-    const encounter = this.encounters.update({ x: mover.x, y: mover.y }, this.state);
+    const encounter = this.encounters.update({ x: mover.x, y: mover.y, col: mover.col, row: mover.row }, this.state);
     if (!encounter) return;
 
     const mood = encounter.enemy.battleStartMood ?? "battleStart";

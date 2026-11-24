@@ -35,8 +35,9 @@
     "id": "ibuprofen",
     "name": "Ibuprofen",
     "kind": "consumable",
-    "heal": 3,
-    "description": "Restores enough resolve to continue dealing with the house."
+    "heal": 10,
+    "description": "Restores enough resolve to continue dealing with the house.",
+    "price": 4
   },
   {
     "id": "dads-cardigan",
@@ -50,7 +51,7 @@
     "name": "Tool Belt",
     "kind": "armor",
     "defense": 3,
-    "price": 12,
+    "price": 30,
     "description": "Heavy with pouches Dad has never once used correctly. Surprisingly protective."
   },
   {
@@ -58,14 +59,14 @@
     "name": "Steel-Toe Boots",
     "kind": "armor",
     "defense": 5,
-    "price": 30,
+    "price": 80,
     "description": "Dome Hepot's finest footwear. Stub a toe on a clog and the clog loses."
   },
   {
     "id": "cold-coffee",
     "name": "Cold Coffee",
     "kind": "consumable",
-    "heal": 8,
+    "heal": 20,
     "price": 6,
     "description": "Microwaved twice, finished anyway. Restores HP through sheer caffeine spite."
   },
@@ -98,7 +99,7 @@
     "name": "Plumbing Snake",
     "kind": "weapon",
     "power": 7,
-    "price": 15,
+    "price": 35,
     "battleMessage": "Dad feeds the Plumbing Snake into the unknown with grim determination.",
     "battleMessages": [
       "Dad feeds the Plumbing Snake into the unknown with grim determination.",
@@ -115,7 +116,7 @@
     "name": "Plunger of the Gods",
     "kind": "weapon",
     "power": 12,
-    "price": 45,
+    "price": 120,
     "battleMessage": "Dad raises the Plunger of the Gods. Lesser clogs flee on sight.",
     "battleMessages": [
       "Dad raises the Plunger of the Gods. Lesser clogs flee on sight.",
@@ -126,5 +127,33 @@
       "With great suction comes great responsibility."
     ],
     "description": "THEE Dome Hepot's finest. Expensive. Mythic. Worth the drive."
+  },
+  {
+    "id": "leftover-pizza",
+    "name": "Leftover Pizza",
+    "kind": "consumable",
+    "heal": 35,
+    "price": 18,
+    "description": "Cold. Folded. Eaten over the sink. Restores a lot of HP."
+  },
+  {
+    "id": "rubber-mallet",
+    "name": "Rubber Mallet",
+    "kind": "weapon",
+    "power": 9,
+    "description": "Found behind the furnace. Hits hard without leaving marks on the drywall.",
+    "battleMessages": [
+      "Dad brings the Rubber Mallet down like a gavel.",
+      "BONK. The mallet bounces. Dad does not.",
+      "Dad taps it, then remembers he is allowed to hit harder.",
+      "The mallet makes the sound of a problem being solved."
+    ]
+  },
+  {
+    "id": "garden-gloves",
+    "name": "Garden Gloves",
+    "kind": "armor",
+    "defense": 2,
+    "description": "Thorn-proof, splinter-proof, spider-resistant. Smell faintly of mulch."
   }
 ]
