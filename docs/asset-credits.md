@@ -14,3 +14,4 @@ Confirm and expand license/source notes before wider distribution.
 - Source: `scripts/art/quest3_art.py` (ASCII pixel grids). Edit the grids and run the script to change the art.
 - `public/assets-active/enemies/Mole_King.png`: by Andy.
 - `public/assets-active/enemies/Vole_Lieutenant.png`: by Andy.
+- `public/assets-active/enemies/Crabgrass_Creeper.png`: by Andy.
