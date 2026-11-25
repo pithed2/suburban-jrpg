@@ -43,7 +43,7 @@ export class BootScene extends Phaser.Scene {
     this.load.image("dryer-fixed", "/assets-active/props/Happy_Dryer.png");
     this.load.image("dust-bunny", "/assets-active/enemies/Dust_Bunny.png");
     this.load.image("angry-dust-bunny", "/assets-active/enemies/Angry_Dust_Bunny_battle.png");
-    this.load.image("icky-spider", "/assets-active/enemies/Icky_Spider_2.png"); // 74×64, pre-transparent
+    this.load.image("icky-spider", "/assets-active/enemies/Icky_Spider_Slime.png");
     this.load.image("single-ply-sam", "/assets-active/enemies/Single_Ply_Sam_battle.png");
     this.load.image("olfactory-ninja", "/assets-active/enemies/Olfactory_Ninja.png");
     this.load.image("toothpaste-slime", "/assets-active/enemies/toothpaste_slime.png");
