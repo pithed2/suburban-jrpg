@@ -2,7 +2,6 @@
   "id": "bathroom",
   "label": "Bathroom",
   "hud": "BATHROOM",
-  "backdrop": "#1c2630",
   "returnTo": {
     "scene": "NeighborhoodScene",
     "spawn": "bathroom"
