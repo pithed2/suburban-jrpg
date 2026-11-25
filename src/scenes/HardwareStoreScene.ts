@@ -5,6 +5,7 @@ import { getArea, items } from "../game/content";
 import { equipItem } from "../game/engine/script";
 import { FieldKit } from "../game/FieldKit";
 import { GridMover } from "../game/GridMover";
+import { STORE } from "../game/storeTiles";
 import { addPixelText, setPixelText } from "../game/uiText";
 
 const TILE = 16;
@@ -15,8 +16,6 @@ const EXIT    = 2;
 const SHELF   = 3;
 const COUNTER = 4;
 
-const WALL_FRAME  = 134;
-const FLOOR_FRAME = 7;
 
 const W = WALL;
 const _ = FLOOR;
@@ -55,14 +54,16 @@ const SPAWN_ROW =  1;
 /** Stock comes from src/data/areas/homedepot.json -> shop. */
 const SHOP_ITEMS: string[] = getArea("homedepot").shop ?? [];
 
-// Dept sign data: [centerCol, label, rowY]
-const DEPT_SIGNS: [number, string][] = [
-  [1.5,  "LUMBER"],
-  [4.5,  "PIPE"],
-  [7.5,  "HARDWARE"],
-  [18.5, "PAINT"],
-  [21.5, "TOOLS"],
-  [24.5, "ELECT."],
+// Shelf departments by the left column of each 2-wide shelf unit.
+const DEPARTMENTS: [number, keyof typeof STORE.shelf][] = [
+  [1, "lumber"], [4, "pipe"], [7, "hardware"],
+  [18, "paint"], [21, "tools"], [24, "electrical"],
+];
+const COUNTER_COL = 10; // service counter runs cols 10-15 on row 7
+
+// Floor props that block walking: lumber pallets and a stray cart.
+const PROPS: [number, number, number][] = [
+  [1, 11, STORE.pallet], [2, 11, STORE.pallet], [26, 11, STORE.cart],
 ];
 
 
@@ -82,6 +83,7 @@ export class HardwareStoreScene extends Phaser.Scene {
   private shopHintText!: Phaser.GameObjects.BitmapText;
   private shopBalanceText!: Phaser.GameObjects.BitmapText;
   private shopSelected = 0;
+  private readonly blocked = new Set<string>();
 
   constructor() {
     super("HardwareStoreScene");
@@ -132,138 +134,42 @@ export class HardwareStoreScene extends Phaser.Scene {
 
   // ── Tiles ──────────────────────────────────────────────────────────────────
 
+  private tile(col: number, row: number, frame: number): Phaser.GameObjects.Image {
+    return this.add.image(col * TILE + TILE / 2, row * TILE + TILE / 2, "store-tiles", frame);
+  }
+
   private drawTiles(): void {
     for (let row = 0; row < ROWS; row++) {
       for (let col = 0; col < COLS; col++) {
         const tileId = MAP[row][col];
-        const cx = col * TILE + TILE / 2;
-        const cy = row * TILE + TILE / 2;
-
         if (tileId === WALL) {
-          const spr = this.add.image(cx, cy, "full-set-int-a4")
-            .setFrame(WALL_FRAME)
-            .setDisplaySize(TILE, TILE);
-          // HD orange band across top wall
-          if (row === 0) spr.setTint(0x994400);
+          const below = MAP[row + 1]?.[col];
+          this.tile(col, row, below !== undefined && below !== WALL ? STORE.wallFace : STORE.wallTop);
+        } else if (tileId === EXIT) {
+          this.tile(col, row, STORE.glassDoor);
         } else if (tileId === SHELF) {
-          this.add.image(cx, cy, "full-set-int-a2")
-            .setFrame(FLOOR_FRAME)
-            .setDisplaySize(TILE, TILE);
-          this.drawShelfAt(cx, cy, col);
+          const dept = DEPARTMENTS.find(([c]) => col === c || col === c + 1)?.[1] ?? "hardware";
+          const top = MAP[row - 1]?.[col] !== SHELF;
+          this.tile(col, row, STORE.shelf[dept][top ? 0 : 1]);
         } else if (tileId === COUNTER) {
-          this.add.image(cx, cy, "full-set-int-a2")
-            .setFrame(FLOOR_FRAME)
-            .setDisplaySize(TILE, TILE);
-          // Counter surface — dark base + orange top edge
-          this.add.rectangle(cx, cy, TILE, TILE, 0x1A1A2E).setOrigin(0.5, 0.5);
-          this.add.rectangle(cx, cy - TILE / 2 + 2, TILE, 3, 0xF96302).setOrigin(0.5, 0.5);
+          this.tile(col, row, STORE.counter[col - COUNTER_COL]);
         } else {
-          this.add.image(cx, cy, "full-set-int-a2")
-            .setFrame(FLOOR_FRAME)
-            .setDisplaySize(TILE, TILE);
-          if (tileId === EXIT) {
-            // Orange door frame on wall exit
-            this.add.rectangle(cx, cy, TILE, TILE, 0xF96302, 0.6);
-            addPixelText(this, cx - 8, cy - 3, "OUT", 6).setTint(0xFFFFFF);
-          }
+          this.tile(col, row, row === 10 ? STORE.stripeFloor : STORE.floor);
         }
       }
     }
-
-    // Orange stripe along bottom of each wall row (HD brand stripe)
-    this.add.rectangle(TILE, 0, (COLS - 2) * TILE, TILE, 0xF96302)
-      .setOrigin(0, 0)
-      .setAlpha(0.15);
-
-    // Aisle floor stripes — thin orange lines at aisle rows
-    for (const aisleRow of [4, 7, 10]) {
-      this.add.rectangle(
-        TILE,
-        aisleRow * TILE + TILE - 2,
-        (COLS - 2) * TILE,
-        2,
-        0xF96302,
-        0.5,
-      ).setOrigin(0, 0);
-    }
-
-    // Aisle number text at the main corridor gap (cols 9-17)
-    this.addAisleMarker(9, 4,  "AISLE 6");
-    this.addAisleMarker(9, 7,  "AISLE 7 — SERVICE");
-    this.addAisleMarker(9, 10, "AISLE 8");
-  }
-
-  private drawShelfAt(cx: number, cy: number, col: number): void {
-    const leftSide  = col <= 8;
-    const rightSide = col >= 18;
-    const tint = leftSide  ? 0x6B5D3F   // warm wood — lumber/hardware left
-               : rightSide ? 0x3A5068   // steel blue — metal/electrical right
-               : 0x555555;              // fallback
-    this.add.image(cx, cy, "full-set-int-b")
-      .setFrame(40)
-      .setDisplaySize(TILE, TILE)
-      .setTint(tint);
-    // Shelf edge highlight
-    this.add.rectangle(cx, cy + TILE / 2 - 1, TILE, 1, 0xFFFFFF, 0.2).setOrigin(0.5, 0.5);
   }
 
   // ── Decorations ────────────────────────────────────────────────────────────
 
   private placeDecorations(): void {
-    // Dept signs hanging at row 1 level
-    for (const [centerCol, label] of DEPT_SIGNS) {
-      this.addDeptSign(centerCol, label);
+    this.tile(13, 1, STORE.mat);
+    this.tile(14, 1, STORE.mat);
+    this.tile(12, 7, STORE.register);
+    for (const [col, row, frame] of PROPS) {
+      this.tile(col, row, frame);
+      this.blocked.add(`${col},${row}`);
     }
-
-    // "SERVICE DESK" sign above counter area
-    const deskX = 12.5 * TILE;
-    const deskY = TILE * 6 + 2;
-    this.add.rectangle(deskX, deskY, TILE * 6, 9, 0x000000).setOrigin(0.5, 0);
-    this.add.rectangle(deskX, deskY, TILE * 6, 9, 0xF96302, 0.9).setOrigin(0.5, 0)
-      .setStrokeStyle(1, 0xCC4400, 1);
-    addPixelText(this, deskX - TILE * 2.6, deskY + 1, "SERVICE DESK", 6).setTint(0xFFFFFF);
-
-    // Small product boxes drawn on shelf top tiles (rows 2, 5, 8)
-    const productColors = [0xCC3300, 0x2255AA, 0xEEAA00, 0x227722, 0x882299];
-    for (const shelfRow of [2, 5, 8]) {
-      for (let col = 1; col <= 26; col++) {
-        if (MAP[shelfRow][col] === SHELF) {
-          const cx = col * TILE + TILE / 2;
-          const cy = shelfRow * TILE + TILE / 2;
-          // 2-3 small product boxes per shelf tile
-          const color = productColors[(col * 3 + shelfRow) % productColors.length];
-          this.add.rectangle(cx - 4, cy - 2, 5, 8, color).setOrigin(0.5, 0.5);
-          this.add.rectangle(cx + 3, cy - 2, 4, 7, productColors[(col + 2) % productColors.length]).setOrigin(0.5, 0.5);
-        }
-      }
-    }
-
-    // Entrance mat below exit tiles
-    this.add.rectangle(13.5 * TILE + TILE / 2, TILE + TILE - 3, TILE * 2, 4, 0xF96302, 0.7)
-      .setOrigin(0.5, 0);
-
-    // Forklift silhouette in far-left back corner (decorative)
-    const fkX = 1.5 * TILE;
-    const fkY = 10 * TILE;
-    this.add.rectangle(fkX + 2, fkY,     12, 28, 0xF96302, 0.55).setOrigin(0.5, 0);
-    this.add.rectangle(fkX - 2, fkY,      8, 20, 0xCC4400, 0.5).setOrigin(0.5, 0);
-    this.add.rectangle(fkX - 6, fkY + 20, 3, 10, 0x888888, 0.7).setOrigin(0.5, 0);
-    this.add.rectangle(fkX,     fkY + 20, 3, 10, 0x888888, 0.7).setOrigin(0.5, 0);
-  }
-
-  private addDeptSign(centerCol: number, label: string): void {
-    const x = centerCol * TILE;
-    const y = TILE + 3;
-    this.add.rectangle(x, y, TILE * 2 - 2, 8, 0xF96302).setOrigin(0.5, 0);
-    this.add.rectangle(x, y, TILE * 2 - 2, 8, 0x000000, 0).setOrigin(0.5, 0)
-      .setStrokeStyle(0.5, 0xCC4400, 0.8);
-    addPixelText(this, x - TILE + 2, y + 1, label, 5).setTint(0xFFFFFF);
-  }
-
-  private addAisleMarker(startCol: number, aisleRow: number, label: string): void {
-    const x = startCol * TILE + 2;
-    const y = aisleRow * TILE + 4;
-    addPixelText(this, x, y, label, 5).setTint(0xF96302).setAlpha(0.6);
   }
 
   // ── Clerk ──────────────────────────────────────────────────────────────────
@@ -288,6 +194,7 @@ export class HardwareStoreScene extends Phaser.Scene {
   private canWalkTo(col: number, row: number): boolean {
     if (col < 0 || col >= COLS || row < 0 || row >= ROWS) return false;
     if (col === CLERK_COL && row === CLERK_ROW) return false;
+    if (this.blocked.has(`${col},${row}`)) return false;
     const t = MAP[row][col];
     return t === FLOOR || t === EXIT;
   }
