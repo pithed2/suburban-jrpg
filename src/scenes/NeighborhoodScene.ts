@@ -3,9 +3,9 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * Main house-interior hub, Dragon Warrior style tile rendering.
  *
- * Tiles drawn from the full_set RPG-Maker sheets (same as TileRoomScene):
- *   walls  → full-set-int-a4  frame WALL_FRAME
- *   floors → full-set-int-a2  frame per room type
+ * Art: original tiles from scripts/art/house_art.py ("house-tiles" sheet,
+ * frame names in src/game/houseTiles.ts). Furniture is the FURNITURE list
+ * below; solid pieces block walking.
  *
  * Object positions (wife, dryer, exits) are taken directly from the values
  * in public/assets-active/maps/new-house.json Objects layer so they never drift.
@@ -20,20 +20,10 @@ import { CharacterSprite } from "../game/CharacterSprite";
 import { DAD_DEF, WIFE_DEF } from "../game/characterDefs";
 import { FieldKit } from "../game/FieldKit";
 import { GridMover } from "../game/GridMover";
+import { HOUSE, type HouseFrame } from "../game/houseTiles";
 
 // ── Tile constants ─────────────────────────────────────────────────────────
 const TILE = 16;
-
-// Walls — full-set-int-a4 (32×32 per frame)
-const WALL_FRAME = 140; // warm cream plaster — suburban interior wall
-
-// Floors — house-core-16 = house_core_16x16.png (16×16 per frame, 64 cols × 96 rows)
-// These are the same frame numbers used before the full_set refactor.
-// They look like a real suburban house rather than a stone-floor RPG.
-const FLOOR_LIVING  = 2052; // row 32 col  4 — warm wood plank    → living room
-const FLOOR_KITCHEN = 2060; // row 32 col 12 — ceramic tile        → kitchen
-const FLOOR_HALL    = 2576; // row 40 col 16 — neutral hall floor  → hallway
-const FLOOR_MUD     = 2116; // row 33 col  4 — entry/mudroom tile  → mudroom / utility
 
 // ── Tile-type IDs used in the MAP array ───────────────────────────────────
 const W = 1;   // wall  (solid)
@@ -49,12 +39,12 @@ const B = 10;  // back door          (solid wall bump marker — backyard, quest
 
 const WALKABLE = new Set([L, K, H, M, S, U]);
 
-// ── Four rooms, Dragon Warrior style ──────────────────────────────────────
+// ── Five rooms, Dragon Warrior style ──────────────────────────────────────
 //
-//   ┌──────────────────────┬──────────────────────────┐
-//   │     LIVING ROOM      │        KITCHEN           │
-//   │      (wife ♥)        │       (dryer ○)          │
-//   └────────┬─────────────┴──────────────┬───────────┘
+//   ┌─────────────┬─────────────┬─────────────────────┐
+//   │ LIVING ROOM │   DINING    │      KITCHEN        │
+//   │  (wife ♥)   =    ROOM     =  (washer/dryer ○)   │
+//   └────────┬────┴─────────────┴──────────┬──────────┘
 //            │                            │
 //   ┌────────┴────────────────────────────┴───────────┐
 //   │                 HALLWAY                         │
@@ -72,21 +62,22 @@ const WALKABLE = new Set([L, K, H, M, S, U]);
 //    Kitchen → Hallway : cols 26–27, row 11 passage
 //    Hallway → Mudroom : cols 7–8,  row 17 passage
 //    Mudroom south     : cols 7–8,  row 21 (garage exit opening)
+//    Living ↔ Dining ↔ Kitchen : rows 5–6 through cols 14 and 22
 //
 const _ = 0;
 /* prettier-ignore */
 const MAP: number[][] = [
   [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_], //  0
   [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_], //  1
-  [_,_,W,W,W,W,W,W,W,W,W,P,P,W,W,_,_,_,_,_,_,_,W,W,W,W,W,W,W,W,W,W,W,W,_,_], //  2  top walls (front door 11-12)
-  [_,_,W,L,L,L,L,L,L,L,L,L,L,L,W,_,_,_,_,_,_,_,W,K,K,K,K,K,K,K,K,K,K,K,W,_,_], //  3
-  [_,_,W,L,L,L,L,L,L,L,L,L,L,L,W,_,_,_,_,_,_,_,W,K,K,K,K,K,K,K,K,K,K,K,W,_,_], //  4
-  [_,_,W,L,L,L,L,L,L,L,L,L,L,L,W,_,_,_,_,_,_,_,W,K,K,K,K,K,K,K,K,K,K,K,W,_,_], //  5
-  [_,_,W,L,L,L,L,L,L,L,L,L,L,L,W,_,_,_,_,_,_,_,W,K,K,K,K,K,K,K,K,K,K,K,W,_,_], //  6
-  [_,_,W,L,L,L,L,L,L,L,L,L,L,L,W,_,_,_,_,_,_,_,W,K,K,K,K,K,K,K,K,K,K,K,W,_,_], //  7
-  [_,_,W,L,L,L,L,L,L,L,L,L,L,L,W,_,_,_,_,_,_,_,W,K,K,K,K,K,K,K,K,K,K,K,W,_,_], //  8
-  [_,_,W,L,L,L,L,L,L,L,L,L,L,L,W,_,_,_,_,_,_,_,W,K,K,K,K,K,K,K,K,K,K,K,B,_,_], //  9  back door at col 33
-  [_,_,W,W,W,W,W,L,L,W,W,W,W,W,W,_,_,_,_,_,_,_,W,W,W,W,W,K,K,W,W,W,W,W,W,_,_], // 10  south walls + door gaps
+  [_,_,W,W,W,W,W,W,W,W,W,P,P,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,_,_], //  2  top walls (front door 11-12)
+  [_,_,W,L,L,L,L,L,L,L,L,L,L,L,W,L,L,L,L,L,L,L,W,K,K,K,K,K,K,K,K,K,K,K,W,_,_], //  3
+  [_,_,W,L,L,L,L,L,L,L,L,L,L,L,W,L,L,L,L,L,L,L,W,K,K,K,K,K,K,K,K,K,K,K,W,_,_], //  4
+  [_,_,W,L,L,L,L,L,L,L,L,L,L,L,L,L,L,L,L,L,L,L,L,K,K,K,K,K,K,K,K,K,K,K,W,_,_], //  5
+  [_,_,W,L,L,L,L,L,L,L,L,L,L,L,L,L,L,L,L,L,L,L,L,K,K,K,K,K,K,K,K,K,K,K,W,_,_], //  6
+  [_,_,W,L,L,L,L,L,L,L,L,L,L,L,W,L,L,L,L,L,L,L,W,K,K,K,K,K,K,K,K,K,K,K,W,_,_], //  7
+  [_,_,W,L,L,L,L,L,L,L,L,L,L,L,W,L,L,L,L,L,L,L,W,K,K,K,K,K,K,K,K,K,K,K,W,_,_], //  8
+  [_,_,W,L,L,L,L,L,L,L,L,L,L,L,W,L,L,L,L,L,L,L,W,K,K,K,K,K,K,K,K,K,K,K,B,_,_], //  9  back door at col 33
+  [_,_,W,W,W,W,W,L,L,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,K,K,W,W,W,W,W,W,_,_], // 10  south walls + door gaps
   [_,_,_,_,_,_,_,L,L,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,K,K,_,_,_,_,_,_,_], // 11  passage tiles
   [_,_,W,W,W,W,W,H,H,W,W,W,W,S,S,W,W,W,W,W,U,U,W,W,W,W,W,H,H,W,W,W,W,W,_,_], // 12  hallway top wall (bathroom stairs 20-21)
   [_,_,W,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,W,_,_], // 13
@@ -115,7 +106,6 @@ function px(col: number, row: number) {
 }
 
 const WIFE_PX     = px(7,  6);   // living room centre
-const TILEROOM_PX = px(28, 14);  // hallway right-centre (utility room door)
 const WIFE_COL    = 7;
 const WIFE_ROW    = 6;
 const SPAWN_COL   = 8;
@@ -132,13 +122,56 @@ const BACKYARD_RETURN_COL = 32;
 const BACKYARD_RETURN_ROW = 9;
 
 
-// ── Floor frame lookup (house-core-16 texture) ────────────────────────────
+// ── Floor frame lookup ─────────────────────────────────────────────────────
 const FLOOR_FRAME: Record<number, number> = {
-  [L]: FLOOR_LIVING,
-  [K]: FLOOR_KITCHEN,
-  [H]: FLOOR_HALL,
-  [M]: FLOOR_MUD,
+  [L]: HOUSE.livingFloor,
+  [K]: HOUSE.kitchenFloor,
+  [H]: HOUSE.hallFloor,
+  [M]: HOUSE.mudFloor,
+  [S]: HOUSE.stairsDown,
+  [U]: HOUSE.stairsUp,
 };
+
+// ── Furniture: [col, row, frame, solid] ───────────────────────────────────
+// Wall pieces (window, TV, pictures, doors) sit on wall tiles.
+const FURNITURE: [number, number, HouseFrame, boolean?][] = [
+  // Living room
+  [3, 3, "bookshelf", true],
+  [5, 2, "tv"], [5, 3, "tvStand", true],
+  [8, 2, "window"], [9, 2, "window"],
+  [11, 2, "door"], [12, 2, "door"],
+  [13, 3, "plant", true],
+  [10, 6, "coffeeTable", true],
+  [10, 7, "rug"],
+  [9, 8, "couchLeft", true], [10, 8, "couchMid", true], [11, 8, "couchRight", true],
+  [12, 8, "endTable", true],
+  [3, 9, "plant", true],
+  // Dining room
+  [16, 2, "picture"], [18, 2, "window"], [20, 2, "picture"],
+  [17, 6, "tableLeft", true], [18, 6, "tableRight", true],
+  [16, 6, "chair", true], [19, 6, "chair", true],
+  [15, 3, "plant", true], [21, 3, "plant", true],
+  [18, 8, "rug"],
+  // Kitchen: counters and laundry along the north wall
+  [24, 2, "window"], [30, 2, "window"],
+  [23, 3, "counter", true], [24, 3, "sink", true], [25, 3, "counter", true],
+  [26, 3, "stove", true], [27, 3, "dryer", true], [28, 3, "washer", true],
+  [29, 3, "counter", true], [30, 3, "counter", true], [31, 3, "counter", true],
+  [33, 3, "fridge", true],
+  [29, 7, "tableLeft", true], [30, 7, "tableRight", true],
+  [28, 7, "chair", true], [31, 7, "chair", true],
+  [34, 9, "door"],
+  // Hallway
+  [4, 12, "picture"], [11, 12, "picture"], [17, 12, "picture"], [24, 12, "picture"], [31, 12, "picture"],
+  [3, 13, "plant", true], [32, 13, "plant", true],
+  [28, 16, "utilityDoor"],
+  // Mudroom
+  [4, 18, "coatHooks"], [11, 18, "coatHooks"],
+  [4, 19, "bench", true], [5, 19, "bench", true],
+  [12, 20, "shoes", true],
+  ...Array.from({ length: 28 }, (_, i): [number, number, HouseFrame] => [4 + i, 14, "runner"]),
+  [7, 21, "garageDoor"], [8, 21, "garageDoor"],
+];
 
 // ── Scene ─────────────────────────────────────────────────────────────────
 type NeighborhoodSpawn = "default" | "basement" | "garage" | "bathroom" | "homedepot" | "backyard";
@@ -198,128 +231,36 @@ export class NeighborhoodScene extends Phaser.Scene {
 
   // ── Tile rendering ─────────────────────────────────────────────────────────
 
+  private tile(col: number, row: number, frame: number): Phaser.GameObjects.Image {
+    return this.add.image(col * TILE + TILE / 2, row * TILE + TILE / 2, "house-tiles", frame);
+  }
+
+  private isFloor(col: number, row: number): boolean {
+    return WALKABLE.has(MAP[row]?.[col]);
+  }
+
   private drawTiles(): void {
     for (let row = 0; row < ROWS; row++) {
       for (let col = 0; col < COLS; col++) {
         const tid = MAP[row][col];
-        if (tid === 0) continue; // exterior — leave as game background colour
-
-        const cx = col * TILE + TILE / 2;
-        const cy = row * TILE + TILE / 2;
-
-        if (tid === W || tid === B) {
-          this.add.image(cx, cy, "full-set-int-a4")
-            .setFrame(WALL_FRAME)
-            .setDisplaySize(TILE, TILE);
-        } else if (tid === D) {
-          this.addFloorTile(cx, cy, FLOOR_MUD);
-        } else if (tid === S) {
-          this.add.image(cx, cy, "full-set-int-a4")
-            .setFrame(WALL_FRAME)
-            .setDisplaySize(TILE, TILE);
+        const floor = FLOOR_FRAME[tid];
+        if (floor !== undefined) {
+          this.tile(col, row, floor);
         } else {
-          const frame = FLOOR_FRAME[tid] ?? FLOOR_HALL;
-          this.addFloorTile(cx, cy, frame);
+          // Walls, door markers and the space outside the rooms.
+          this.tile(col, row, this.isFloor(col, row + 1) && tid !== 0 ? HOUSE.wallFace : HOUSE.wallTop);
         }
       }
     }
-
-    this.addMapOverlays();
   }
 
-  private addMapOverlays(): void {
-    this.add.image(7 * TILE, 21 * TILE, "garage-door")
-      .setDisplaySize(TILE * 2, TILE)
-      .setOrigin(0, 0);
-
-    this.add.image(13 * TILE, 12 * TILE, "stairs-down")
-      .setDisplaySize(TILE * 2, TILE)
-      .setOrigin(0, 0);
-
-    this.add.image(20 * TILE, 12 * TILE, "stairs-up")
-      .setDisplaySize(TILE * 2, TILE)
-      .setOrigin(0, 0);
-
-    // Back door to the backyard (quest 3).
-    this.add.image(33 * TILE + TILE / 2, 9 * TILE + TILE / 2, "lawn-tiles", 6);
-
-    this.add.image(11 * TILE, 2 * TILE, "garage-door")
-      .setDisplaySize(TILE * 2, TILE)
-      .setOrigin(0, 0)
-      .setTint(0x93c5fd);
-  }
-
-  private addFloorTile(x: number, y: number, frame: number): void {
-    this.add.image(x, y, "house-core-16")
-      .setFrame(frame)
-      .setDisplaySize(TILE, TILE);
-  }
-
-  // ── Decorations ────────────────────────────────────────────────────────────
+  // ── Furniture ──────────────────────────────────────────────────────────────
 
   private placeDecorations(): void {
-    // ── Utility room marker ────────────────────────────────────────────────
-    this.add.rectangle(TILEROOM_PX.x, TILEROOM_PX.y, 2 * TILE, TILE, 0x60a5fa, 0.12)
-      .setStrokeStyle(1, 0x60a5fa, 0.5);
-
-    const spr16 = (col: number, row: number, frame: number) =>
-      this.add.image(col * TILE + TILE / 2, row * TILE + TILE / 2, "interiors-free-16")
-        .setFrame(frame).setDisplaySize(TILE, TILE);
-
-    // kitchen_LRK.png: 26 cols × 25 rows, 16×16 px per frame
-    const KW = 26;
-    const kitchen = (col: number, row: number, tsRow: number, tsCol: number) =>
-      this.add.image(col * TILE + TILE / 2, row * TILE + TILE / 2, "kitchen-props")
-        .setFrame(tsRow * KW + tsCol).setDisplaySize(TILE, TILE);
-
-    const web = (cx: number, cy: number, alpha = 0.75) =>
-      this.add.image(cx, cy, "full-set-int-c")
-        .setFrame(167).setDisplaySize(TILE * 2, TILE * 2).setAlpha(alpha);
-
-    const block = (col: number, row: number) => this.npcTiles.add(`${col},${row}`);
-
-    // ── Living room ────────────────────────────────────────────────────────
-    // TV + stand against north wall (cols 4-5, rows 2-3; row 2 = wall, no block needed)
-    spr16(4, 2, 224); spr16(5, 2, 225);  // screen on wall
-    spr16(4, 3, 240); spr16(5, 3, 241);  // stand on floor — block
-    block(4, 3); block(5, 3);
-
-    // Window on north wall (row 2 = wall, no block)
-    spr16(9, 2, 208); spr16(10, 2, 209);
-
-    // Sofa against south wall (cols 8-11, rows 8-9)
-    spr16(8, 8, 160); spr16(9, 8, 161); spr16(10, 8, 162); spr16(11, 8, 163);
-    spr16(8, 9, 176); spr16(9, 9, 177); spr16(10, 9, 178); spr16(11, 9, 179);
-    for (let c = 8; c <= 11; c++) { block(c, 8); block(c, 9); }
-
-    // End table beside sofa
-    spr16(12, 8, 187);
-    block(12, 8);
-
-    // ── Kitchen ────────────────────────────────────────────────────────────
-    // Window on north wall (row 2 = wall, no block)
-    spr16(25, 2, 208); spr16(26, 2, 209);
-
-    // Counter top + sink + stove: gray kitchen set row 21 (frames 546-555), 10 tiles
-    // Cabinet fronts:             gray kitchen set row 22 (frames 572-581), 10 tiles
-    for (let i = 0; i < 10; i++) {
-      kitchen(23 + i, 3, 21, i);  // counter surface (sink ~col2, stove ~cols6-9)
-      kitchen(23 + i, 4, 22, i);  // cabinet fronts
-      block(23 + i, 3);
-      block(23 + i, 4);
+    for (const [col, row, frame, solid] of FURNITURE) {
+      this.tile(col, row, HOUSE[frame]);
+      if (solid) this.npcTiles.add(`${col},${row}`);
     }
-
-    // Fridge against east wall: 2 tiles wide × 4 tiles tall (cols 31-32, rows 5-8)
-    // kitchen_LRK fridge: rows 1-4, cols 22-23 → frames 48-49, 74-75, 100-101, 126-127
-    const fridgeRows = [1, 2, 3, 4];
-    for (let r = 0; r < 4; r++) {
-      kitchen(31, 5 + r, fridgeRows[r], 22);
-      kitchen(32, 5 + r, fridgeRows[r], 23);
-      block(31, 5 + r); block(32, 5 + r);
-    }
-
-    // ── Hallway — cobweb in NE corner near basement stairs ────────────────
-    web(33 * TILE, 12 * TILE, 0.6);
   }
 
   // ── Characters ─────────────────────────────────────────────────────────────

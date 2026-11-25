@@ -25,3 +25,5 @@ Confirm and expand license/source notes before wider distribution.
 - `public/assets-active/enemies/Stink_Bug.png`: by Andy.
 - `public/assets-active/tilesets/bathroom_16x16.png`
 - Source: `scripts/art/bathroom_art.py` (ASCII pixel grids).
+- `public/assets-active/tilesets/house_16x16.png`
+- Source: `scripts/art/house_art.py` (ASCII pixel grids).
