@@ -1,5 +1,6 @@
 import fixBathroom from "../data/quests/fix-bathroom.json";
 import fixDryer from "../data/quests/fix-dryer.json";
+import reclaimLawn from "../data/quests/reclaim-lawn.json";
 import type { Condition } from "./engine/conditions";
 import type { LineSpec, ScriptEvents } from "./engine/script";
 import type { GameState, QuestStepId } from "./state";
@@ -28,7 +29,7 @@ export interface QuestDefinition {
 }
 
 /** Story order. Add new quest files here. */
-export const quests = [fixDryer, fixBathroom] as unknown as QuestDefinition[];
+export const quests = [fixDryer, fixBathroom, reclaimLawn] as unknown as QuestDefinition[];
 
 export function getQuest(questId: string): QuestDefinition {
   const quest = quests.find((candidate) => candidate.id === questId);

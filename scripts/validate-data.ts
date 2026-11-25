@@ -17,7 +17,7 @@ const textures = new Set(
 
 const SCENES = [
   "NeighborhoodScene", "BasementScene", "GarageScene", "BathroomScene", "HardwareStoreScene",
-  "HDCutScene", "TileRoomScene", "NameEntryScene", "StoryIntroScene",
+  "HDCutScene", "TileRoomScene", "NameEntryScene", "StoryIntroScene", "BackyardScene", "TunnelScene",
 ];
 
 export function validateContent(): string[] {

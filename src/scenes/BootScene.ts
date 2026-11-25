@@ -50,6 +50,16 @@ export class BootScene extends Phaser.Scene {
     this.load.image("mold-patch", "/assets-active/enemies/mold-patch.png");
     this.load.image("clogged-toilet-battle", "/assets-active/enemies/clogged_toilet_boss.png");
     this.load.image("stink-bug", "/assets-active/enemies/stink_bug_battle.png");
+    // Quest 3 (original art, made by scripts/art/quest3_art.py)
+    this.load.image("crabgrass-creeper", "/assets-active/enemies/crabgrass_creeper.png");
+    this.load.image("dandelion-puff", "/assets-active/enemies/dandelion_puff.png");
+    this.load.image("lawn-grub", "/assets-active/enemies/lawn_grub.png");
+    this.load.image("fire-ant-mound", "/assets-active/enemies/fire_ant_mound.png");
+    this.load.image("rogue-sprinkler", "/assets-active/enemies/rogue_sprinkler.png");
+    this.load.image("vole-lieutenant", "/assets-active/enemies/vole_lieutenant.png");
+    this.load.image("lucky-clover", "/assets-active/enemies/lucky_clover.png");
+    this.load.image("mole-king", "/assets-active/enemies/mole_king.png");
+    this.load.spritesheet("lawn-tiles", "/assets-active/tilesets/lawn_16x16.png", { frameWidth: 16, frameHeight: 16 });
     this.load.audio("dramatic-bg", "/assets-active/audio/dramatic-bg.mp3");
     this.load.audio("home-bg", "/assets-active/audio/home-bg.mp3");
     this.load.audio("comfort-bg", "/assets-active/audio/comfort-bg.mp3");

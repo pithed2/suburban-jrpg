@@ -389,7 +389,13 @@ export class HardwareStoreScene extends Phaser.Scene {
     });
     const exitCursor = this.shopSelected === SHOP_ITEMS.length ? ">" : " ";
     lines.push(`${exitCursor} LEAVE`);
-    setPixelText(this.shopItemsText, lines.join("\n"));
+    // The panel fits 8 rows. Scroll the list so the cursor stays visible.
+    const VISIBLE = 8;
+    const first = Phaser.Math.Clamp(this.shopSelected - VISIBLE + 2, 0, Math.max(0, lines.length - VISIBLE));
+    const shown = lines.slice(first, first + VISIBLE);
+    if (first > 0) shown[0] = `${shown[0]}  MORE`;
+    if (first + VISIBLE < lines.length) shown[VISIBLE - 1] = `${shown[VISIBLE - 1]}  MORE`;
+    setPixelText(this.shopItemsText, shown.join("\n"));
 
     // Balance
     setPixelText(this.shopBalanceText, `BALANCE: ${this.kit.state.player.cash} ♥`);

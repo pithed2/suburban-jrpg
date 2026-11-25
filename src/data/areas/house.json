@@ -147,6 +147,33 @@
           }
         ]
       }
+    ],
+    "backdoor": [
+      {
+        "when": {
+          "questsDone": [
+            "fix-bathroom"
+          ]
+        },
+        "do": [
+          {
+            "goto": "BackyardScene",
+            "spawn": "house"
+          }
+        ]
+      },
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The back door. The backyard is a problem for future Dad."
+              ]
+            ]
+          }
+        ]
+      }
     ]
   }
 }

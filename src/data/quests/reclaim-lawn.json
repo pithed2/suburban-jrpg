@@ -1,0 +1,195 @@
+{
+  "id": "reclaim-lawn",
+  "title": "Reclaim the Lawn",
+  "countdownLabel": "10 DAYS UNTIL ARRIVAL",
+  "steps": [
+    {
+      "id": "talk-to-wife-lawn",
+      "label": "Talk to wife"
+    },
+    {
+      "id": "inspect-lawn",
+      "label": "Check the backyard"
+    },
+    {
+      "id": "find-spade",
+      "label": "Buy a real shovel"
+    },
+    {
+      "id": "plug-burrows",
+      "label": "Plug the 3 escape burrows"
+    },
+    {
+      "id": "defeat-mole-king",
+      "label": "Defeat the Mole King"
+    },
+    {
+      "id": "return-to-wife-lawn",
+      "label": "Return to wife"
+    }
+  ],
+  "defeat": {
+    "lines": [
+      [
+        "WIFE",
+        "You have dirt in your ears. How do you have dirt in your ears?"
+      ]
+    ],
+    "hints": [
+      {
+        "when": {
+          "not": {
+            "flags": [
+              "ownsSpade"
+            ]
+          }
+        },
+        "text": "The plunger is not a lawn tool. Dome Hepot sells a real spade."
+      },
+      {
+        "when": {
+          "flags": [
+            "burrowPlugged1",
+            "burrowPlugged2",
+            "burrowPlugged3"
+          ],
+          "notFlags": [
+            "hasCastorOil"
+          ]
+        },
+        "text": "Mrs. Okafor knows something about moles. Find her cat."
+      },
+      {
+        "text": "Grind up top until the deep tunnels stop hurting so much."
+      }
+    ]
+  },
+  "events": {
+    "house:wife": [
+      {
+        "when": {
+          "flags": [
+            "lawnFixed"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "WIFE",
+                "The lawn is flat. I walked on it in socks. You did good."
+              ]
+            ]
+          },
+          {
+            "checkIn": true
+          }
+        ]
+      },
+      {
+        "when": {
+          "flags": [
+            "moleKingDefeated"
+          ]
+        },
+        "do": [
+          {
+            "complete": "return-to-wife-lawn"
+          },
+          {
+            "set": {
+              "lawnFixed": true
+            }
+          },
+          {
+            "hud": "LAWN RECLAIMED"
+          },
+          {
+            "say": [
+              [
+                "DAD",
+                "The lawn is ours again."
+              ],
+              [
+                "WIFE",
+                "What happened to the moles?"
+              ],
+              [
+                "DAD",
+                "They are moving to the Hendersons'. They have a pool."
+              ],
+              [
+                "WIFE",
+                "...Okay. I'm not going to ask."
+              ],
+              [
+                "WIFE",
+                "Your mother called again. No, my mother. She wants to know if the gutters are clean."
+              ],
+              [
+                "NARRATOR",
+                "Dad looks up at the gutters. A small tree is growing in one of them."
+              ],
+              [
+                "NARRATOR",
+                "TO BE CONTINUED."
+              ]
+            ]
+          },
+          {
+            "checkIn": true
+          },
+          {
+            "completeQuest": "reclaim-lawn"
+          },
+          {
+            "save": true
+          }
+        ]
+      },
+      {
+        "when": {
+          "notFlags": [
+            "enteredTunnels"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "WIFE",
+                "Did you look at the backyard yet? Back door's in the kitchen."
+              ]
+            ]
+          },
+          {
+            "checkIn": true
+          }
+        ]
+      },
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "WIFE",
+                "How's the war on the moles?"
+              ],
+              [
+                "DAD",
+                "Ongoing. They have a king."
+              ],
+              [
+                "WIFE",
+                "Of course they do."
+              ]
+            ]
+          },
+          {
+            "checkIn": true
+          }
+        ]
+      }
+    ]
+  }
+}

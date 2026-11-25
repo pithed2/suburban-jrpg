@@ -1,6 +1,6 @@
 /**
  * Headless quest walkthrough. Drives the real event scripts from src/data with
- * a fake host and checks each beat of quests 1 and 2. Run: npm run check
+ * a fake host and checks each beat of quests 1 to 3. Run: npm run check
  *
  * It does not draw anything. Battles resolve to the outcome the test picks.
  */
@@ -171,7 +171,82 @@ async function main(): Promise<void> {
 
   await at("house", "wife");
   check("wife finishes quest 2", state.flags.bathroomFixed && state.completedQuestIds.includes("fix-bathroom"));
-  check("mop-up and return steps complete", ["mop-up", "return-to-wife-bathroom"].every((id) => state.quest.completedStepIds.includes(id)));
+  check("quest 3 starts at inspect-lawn after quest 2", state.quest.questId === "reclaim-lawn" && step() === "inspect-lawn" && said("walk around the property"));
+
+  console.log("Quest 3: Reclaim the Lawn");
+  await at("house", "backdoor");
+  check("back door goes to the backyard", host.gotos[0] === "BackyardScene:house");
+  await at("backyard", "enter");
+  check("backyard intro sets step find-spade without a spade", step() === "find-spade" && said("mole FOYER"));
+  await at("backyard", "enter");
+  check("backyard intro plays once", !said("mole FOYER"));
+
+  await at("tunnels", "enter");
+  check("tunnel intro sets enteredTunnels", state.flags.enteredTunnels === true);
+  await at("tunnels", "burrow:1");
+  check("burrow needs a spade", !state.flags.burrowPlugged1 && said("real shovel"));
+  await at("tunnels", "moleking");
+  check("Mole King escapes while burrows are open", host.battles.length === 0 && said("drops into a burrow"));
+
+  await at("homedepot", "buy:flat-edge-spade");
+  check("buying the spade sets step plug-burrows", state.flags.ownsSpade && step() === "plug-burrows");
+
+  await at("tunnels", "burrow:1");
+  await at("tunnels", "burrow:2");
+  check("two burrows plugged, step still plug-burrows", state.flags.burrowPlugged2 && step() === "plug-burrows");
+  await at("tunnels", "burrow:2");
+  check("plugged burrow says so", said("Plugged. Packed."));
+  await at("tunnels", "burrow:3");
+  check("third burrow sets step defeat-mole-king", step() === "defeat-mole-king" && said("All 3"));
+
+  await at("backyard", "okafor");
+  check("Mrs. Okafor asks about her cat", state.flags.okaforAsked && said("Biscuit"));
+  host.nextOutcome = "escape";
+  await at("tunnels", "biscuit");
+  check("running from the vole leaves the cat", host.battles[0] === "vole-lieutenant" && !state.flags.foundBiscuit);
+  host.nextOutcome = "victory";
+  await at("tunnels", "biscuit");
+  check("beating the vole frees Biscuit", state.flags.foundBiscuit === true);
+  await at("backyard", "okafor");
+  check("Okafor gives the castor oil pellets", state.flags.hasCastorOil && state.player.inventory.includes("castor-oil-pellets"));
+  await at("backyard", "okafor");
+  check("Okafor reward is given once", state.player.inventory.filter((id) => id === "castor-oil-pellets").length === 1);
+
+  const hpBefore = state.player.hp;
+  state.player.hp = 1;
+  await at("backyard", "shed");
+  check("shed restores HP", state.player.hp === state.player.maxHp && hpBefore > 0);
+
+  await at("tunnels", "moleking");
+  check("Mole King fight starts with castor oil line", host.battles[0] === "mole-king" && said("castor oil pellets"));
+  check("Mole King victory: step return-to-wife-lawn, back to the backyard", state.flags.moleKingDefeated && step() === "return-to-wife-lawn" && host.gotos[0] === "BackyardScene:tunnels");
+
+  await at("house", "wife");
+  check("wife finishes quest 3", state.flags.lawnFixed && state.completedQuestIds.includes("reclaim-lawn"));
+  await at("house", "wife");
+  check("wife after quest 3 just checks in", said("socks"));
+
+  console.log("Quest 3 from an old save that finished quest 2");
+  {
+    Object.assign(state, createInitialGameState());
+    state.flags.bathroomFixed = true;
+    state.completedQuestIds = ["fix-dryer", "fix-bathroom"];
+    state.quest = { questId: "fix-bathroom", activeStepId: "return-to-wife-bathroom", completedStepIds: ["mop-up", "return-to-wife-bathroom"] };
+    await at("house", "backdoor");
+    check("back door opens once quest 2 is done", host.gotos[0] === "BackyardScene:house");
+    await at("house", "wife");
+    check("wife starts quest 3 on an old save", state.quest.questId === "reclaim-lawn" && step() === "inspect-lawn");
+    state.flags.ownsSpade = true;
+    await at("backyard", "enter");
+    check("spade bought early skips find-spade", step() === "plug-burrows");
+  }
+
+  console.log("Back door before quest 3");
+  {
+    Object.assign(state, createInitialGameState());
+    await at("house", "backdoor");
+    check("back door is shut during quest 1", host.gotos.length === 0 && said("future Dad"));
+  }
 
   console.log("Quest 2 alternate order: store before toilet");
   const fresh = createInitialGameState();

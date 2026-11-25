@@ -155,5 +155,44 @@
     "kind": "armor",
     "defense": 2,
     "description": "Thorn-proof, splinter-proof, spider-resistant. Smell faintly of mulch."
+  },
+  {
+    "id": "flat-edge-spade",
+    "name": "Flat-Edge Spade",
+    "kind": "weapon",
+    "power": 16,
+    "price": 220,
+    "description": "Sharp, square, serious. The shovel Dad should have bought in 2016, before the Incident.",
+    "battleMessage": "Dad drives the Flat-Edge Spade in with his whole boot.",
+    "battleMessages": [
+      "Dad drives the Flat-Edge Spade in with his whole boot.",
+      "Dad edges the enemy like it is the property line.",
+      "Dad spades with the focus of a man who has measured twice.",
+      "The spade goes CHUNK. Dad nods at the sound.",
+      "Dad turns the enemy over like spring soil.",
+      "Dad leans on the handle, wipes his brow, then strikes again."
+    ]
+  },
+  {
+    "id": "grass-stained-sneakers",
+    "name": "Grass-Stain Sneakers",
+    "kind": "armor",
+    "defense": 6,
+    "price": 180,
+    "description": "White once. Now a map of every lawn Dad has fought on. Excellent traction, terrible fashion."
+  },
+  {
+    "id": "grilled-bratwurst",
+    "name": "Grilled Bratwurst",
+    "kind": "consumable",
+    "heal": 60,
+    "price": 30,
+    "description": "Charred, juicy, eaten standing up next to the grill. Restores a lot of HP."
+  },
+  {
+    "id": "castor-oil-pellets",
+    "name": "Castor Oil Pellets",
+    "kind": "key",
+    "description": "Mrs. Okafor's mole repellent. Moles hate the smell. So does everyone else."
   }
 ]

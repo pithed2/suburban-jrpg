@@ -185,7 +185,7 @@ Dungeon maps are in `src/game/maps/<area>.ts`. Each file uses `growMap()` from `
 
 ## Checks and tuning
 
-- `npm run check`: validates every id in the data (also loot tables, drops and textures), checks the maps, then plays quests 1 and 2 headless through the real scripts. Run it after each content change.
+- `npm run check`: validates every id in the data (also loot tables, drops and textures), checks the maps, then plays quests 1 to 3 headless through the real scripts. Run it after each content change.
 - `npm run balance`: simulates fights per area and level. It prints win rates, HP lost, and the number of random fights to the next level. It uses `balance.json` → `areas` for the target levels and gear. Add an entry for each new area.
 
 ## Dev shortcuts

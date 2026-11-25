@@ -1,0 +1,1047 @@
+{
+  "id": "tunnels",
+  "label": "Mole Tunnels",
+  "hud": "MOLE TUNNELS",
+  "returnTo": {
+    "scene": "BackyardScene",
+    "spawn": "tunnels"
+  },
+  "backdrop": "#2b1a0e",
+  "randomEncounters": {
+    "enabled": true,
+    "stepDistance": 80,
+    "baseChance": 0.22,
+    "cooldownRolls": 3,
+    "disabledWhen": {
+      "flags": [
+        "moleKingDefeated"
+      ]
+    },
+    "introMessages": [
+      "Dirt trickles from the ceiling.",
+      "Something digs nearby, then stops."
+    ],
+    "entries": [
+      {
+        "enemyId": "crabgrass-creeper",
+        "weight": 2,
+        "regions": [
+          [
+            0,
+            0,
+            47,
+            11
+          ]
+        ],
+        "introMessages": [
+          "Crabgrass roots hang from the ceiling. One of them grabs."
+        ]
+      },
+      {
+        "enemyId": "lawn-grub",
+        "weight": 3,
+        "regions": [
+          [
+            0,
+            0,
+            47,
+            11
+          ],
+          [
+            0,
+            12,
+            47,
+            27
+          ]
+        ]
+      },
+      {
+        "enemyId": "dandelion-puff",
+        "weight": 1,
+        "regions": [
+          [
+            0,
+            0,
+            47,
+            11
+          ]
+        ]
+      },
+      {
+        "enemyId": "fire-ant-mound",
+        "weight": 2,
+        "regions": [
+          [
+            0,
+            12,
+            47,
+            27
+          ],
+          [
+            0,
+            28,
+            47,
+            39
+          ]
+        ]
+      },
+      {
+        "enemyId": "rogue-sprinkler",
+        "weight": 2,
+        "regions": [
+          [
+            0,
+            12,
+            47,
+            27
+          ],
+          [
+            0,
+            28,
+            47,
+            39
+          ]
+        ]
+      },
+      {
+        "enemyId": "vole-lieutenant",
+        "weight": 3,
+        "regions": [
+          [
+            0,
+            28,
+            47,
+            39
+          ]
+        ]
+      },
+      {
+        "enemyId": "lucky-clover",
+        "weight": 1,
+        "regions": [
+          [
+            0,
+            12,
+            47,
+            27
+          ],
+          [
+            0,
+            28,
+            47,
+            39
+          ]
+        ]
+      }
+    ]
+  },
+  "hotspots": [
+    {
+      "id": "moleking",
+      "col": 13,
+      "row": 31,
+      "radius": 2,
+      "solid": true
+    },
+    {
+      "id": "biscuit",
+      "col": 11,
+      "row": 25,
+      "radius": 1.6,
+      "solid": true,
+      "when": {
+        "notFlags": [
+          "foundBiscuit"
+        ]
+      }
+    },
+    {
+      "id": "burrow:1",
+      "col": 30,
+      "row": 3,
+      "radius": 1.5,
+      "solid": true
+    },
+    {
+      "id": "burrow:2",
+      "col": 39,
+      "row": 14,
+      "radius": 1.5,
+      "solid": true
+    },
+    {
+      "id": "burrow:3",
+      "col": 45,
+      "row": 32,
+      "radius": 1.5,
+      "solid": true
+    },
+    {
+      "id": "chest:storeroom",
+      "col": 45,
+      "row": 8,
+      "radius": 1.75,
+      "solid": true,
+      "chest": {
+        "id": "tunnels:storeroom",
+        "frame": 4,
+        "loot": [
+          {
+            "weight": 4,
+            "cash": [
+              18,
+              36
+            ]
+          },
+          {
+            "weight": 2,
+            "item": "cold-coffee"
+          },
+          {
+            "weight": 2,
+            "item": "energy-drink"
+          },
+          {
+            "weight": 1,
+            "item": "grilled-bratwurst"
+          }
+        ]
+      }
+    },
+    {
+      "id": "chest:junction",
+      "col": 13,
+      "row": 15,
+      "radius": 1.75,
+      "solid": true,
+      "chest": {
+        "id": "tunnels:junction",
+        "frame": 4,
+        "loot": [
+          {
+            "weight": 4,
+            "cash": [
+              18,
+              36
+            ]
+          },
+          {
+            "weight": 2,
+            "item": "cold-coffee"
+          },
+          {
+            "weight": 2,
+            "item": "energy-drink"
+          },
+          {
+            "weight": 1,
+            "item": "grilled-bratwurst"
+          }
+        ]
+      }
+    },
+    {
+      "id": "chest:flood",
+      "col": 40,
+      "row": 20,
+      "radius": 1.75,
+      "solid": true,
+      "chest": {
+        "id": "tunnels:flood",
+        "frame": 4,
+        "loot": [
+          {
+            "weight": 4,
+            "cash": [
+              18,
+              36
+            ]
+          },
+          {
+            "weight": 2,
+            "item": "cold-coffee"
+          },
+          {
+            "weight": 2,
+            "item": "energy-drink"
+          },
+          {
+            "weight": 1,
+            "item": "grilled-bratwurst"
+          }
+        ]
+      }
+    },
+    {
+      "id": "chest:gallery",
+      "col": 31,
+      "row": 35,
+      "radius": 1.75,
+      "solid": true,
+      "chest": {
+        "id": "tunnels:gallery",
+        "frame": 4,
+        "loot": [
+          {
+            "weight": 4,
+            "cash": [
+              30,
+              60
+            ]
+          },
+          {
+            "weight": 2,
+            "item": "leftover-pizza"
+          },
+          {
+            "weight": 2,
+            "item": "energy-drink"
+          },
+          {
+            "weight": 2,
+            "item": "grilled-bratwurst"
+          }
+        ]
+      }
+    },
+    {
+      "id": "chest:throne",
+      "col": 18,
+      "row": 37,
+      "radius": 1.75,
+      "solid": true,
+      "chest": {
+        "id": "tunnels:throne",
+        "frame": 0,
+        "loot": [
+          {
+            "weight": 4,
+            "cash": [
+              30,
+              60
+            ]
+          },
+          {
+            "weight": 2,
+            "item": "leftover-pizza"
+          },
+          {
+            "weight": 2,
+            "item": "energy-drink"
+          },
+          {
+            "weight": 2,
+            "item": "grilled-bratwurst"
+          }
+        ],
+        "tint": "#ffd54f"
+      }
+    },
+    {
+      "id": "ornament:1",
+      "col": 9,
+      "row": 30,
+      "radius": 1.2,
+      "solid": true
+    },
+    {
+      "id": "ornament:2",
+      "col": 17,
+      "row": 30,
+      "radius": 1.2,
+      "solid": true
+    },
+    {
+      "id": "ornament:3",
+      "col": 9,
+      "row": 37,
+      "radius": 1.2,
+      "solid": true
+    },
+    {
+      "id": "ornament:4",
+      "col": 15,
+      "row": 37,
+      "radius": 1.2,
+      "solid": true
+    }
+  ],
+  "events": {
+    "enter": [
+      {
+        "when": {
+          "notFlags": [
+            "enteredTunnels"
+          ]
+        },
+        "do": [
+          {
+            "set": {
+              "enteredTunnels": true
+            }
+          },
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Dad climbs down an old wooden ladder into the dark."
+              ],
+              [
+                "NARRATOR",
+                "The tunnels go on much further than any lawn should allow."
+              ],
+              [
+                "DAD'S BRAIN",
+                "The deeper we go, the worse it gets. Classic underground. Grind up top first."
+              ]
+            ]
+          },
+          {
+            "save": true
+          }
+        ]
+      },
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Cool, damp dirt. The smell of every spring Dad has ever had."
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "default": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Roots, rocks, and one very old golf ball."
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "burrow:1": [
+      {
+        "when": {
+          "flags": [
+            "burrowPlugged1"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Plugged. Packed. Stomped. Dad pats it like a good dog."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "when": {
+          "notFlags": [
+            "ownsSpade"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "An escape burrow. It goes up to the lawn, under the patio."
+              ],
+              [
+                "NARRATOR",
+                "Dad tries to fill it with his hands. The dirt goes right back in."
+              ],
+              [
+                "DAD'S BRAIN",
+                "We need a real shovel. Dome Hepot. Garden aisle."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "do": [
+          {
+            "set": {
+              "burrowPlugged1": true
+            }
+          },
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "An escape burrow, under the patio."
+              ],
+              [
+                "NARRATOR",
+                "Dad packs it with dirt using the Flat-Edge Spade, then stomps it flat."
+              ],
+              [
+                "DAD",
+                "Not today, your majesty."
+              ]
+            ]
+          },
+          {
+            "if": {
+              "flags": [
+                "burrowPlugged1",
+                "burrowPlugged2",
+                "burrowPlugged3"
+              ]
+            },
+            "then": [
+              {
+                "if": {
+                  "step": "plug-burrows"
+                },
+                "then": [
+                  {
+                    "complete": "plug-burrows"
+                  },
+                  {
+                    "step": "defeat-mole-king"
+                  }
+                ]
+              },
+              {
+                "say": [
+                  [
+                    "SYSTEM",
+                    "All 3 escape burrows are plugged."
+                  ],
+                  [
+                    "DAD'S BRAIN",
+                    "He has nowhere to run. The throne room. Deep down. Go."
+                  ]
+                ]
+              }
+            ],
+            "else": [
+              {
+                "say": [
+                  [
+                    "SYSTEM",
+                    "Dad plugged an escape burrow."
+                  ]
+                ]
+              }
+            ]
+          },
+          {
+            "save": true
+          }
+        ]
+      }
+    ],
+    "burrow:2": [
+      {
+        "when": {
+          "flags": [
+            "burrowPlugged2"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Plugged. Packed. Stomped. Dad pats it like a good dog."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "when": {
+          "notFlags": [
+            "ownsSpade"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "An escape burrow. It goes up to the lawn, under the vegetable bed."
+              ],
+              [
+                "NARRATOR",
+                "Dad tries to fill it with his hands. The dirt goes right back in."
+              ],
+              [
+                "DAD'S BRAIN",
+                "We need a real shovel. Dome Hepot. Garden aisle."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "do": [
+          {
+            "set": {
+              "burrowPlugged2": true
+            }
+          },
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "An escape burrow, under the vegetable bed."
+              ],
+              [
+                "NARRATOR",
+                "Dad packs it with dirt using the Flat-Edge Spade, then stomps it flat."
+              ],
+              [
+                "DAD",
+                "Not today, your majesty."
+              ]
+            ]
+          },
+          {
+            "if": {
+              "flags": [
+                "burrowPlugged1",
+                "burrowPlugged2",
+                "burrowPlugged3"
+              ]
+            },
+            "then": [
+              {
+                "if": {
+                  "step": "plug-burrows"
+                },
+                "then": [
+                  {
+                    "complete": "plug-burrows"
+                  },
+                  {
+                    "step": "defeat-mole-king"
+                  }
+                ]
+              },
+              {
+                "say": [
+                  [
+                    "SYSTEM",
+                    "All 3 escape burrows are plugged."
+                  ],
+                  [
+                    "DAD'S BRAIN",
+                    "He has nowhere to run. The throne room. Deep down. Go."
+                  ]
+                ]
+              }
+            ],
+            "else": [
+              {
+                "say": [
+                  [
+                    "SYSTEM",
+                    "Dad plugged an escape burrow."
+                  ]
+                ]
+              }
+            ]
+          },
+          {
+            "save": true
+          }
+        ]
+      }
+    ],
+    "burrow:3": [
+      {
+        "when": {
+          "flags": [
+            "burrowPlugged3"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Plugged. Packed. Stomped. Dad pats it like a good dog."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "when": {
+          "notFlags": [
+            "ownsSpade"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "An escape burrow. It goes up to the lawn, under the mailbox, somehow."
+              ],
+              [
+                "NARRATOR",
+                "Dad tries to fill it with his hands. The dirt goes right back in."
+              ],
+              [
+                "DAD'S BRAIN",
+                "We need a real shovel. Dome Hepot. Garden aisle."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "do": [
+          {
+            "set": {
+              "burrowPlugged3": true
+            }
+          },
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "An escape burrow, under the mailbox, somehow."
+              ],
+              [
+                "NARRATOR",
+                "Dad packs it with dirt using the Flat-Edge Spade, then stomps it flat."
+              ],
+              [
+                "DAD",
+                "Not today, your majesty."
+              ]
+            ]
+          },
+          {
+            "if": {
+              "flags": [
+                "burrowPlugged1",
+                "burrowPlugged2",
+                "burrowPlugged3"
+              ]
+            },
+            "then": [
+              {
+                "if": {
+                  "step": "plug-burrows"
+                },
+                "then": [
+                  {
+                    "complete": "plug-burrows"
+                  },
+                  {
+                    "step": "defeat-mole-king"
+                  }
+                ]
+              },
+              {
+                "say": [
+                  [
+                    "SYSTEM",
+                    "All 3 escape burrows are plugged."
+                  ],
+                  [
+                    "DAD'S BRAIN",
+                    "He has nowhere to run. The throne room. Deep down. Go."
+                  ]
+                ]
+              }
+            ],
+            "else": [
+              {
+                "say": [
+                  [
+                    "SYSTEM",
+                    "Dad plugged an escape burrow."
+                  ]
+                ]
+              }
+            ]
+          },
+          {
+            "save": true
+          }
+        ]
+      }
+    ],
+    "biscuit": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Across the flooded pipe, an orange cat sits on a rusty sprinkler valve. He looks bored."
+              ],
+              [
+                "NARRATOR",
+                "A Vole Lieutenant stands guard over him, holding a tiny clipboard."
+              ],
+              [
+                "DAD",
+                "Is that... are you holding that cat hostage?"
+              ]
+            ]
+          },
+          {
+            "battle": "vole-lieutenant",
+            "victory": [
+              {
+                "set": {
+                  "foundBiscuit": true
+                }
+              },
+              {
+                "say": [
+                  [
+                    "NARRATOR",
+                    "The Vole Lieutenant retreats into the wall to file a report."
+                  ],
+                  [
+                    "NARRATOR",
+                    "The cat walks over and sits on Dad's foot. His collar says BISCUIT."
+                  ],
+                  [
+                    "DAD'S BRAIN",
+                    "Mrs. Okafor. Next door. Bring him up."
+                  ]
+                ]
+              },
+              {
+                "save": true
+              }
+            ],
+            "escape": [
+              {
+                "say": [
+                  [
+                    "NARRATOR",
+                    "Dad backs away. The vole writes something down."
+                  ]
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "moleking": [
+      {
+        "when": {
+          "flags": [
+            "moleKingDefeated"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "An empty throne of lawn ornaments. A small crown lies on the floor."
+              ],
+              [
+                "NARRATOR",
+                "Dad leaves it. It's not his size."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "when": {
+          "not": {
+            "flags": [
+              "burrowPlugged1",
+              "burrowPlugged2",
+              "burrowPlugged3"
+            ]
+          }
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "On a throne of stolen lawn ornaments sits a mole in a crown."
+              ],
+              [
+                "THE MOLE KING",
+                "A visitor. With a shovel. How quaint."
+              ],
+              [
+                "NARRATOR",
+                "Before Dad can move, the Mole King drops into a burrow and is gone."
+              ],
+              [
+                "DAD'S BRAIN",
+                "He has escape burrows. Plug all 3 and he can't run."
+              ]
+            ]
+          },
+          {
+            "if": {
+              "step": "defeat-mole-king"
+            },
+            "then": [
+              {
+                "step": "plug-burrows"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The Mole King sits on his throne of stolen lawn ornaments. He turns his face toward Dad. He has no eyes to speak of."
+              ],
+              [
+                "THE MOLE KING",
+                "You plugged my burrows. You walked my halls. You sweat on my floor."
+              ],
+              [
+                "THE MOLE KING",
+                "Very well. Let us settle this, lawn man. For the lawn."
+              ],
+              [
+                "DAD",
+                "For the lawn."
+              ]
+            ]
+          },
+          {
+            "if": {
+              "flags": [
+                "hasCastorOil"
+              ]
+            },
+            "then": [
+              {
+                "say": [
+                  [
+                    "NARRATOR",
+                    "Dad throws a handful of castor oil pellets on the floor."
+                  ]
+                ]
+              }
+            ]
+          },
+          {
+            "battle": "mole-king",
+            "victory": [
+              {
+                "set": {
+                  "moleKingDefeated": true
+                }
+              },
+              {
+                "complete": "defeat-mole-king"
+              },
+              {
+                "step": "return-to-wife-lawn"
+              },
+              {
+                "say": [
+                  [
+                    "NARRATOR",
+                    "The Mole King sinks into the soil for the last time. His crown rolls to Dad's feet."
+                  ],
+                  [
+                    "THE MOLE KING",
+                    "Fine. FINE. We will move to the Hendersons'. They have a pool."
+                  ],
+                  [
+                    "NARRATOR",
+                    "Far above, every molehill in the yard sinks flat at once."
+                  ],
+                  {
+                    "speaker": "DAD",
+                    "voice": "dad:selfTalk:victory"
+                  }
+                ]
+              },
+              {
+                "save": true
+              },
+              {
+                "goto": "BackyardScene",
+                "spawn": "tunnels"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "ornament:1": [
+      {
+        "do": [
+          {
+            "run": "ornaments"
+          }
+        ]
+      }
+    ],
+    "ornament:2": [
+      {
+        "do": [
+          {
+            "run": "ornaments"
+          }
+        ]
+      }
+    ],
+    "ornament:3": [
+      {
+        "do": [
+          {
+            "run": "ornaments"
+          }
+        ]
+      }
+    ],
+    "ornament:4": [
+      {
+        "do": [
+          {
+            "run": "ornaments"
+          }
+        ]
+      }
+    ],
+    "ornaments": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "A garden gnome, stolen from a yard on the next street. It has seen things down here."
+              ]
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -3,9 +3,11 @@
  * can reach from the entrance. Also prints the maps when run with --print.
  */
 import { getArea } from "../src/game/content";
+import * as backyard from "../src/game/maps/backyard";
 import * as basement from "../src/game/maps/basement";
 import * as bathroom from "../src/game/maps/bathroom";
 import * as garage from "../src/game/maps/garage";
+import * as tunnels from "../src/game/maps/tunnels";
 
 interface MapModule { MAP: number[][]; F: number; X: number }
 
@@ -13,6 +15,8 @@ const DUNGEONS: Array<{ id: string; map: MapModule; spawn: [number, number]; blo
   { id: "garage", map: garage, spawn: [13, 1] },
   { id: "basement", map: basement, spawn: [17, 1], blocked: ["32,19", "33,19", "32,20", "33,20"] },
   { id: "bathroom", map: bathroom, spawn: [11, 2] },
+  { id: "backyard", map: backyard, spawn: [17, 2], blocked: ["33,11"] },
+  { id: "tunnels", map: tunnels, spawn: [4, 2], blocked: tunnels.ORNAMENTS.map(([c, r]) => `${c},${r}`) },
 ];
 
 export function checkMaps(print = false): string[] {

@@ -13,7 +13,10 @@
     "steel-toe-boots",
     "cold-coffee",
     "leftover-pizza",
-    "energy-drink"
+    "energy-drink",
+    "flat-edge-spade",
+    "grass-stained-sneakers",
+    "grilled-bratwurst"
   ],
   "hotspots": [
     {
@@ -135,6 +138,30 @@
               },
               {
                 "step": "inspect-toilet"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "buy:flat-edge-spade": [
+      {
+        "do": [
+          {
+            "set": {
+              "ownsSpade": true
+            }
+          },
+          {
+            "if": {
+              "step": "find-spade"
+            },
+            "then": [
+              {
+                "complete": "find-spade"
+              },
+              {
+                "step": "plug-burrows"
               }
             ]
           }

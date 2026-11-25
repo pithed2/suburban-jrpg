@@ -45,6 +45,7 @@ const D = 6;   // garage door        (solid wall bump marker)
 const S = 7;   // basement stairs    (walkable exit marker)
 const U = 8;   // bathroom stairs up (walkable exit marker)
 const P = 9;   // front door         (solid wall bump marker — Dome Hepot)
+const B = 10;  // back door          (solid wall bump marker — backyard, quest 3)
 
 const WALKABLE = new Set([L, K, H, M, S, U]);
 
@@ -84,7 +85,7 @@ const MAP: number[][] = [
   [_,_,W,L,L,L,L,L,L,L,L,L,L,L,W,_,_,_,_,_,_,_,W,K,K,K,K,K,K,K,K,K,K,K,W,_,_], //  6
   [_,_,W,L,L,L,L,L,L,L,L,L,L,L,W,_,_,_,_,_,_,_,W,K,K,K,K,K,K,K,K,K,K,K,W,_,_], //  7
   [_,_,W,L,L,L,L,L,L,L,L,L,L,L,W,_,_,_,_,_,_,_,W,K,K,K,K,K,K,K,K,K,K,K,W,_,_], //  8
-  [_,_,W,L,L,L,L,L,L,L,L,L,L,L,W,_,_,_,_,_,_,_,W,K,K,K,K,K,K,K,K,K,K,K,W,_,_], //  9
+  [_,_,W,L,L,L,L,L,L,L,L,L,L,L,W,_,_,_,_,_,_,_,W,K,K,K,K,K,K,K,K,K,K,K,B,_,_], //  9  back door at col 33
   [_,_,W,W,W,W,W,L,L,W,W,W,W,W,W,_,_,_,_,_,_,_,W,W,W,W,W,K,K,W,W,W,W,W,W,_,_], // 10  south walls + door gaps
   [_,_,_,_,_,_,_,L,L,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,K,K,_,_,_,_,_,_,_], // 11  passage tiles
   [_,_,W,W,W,W,W,H,H,W,W,W,W,S,S,W,W,W,W,W,U,U,W,W,W,W,W,H,H,W,W,W,W,W,_,_], // 12  hallway top wall (bathroom stairs 20-21)
@@ -127,6 +128,8 @@ const BATHROOM_RETURN_COL = 20;
 const BATHROOM_RETURN_ROW = 13;
 const HOMEDEPOT_RETURN_COL = 11;
 const HOMEDEPOT_RETURN_ROW = 3;
+const BACKYARD_RETURN_COL = 32;
+const BACKYARD_RETURN_ROW = 9;
 
 
 // ── Floor frame lookup (house-core-16 texture) ────────────────────────────
@@ -138,7 +141,7 @@ const FLOOR_FRAME: Record<number, number> = {
 };
 
 // ── Scene ─────────────────────────────────────────────────────────────────
-type NeighborhoodSpawn = "default" | "basement" | "garage" | "bathroom" | "homedepot";
+type NeighborhoodSpawn = "default" | "basement" | "garage" | "bathroom" | "homedepot" | "backyard";
 
 export class NeighborhoodScene extends Phaser.Scene {
   private mover!: GridMover;
@@ -204,7 +207,7 @@ export class NeighborhoodScene extends Phaser.Scene {
         const cx = col * TILE + TILE / 2;
         const cy = row * TILE + TILE / 2;
 
-        if (tid === W) {
+        if (tid === W || tid === B) {
           this.add.image(cx, cy, "full-set-int-a4")
             .setFrame(WALL_FRAME)
             .setDisplaySize(TILE, TILE);
@@ -236,6 +239,9 @@ export class NeighborhoodScene extends Phaser.Scene {
     this.add.image(20 * TILE, 12 * TILE, "stairs-up")
       .setDisplaySize(TILE * 2, TILE)
       .setOrigin(0, 0);
+
+    // Back door to the backyard (quest 3).
+    this.add.image(33 * TILE + TILE / 2, 9 * TILE + TILE / 2, "lawn-tiles", 6);
 
     this.add.image(11 * TILE, 2 * TILE, "garage-door")
       .setDisplaySize(TILE * 2, TILE)
@@ -326,6 +332,7 @@ export class NeighborhoodScene extends Phaser.Scene {
       garage: { col: GARAGE_RETURN_COL, row: GARAGE_RETURN_ROW },
       bathroom: { col: BATHROOM_RETURN_COL, row: BATHROOM_RETURN_ROW },
       homedepot: { col: HOMEDEPOT_RETURN_COL, row: HOMEDEPOT_RETURN_ROW },
+      backyard: { col: BACKYARD_RETURN_COL, row: BACKYARD_RETURN_ROW },
     };
     const spawn = spawnTable[this.spawn] ?? spawnTable.default;
     const spawnCol = spawn.col;
@@ -362,6 +369,9 @@ export class NeighborhoodScene extends Phaser.Scene {
     }
     if (MAP[row]?.[col] === P) {
       this.kit.goto("HDCutScene");
+    }
+    if (MAP[row]?.[col] === B && this.kit.isIdle) {
+      void this.kit.run("backdoor");
     }
   }
 }

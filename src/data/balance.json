@@ -254,6 +254,31 @@
       },
       "boss": "clogged-toilet",
       "note": "Toilet boss. Needs a plumbing weapon and LV7-8."
+    },
+    "backyard": {
+      "quest": "reclaim-lawn",
+      "targetLevel": [
+        8,
+        9
+      ],
+      "gear": {
+        "weapon": "plunger-of-the-gods",
+        "armor": "tool-belt"
+      },
+      "note": "Lawn surface. Farm cash here for the spade (220) and sneakers (180)."
+    },
+    "tunnels": {
+      "quest": "reclaim-lawn",
+      "targetLevel": [
+        9,
+        11
+      ],
+      "gear": {
+        "weapon": "flat-edge-spade",
+        "armor": "grass-stained-sneakers"
+      },
+      "boss": "mole-king",
+      "note": "Mole King. Needs 3 burrows plugged. With castor oil: about 35% LV9, 60% LV10, 75% LV11, 96% LV12. Without: 0% at LV11."
     }
   }
 }

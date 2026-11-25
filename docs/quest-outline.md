@@ -61,6 +61,8 @@ Q10 counts all of them. With every item the final boss is fair at LV 23. With no
 
 ## 4. Quest 3: Reclaim the Lawn (detailed)
 
+**Built (2026-11-25).** Changes from this plan: the main path needs the Flat-Edge Spade (220 LP) to plug 3 escape burrows inside the tunnels. Biscuit is guarded by a Vole Lieutenant fight. Duct Tape Solution (heal 36 to 48, 7 DP) comes at LV 9 and Google It (damage x1.9) at LV 10. Bug Spray is not built yet. Simulated Mole King with castor oil: about 35% at LV 9, 60% at LV 10, 75% at LV 11, 96% at LV 12. Without the oil: 0% at LV 11, 22% at LV 12.
+
 **Countdown:** 10 DAYS UNTIL ARRIVAL. **Band:** LV 8 to 11. **Boss:** Mole King.
 
 ### Premise and hook

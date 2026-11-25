@@ -31,5 +31,22 @@
     "cost": 5,
     "kind": "damage",
     "multiplier": 1.6
+  },
+  {
+    "id": "duct-tape-solution",
+    "name": "Duct Tape Solution",
+    "levelRequired": 9,
+    "cost": 7,
+    "kind": "heal",
+    "healMin": 36,
+    "healMax": 48
+  },
+  {
+    "id": "google-it",
+    "name": "Google It",
+    "levelRequired": 10,
+    "cost": 8,
+    "kind": "damage",
+    "multiplier": 1.9
   }
 ]
