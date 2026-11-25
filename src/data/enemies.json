@@ -1301,11 +1301,10 @@
       "ambushMessage": "Four leaves. Dad has never seen four leaves. It sees Dad back."
     },
     "battleView": {
-      "width": 40,
-      "height": 40,
-      "y": 95,
-      "backdrop": "#1f4d1a",
-      "tint": "#ffe680"
+      "width": 44,
+      "height": 44,
+      "y": 93,
+      "backdrop": "#122b0f"
     }
   },
   {
