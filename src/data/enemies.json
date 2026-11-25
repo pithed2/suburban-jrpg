@@ -1074,9 +1074,9 @@
       "ambushMessage": "The soil heaves. A Lawn Grub surfaces like a bad thought."
     },
     "battleView": {
-      "width": 40,
-      "height": 40,
-      "y": 95,
+      "width": 44,
+      "height": 44,
+      "y": 93,
       "backdrop": "#2b1a0e"
     },
     "drops": [

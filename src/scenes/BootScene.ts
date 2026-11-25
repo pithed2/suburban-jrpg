@@ -53,7 +53,7 @@ export class BootScene extends Phaser.Scene {
     // Quest 3 (original art, made by scripts/art/quest3_art.py)
     this.load.image("crabgrass-creeper", "/assets-active/enemies/Crabgrass_Creeper.png");
     this.load.image("dandelion-puff", "/assets-active/enemies/Dandelion_Puff.png");
-    this.load.image("lawn-grub", "/assets-active/enemies/lawn_grub.png");
+    this.load.image("lawn-grub", "/assets-active/enemies/Lawn_Grub.png");
     this.load.image("fire-ant-mound", "/assets-active/enemies/fire_ant_mound.png");
     this.load.image("rogue-sprinkler", "/assets-active/enemies/rogue_sprinkler.png");
     this.load.image("vole-lieutenant", "/assets-active/enemies/Vole_Lieutenant.png");
