@@ -47,7 +47,7 @@ export class BootScene extends Phaser.Scene {
     this.load.image("single-ply-sam", "/assets-active/enemies/Single_Ply_Sam_battle.png");
     this.load.image("olfactory-ninja", "/assets-active/enemies/Olfactory_Ninja.png");
     this.load.image("toothpaste-slime", "/assets-active/enemies/toothpaste_slime.png");
-    this.load.image("mold-patch", "/assets-active/enemies/mold-patch.png");
+    this.load.image("mold-patch", "/assets-active/enemies/Mold_Patch.png");
     this.load.image("clogged-toilet-battle", "/assets-active/enemies/clogged_toilet_boss.png");
     this.load.image("stink-bug", "/assets-active/enemies/stink_bug_battle.png");
     // Quest 3 (original art, made by scripts/art/quest3_art.py)

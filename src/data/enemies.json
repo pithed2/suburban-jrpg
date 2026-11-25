@@ -372,8 +372,7 @@
     "battleView": {
       "width": 44,
       "height": 44,
-      "y": 93,
-      "backdrop": "#1c2630"
+      "y": 93
     }
   },
   {
@@ -478,6 +477,11 @@
       "levelAdvantageBonus": 0.02,
       "maxAmbushChance": 0.14,
       "ambushMessage": "The Mold Patch has been waiting behind the shower curtain the entire time."
+    },
+    "battleView": {
+      "width": 48,
+      "height": 48,
+      "y": 93
     }
   },
   {
@@ -869,8 +873,11 @@
       "ambushMessage": "The dark corner of the tub was never grout. It was waiting."
     },
     "battleView": {
-      "tint": "#455a64",
-      "backdrop": "#0f172a"
+      "tint": "#b8c4cc",
+      "backdrop": "#3a3f45",
+      "width": 48,
+      "height": 48,
+      "y": 93
     },
     "drops": [
       {
