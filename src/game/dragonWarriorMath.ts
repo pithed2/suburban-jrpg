@@ -70,12 +70,21 @@ export function rollDadSkillDamage(state: GameState, enemy: EnemyDefinition): nu
   return randomInt(Math.max(2, baseDamage - 2), baseDamage + 3);
 }
 
+/**
+ * Enemy damage against Dad. The listed attack damage (+/-1) is the main
+ * number, and the worn armor's defense comes off it, so armor always counts.
+ * Enemy listed damage is tuned for the armor that balance.json expects in each
+ * area; better armor than that makes the area easier. The stat formula is a
+ * fallback for enemies whose attack stat outgrows their listed damage.
+ */
 export function rollEnemyDamage(state: GameState, enemy: EnemyDefinition, listedDamage: number): number {
-  const defense = Math.floor(state.player.agility / 2) + state.player.defense + getArmorDefense(state);
+  const armor = getArmorDefense(state);
+  const defense = Math.floor(state.player.agility / 2) + state.player.defense + armor;
   const baseDamage = Math.max(1, Math.floor((enemy.attack - defense) / 2));
   const dramaticFloor = Math.max(1, listedDamage - 1);
   const dramaticCeiling = Math.max(dramaticFloor, listedDamage + 1);
-  return Math.max(randomInt(dramaticFloor, dramaticCeiling), randomInt(1, baseDamage + 2));
+  const dramatic = Math.max(1, randomInt(dramaticFloor, dramaticCeiling) - armor);
+  return Math.max(dramatic, randomInt(1, baseDamage + 2));
 }
 
 export function rollHealing(min = 23, max = 30): number {

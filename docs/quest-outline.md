@@ -1,11 +1,11 @@
 # Quest outline: quests 3 to 10
 
-Status: draft for review. This is a plan. No code or data changes yet.
+Status: draft for review. Andy's answers (2026-11-25): side quests feed the same boss and later bosses, armor fix yes, level cap 25. The armor fix and the LV 21 to 25 rows are in this PR. Nothing else is built.
 
 ## 1. Rules for every quest
 
 1. Each quest is one house or yard crisis, one dungeon, one boss.
-2. The boss has a gate item. A side quest gives the item. Without the item, the boss win rate is under 10% at the top of the quest level band. With the item, the boss follows the curve in rule 3.
+2. The boss has a gate item. A side quest gives the item. Without the item, the boss win rate is under 10% at the top of the quest level band. With the item, the boss follows the curve in rule 3. The item (or the side quest flag) also weakens one or more later bosses. See section 3.
 3. Boss win curve, same as quests 1 and 2: about 30% at the band level, about 75% at band + 1, about 95% at band + 2 (simulated with the item and the quest gear).
 4. The grind gets longer each quest. Target: 25 to 40 random fights per quest. Fights per level go up from about 12 in quest 3 to about 40 in quest 10, because the late levels need more XP and the bosses are 1 level apart.
 5. Each dungeon has a deep zone (`regions`) with harder enemies and better chests. Each dungeon has one rare high-XP enemy, like the Golden Roll.
@@ -14,24 +14,52 @@ Status: draft for review. This is a plan. No code or data changes yet.
 
 ## 2. Level plan
 
-Quest 2 ends at about LV 8 (580 XP). The level table stops at LV 20.
+Quest 2 ends at about LV 8 (580 XP). The level table now goes to LV 25 (rows 21 to 25 added in this PR, first guess).
 
 | Quest | Countdown | Level band | Boss 75% level | XP to grind (from last boss level) | Avg XP per normal fight | Est. fights |
 | --- | --- | --- | --- | --- | --- | --- |
 | 3 Lawn | 10 days | 8 to 11 | 10 | 870 | 30 to 40 | 25 to 30 |
 | 4 Gutters | 9 days | 10 to 13 | 12 | 1,500 | 45 to 55 | 30 |
 | 5 Water heater | 8 days | 12 to 15 | 14 | 2,350 | 60 to 70 | 35 to 40 |
-| 6 WiFi | 7 days | 14 to 16 | 15 | 1,600 | 55 to 65 | 25 to 30 |
-| 7 Garage | 6 days | 15 to 17 | 16 | 1,900 | 60 to 70 | 30 |
-| 8 HOA | 5 days | 16 to 18 | 17 | 2,200 | 60 to 70 | 30 to 35 |
-| 9 Disposal | 3 days | 17 to 19 | 18 | 2,600 | 65 to 75 | 35 to 40 |
-| 10 Arrival | 1 day | 18 to 20 | 19 | 3,000 | 70 to 80 | 40 |
+| 6 WiFi | 7 days | 14 to 17 | 16 | 3,500 | 75 to 85 | 45 |
+| 7 Garage | 6 days | 16 to 18 | 17 | 2,200 | 80 to 90 | 25 to 30 |
+| 8 HOA | 5 days | 17 to 20 | 19 | 5,600 | 105 to 115 | 50 |
+| 9 Disposal | 3 days | 19 to 22 | 21 | 7,400 | 135 to 145 | 50 to 55 |
+| 10 Arrival | 1 day | 21 to 25 | 23 | 9,800 | 165 to 175 | 55 to 60 |
 
 Boss XP is not counted in the grind column. It is a bonus of about 15% to 20% of the next level.
 
-Total estimate: about 250 to 300 random fights from quest 3 to the end. Classic NES pace, if each fight takes about 30 seconds, is 2 to 3 hours of grinding. Confidence: 0.6. The real number depends on run rate, heal costs and how often the player goes home to rest.
+The final boss is fair at LV 23 with every carry-over item. LV 24 and 25 are the room for a player who skipped side quests, or who wants to over-level.
 
-## 3. Quest 3: Reclaim the Lawn (detailed)
+Total estimate: about 330 random fights from quest 3 to the end. Classic NES pace, if each fight takes about 30 seconds, is about 3 hours of grinding. Confidence: 0.55. The real number depends on run rate, heal costs and how often the player goes home to rest.
+
+## 3. Side quest carry-over
+
+Each side quest item (or the flag it sets) does two jobs:
+
+1. It weakens the boss of its own quest. This is the main gate.
+2. It weakens one or more later bosses, or opens a later shortcut.
+
+Rules:
+
+- A carry-over effect is a soft gate only. A missed side quest makes a later boss harder (about 1 to 2 levels more grind), never impossible. Hard gates stay on the main path of the same quest.
+- Key items are never used up and cannot be sold. The later boss checks them with a `modifiers` entry (`when: { items: [...] }`) or a flag. This works in data now.
+- The player can go back and do a missed side quest later. Old areas stay open.
+
+| Side quest | Item or flag | Own boss | Later effect |
+| --- | --- | --- | --- |
+| Q3 Mrs. Okafor's cat | Castor Oil Pellets, `biscuitReturned` | Mole King | Q8: Mrs. Okafor signs the petition. Q10: the Mole King relapse is skipped. |
+| Q4 Dave's drone | Gutter Scoop, `daveDroneReturned` | Downspout Hydra | Unlocks the Call Dave skill at LV 13 (needs code: skill gated by flag). Q9: the scoop pulls peels out of the Grinder (defense down). |
+| Q5 Owner's Manual | Owner's Manual | The Tank | Q9: the binder also holds the disposal manual. It tells Dad where the hex key is (shorter junk drawer). Q10: Tank relapse skipped. |
+| Q5 main path | Headlamp | The Tank (hard gate) | Q6: the teen's room is dark. Q7: the garage rafters are dark. |
+| Q6 Teen's trust | Ethernet Cable, `teenTrust` | WiFi Phantom | Q8: the teen signs the petition. Q10: the teen holds the door (the White Glove skips its first attack). |
+| Q7 Yard sale | Label Maker | The Pile | Q10: every room is labeled. The White Glove's "Inspect" attack does less damage. |
+| Q8 Petition | Petition | HOA Wraith | Q10: the HOA does not show up. One fewer phase. |
+| Q9 Junk drawer | Hex Key | The Grinder | Q10: last carry-over item. |
+
+Q10 counts all of them. With every item the final boss is fair at LV 23. With none, it needs about LV 25.
+
+## 4. Quest 3: Reclaim the Lawn (detailed)
 
 **Countdown:** 10 DAYS UNTIL ARRIVAL. **Band:** LV 8 to 11. **Boss:** Mole King.
 
@@ -81,7 +109,7 @@ The neighbor across the fence, Mrs. Okafor, lost her cat Biscuit in the tunnels.
 
 Arrive at LV 8. Grind depth 1 to LV 9 (about 12 fights). Depth 2 to LV 10 (about 15 fights). Boss is fair at LV 10 with the pellets and spade. Confidence: 0.6.
 
-## 4. Quest 4: Clean the Gutters (detailed)
+## 5. Quest 4: Clean the Gutters (detailed)
 
 **Countdown:** 9 DAYS UNTIL ARRIVAL. **Band:** LV 10 to 13. **Boss:** The Downspout Hydra.
 
@@ -134,7 +162,7 @@ Dave's teenage son flew a drone onto the roof. It is on the chimney peak (deep z
 
 Arrive at LV 10. The eaves get Dad to LV 11. The gutters get Dad to LV 12. The chimney peak is for the side quest and for players who want to over-level. Boss is fair at LV 12 with the scoop. Confidence: 0.55.
 
-## 5. Quest 5: Bring Back Hot Water (detailed)
+## 6. Quest 5: Bring Back Hot Water (detailed)
 
 **Countdown:** 8 DAYS UNTIL ARRIVAL. **Band:** LV 12 to 15. **Boss:** The Tank.
 
@@ -180,15 +208,15 @@ The manual is in the Crawlspace Archive, in a box marked "IMPORTANT DO NOT THROW
 - Weapon: **Pipe Wrench** (power 27, price 560). Big brother of the Adjustable Wrench.
 - Armor: **Reading Glasses of Precision** (defense 11, price 480). From the foundation doc list. Funny that glasses are armor.
 - Key items: **Headlamp**, **Owner's Manual**.
-- Dad Skill: **Call Dave** at LV 13. Strong damage skill. Dave shows up, says one sentence, and hits the enemy with something he borrowed.
+- Dad Skill: **Call Dave** at LV 13, only if Dave's drone side quest (quest 4) is done. Strong damage skill. Dave shows up, says one sentence, and hits the enemy with something he borrowed.
 
 ### Grind expectation
 
 Arrive at LV 12. Revisit basement as a fast walk. Mechanical room to LV 13 and 14 (about 35 to 40 fights). Boss is fair at LV 14 with the manual. This is the first quest where the grind should feel long. Confidence: 0.55.
 
-## 6. Quests 6 to 10 (sketches)
+## 7. Quests 6 to 10 (sketches)
 
-### Quest 6: Restore the WiFi (7 days, band 14 to 16)
+### Quest 6: Restore the WiFi (7 days, band 14 to 17)
 
 - Premise: the WiFi goes down. The teen has not left their room. The in-laws want to video call the cousins.
 - Dungeon: the teen's room. Laundry hills, a desk of cables, a closet that is a portal.
@@ -197,7 +225,7 @@ Arrive at LV 12. Revisit basement as a fast walk. Mechanical room to LV 13 and 1
 - Side quest: earn the teen's trust. Bring them food from the kitchen and do not ask questions. The teen gives the **Admin Password** (a sticky note). Hard gate: Dad cannot reboot the router without it. Soft gate: **Ethernet Cable** (lowers dodge).
 - Key beat: the teen helps for one moment and then goes back to being a teen. Keep this kind.
 
-### Quest 7: Clear the Garage (6 days, band 15 to 17)
+### Quest 7: Clear the Garage (6 days, band 16 to 18)
 
 - Premise: the in-laws need a parking spot. The garage has not held a car since 2017.
 - Dungeon: the garage again, now bigger and full of boxes. A maze that changes when Dad moves boxes (3 or 4 box-push puzzles, like the breaker).
@@ -206,7 +234,7 @@ Arrive at LV 12. Revisit basement as a fast walk. Mechanical room to LV 13 and 1
 - Side quest: hold a yard sale. Sell 3 items to neighbors. The kid gets the **Label Maker**. Soft gate: The Pile loses defense because "everything has a place now".
 - Revisit beat: the Heating Coil's dryer is in the corner. It hums at Dad. Dad hums back.
 
-### Quest 8: Answer the HOA (5 days, band 16 to 18)
+### Quest 8: Answer the HOA (5 days, band 17 to 20)
 
 - Premise: a violation letter. The mole holes (quest 3), the gutters (quest 4), the boxes on the driveway (quest 7). The HOA president has photos.
 - Dungeon: the Community Clubhouse. Halls of bylaws, a pool with no swimmers, a meeting room that never ends.
@@ -215,7 +243,7 @@ Arrive at LV 12. Revisit basement as a fast walk. Mechanical room to LV 13 and 1
 - Side quest: get signatures from every neighbor met so far (Mrs. Okafor, Dave, the Dome Hepot clerk, the teen). The **Petition** is the soft gate. This pays off the recurring cast.
 - Caveat: the HOA president is a person. Keep the person human and the Wraith a monster made of rules, so the joke is the system, not the neighbor.
 
-### Quest 9: Fix the Garbage Disposal (3 days, band 17 to 19)
+### Quest 9: Fix the Garbage Disposal (3 days, band 19 to 22)
 
 - Premise: Thanksgiving prep. Dad puts potato peels down the disposal. It stops. It hums. The wife looks at Dad. Dad looks at the peels.
 - Dungeon: the kitchen. Under the sink, the back of the fridge (expired condiments), the pantry.
@@ -223,16 +251,16 @@ Arrive at LV 12. Revisit basement as a fast walk. Mechanical room to LV 13 and 1
 - Boss: **The Grinder.** HP and damage are the highest so far.
 - Side quest: find the tiny hex key that came with the disposal. It is in the junk drawer, which is its own small dungeon. Soft gate: the hex key frees the jam. In real life, this is how you fix a jammed disposal. The joke is that the final weapon against the strongest normal boss is a 1/4-inch Allen wrench.
 
-### Quest 10: The Arrival (1 day, band 18 to 20)
+### Quest 10: The Arrival (1 day, band 21 to 25)
 
 - Premise: the in-laws' car is on the street. Dad has one hour. Everything he fixed tries to break again at the same time.
 - Dungeon: the whole house as one big final dungeon. Each wing is a past area at high level, with remixed enemies. NES final castle feel.
 - Mini-bosses: "relapse" versions of past bosses (Heating Coil, Toilet, Mole King and the others). Each is optional if the matching side quest was done.
 - Final boss: **The White Glove.** Not the mother-in-law herself. It is her judgment, which Dad has carried for 20 years. It inspects each room.
-- Gimmick: one modifier per earlier side quest item. Each item Dad kept lowers the boss's power. All items: fair fight at LV 19. Few items: very hard.
+- Gimmick: one modifier per earlier side quest item. Each item Dad kept lowers the boss's power. All items: fair fight at LV 23. No items: about LV 25.
 - Ending: the doorbell. The mother-in-law steps in, looks around and says one small kind thing. Credits.
 
-## 7. Engine work this plan needs
+## 8. Engine work this plan needs
 
 I read the code to check what the data can do now. Items marked "needs code" are small, but they are code.
 
@@ -247,17 +275,19 @@ I read the code to check what the data can do now. Items marked "needs code" are
 | Dark map with vision radius (Headlamp) | 5 | No | 0.8 |
 | Boss phases or turn counters (Hydra, Tank, Phantom) | 4, 5, 6 | No, attack pick is random | 0.9 |
 | Status effects (sleep, stun) | Optional | No, there are none now | 0.9 |
-| Level table past LV 20 | Only if we extend | Yes, `balance.json` | 0.9 |
+| Level table to LV 25 | 9, 10 | Done in this PR (first guess) | 0.9 |
+| Skill unlocked by a flag (Call Dave) | 4 | No, skills unlock by level only | 0.9 |
+| Armor takes off listed damage | All | Done in this PR | 0.9 |
 | Box-push puzzle | 7 | No | 0.7 |
 | Headless walkthrough tests for each new quest | All | No, `scripts/check-quests.ts` covers quests 1 and 2 | 0.85 |
 
 Recommendation: build quest 3 with data-only gates first. Add phases and status effects only when a boss needs them.
 
-## 8. Caveats
+## 9. Caveats
 
-- **C1. Armor almost does nothing now.** In `rollEnemyDamage`, damage is the larger of the listed damage (plus or minus 1) and the stat formula. Armor only changes the stat formula. The listed damage is almost always larger, so armor rarely matters. I checked this in `src/game/dragonWarriorMath.ts`. Confidence: 0.9. Options: (a) let armor subtract from listed damage, or (b) do not use armor as a gate item. I recommend (a). It changes quest 1 and 2 balance, so we must run the sim again.
+- **C1. Armor fix (done in this PR).** Before: enemy damage was the larger of the listed damage and a stat formula, and only the formula used armor, so armor almost never mattered. Now the armor's defense comes off the listed damage. To keep quests 1 and 2 the same, each enemy's listed damage went up by the armor the sim expects in its area (garage +1, basement +2, bathroom +3). The boss curves in `npm run balance` are the same as before. Better armor than expected now helps a lot: Steel-Toe Boots (80 LP) instead of the Tool Belt move the toilet's 75% level from LV 7 to about LV 5.5. Option: raise the boots to about 200 LP so they are a grind goal.
 - **C2. Stat numbers are guesses.** Only the quest 3 table has per-enemy numbers. All of them need `npm run balance` before they are real. Confidence: 0.5.
-- **C3. The level table ends at LV 20.** The final boss at LV 19 leaves 1 level of room. If you want a longer final grind, extend the table to LV 25.
+- **C3. LV 21 to 25 are a guess.** They continue the curve (HP +7, STR +3 per level, XP steps from 4,000 to 6,400). Nothing uses them yet.
 - **C4. Grind time is a guess.** I did not time real fights. Fights per level are from the sim; the minutes per fight are an estimate.
 - **C5. Art cost.** About 6 new enemies and 1 boss per quest. That is about 55 new battle images for quests 3 to 10. Tint reuse can cover the first pass, but bosses need real art.
-- **C6. Item feeds which boss.** This plan has each side quest feed the boss of the same quest. A different reading of your goal is that a side quest feeds the next quest's boss. That makes more backtracking. Tell me which one you want.
+- **C6. A skipped side quest shows up late.** A player who skips quest 3's side quest finds out in quest 8 or 10. The wife's check-in line could hint at missed side quests. Not designed yet.

@@ -1,5 +1,5 @@
 {
-  "_doc": "Tuning sheet. Change numbers here (and in enemies.json), then run `npm run balance` to see win rates and grind time per area. Levels 1-4 match the original quests 1-2 tuning; 5-20 are a first guess for quests 3-10.",
+  "_doc": "Tuning sheet. Change numbers here (and in enemies.json), then run `npm run balance` to see win rates and grind time per area. Levels 1-8 match the quests 1-2 tuning; 9-25 are a first guess for quests 3-10 (see docs/quest-outline.md). Enemy listed damage assumes the armor in each area's `gear`; worn armor defense comes off listed damage.",
   "levels": [
     {
       "level": 1,
@@ -160,6 +160,46 @@
       "maxDadPoints": 55,
       "strength": 71,
       "agility": 52
+    },
+    {
+      "level": 21,
+      "xp": 24000,
+      "maxHp": 172,
+      "maxDadPoints": 58,
+      "strength": 74,
+      "agility": 55
+    },
+    {
+      "level": 22,
+      "xp": 28600,
+      "maxHp": 179,
+      "maxDadPoints": 60,
+      "strength": 77,
+      "agility": 57
+    },
+    {
+      "level": 23,
+      "xp": 33800,
+      "maxHp": 186,
+      "maxDadPoints": 63,
+      "strength": 80,
+      "agility": 60
+    },
+    {
+      "level": 24,
+      "xp": 39600,
+      "maxHp": 193,
+      "maxDadPoints": 65,
+      "strength": 83,
+      "agility": 62
+    },
+    {
+      "level": 25,
+      "xp": 46000,
+      "maxHp": 200,
+      "maxDadPoints": 68,
+      "strength": 86,
+      "agility": 65
     }
   ],
   "defeat": {
