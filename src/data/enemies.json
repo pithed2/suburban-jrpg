@@ -14,15 +14,15 @@
     "attackPattern": [
       {
         "message": "Scatters under the utility shelf",
-        "damage": 1
-      },
-      {
-        "message": "Triggers a suspicious sneeze",
         "damage": 2
       },
       {
+        "message": "Triggers a suspicious sneeze",
+        "damage": 3
+      },
+      {
         "message": "Rolls with silent accusation",
-        "damage": 1
+        "damage": 2
       }
     ],
     "actionResponses": {
@@ -64,19 +64,19 @@
     "attackPattern": [
       {
         "message": "Hurls itself at Dad with absolute personal grievance",
-        "damage": 3
-      },
-      {
-        "message": "Performs a dramatic rolling charge straight at Dad's ankles",
         "damage": 4
       },
       {
+        "message": "Performs a dramatic rolling charge straight at Dad's ankles",
+        "damage": 5
+      },
+      {
         "message": "Emits a cloud of malicious lint",
-        "damage": 2
+        "damage": 3
       },
       {
         "message": "Stares Dad down with the fury of years of neglect",
-        "damage": 3
+        "damage": 4
       }
     ],
     "actionResponses": {
@@ -118,19 +118,19 @@
     "attackPattern": [
       {
         "message": "Skitters directly toward Dad's shoe",
-        "damage": 1
+        "damage": 2
       },
       {
         "message": "Deploys Too Many Legs in a distressing configuration",
-        "damage": 2
+        "damage": 3
       },
       {
         "message": "Drops from the ceiling at approximately face height",
-        "damage": 2
+        "damage": 3
       },
       {
         "message": "Freezes and stares. Dad stares back. Damage is mostly emotional.",
-        "damage": 1
+        "damage": 2
       }
     ],
     "actionResponses": {
@@ -179,21 +179,21 @@
     "attackPattern": [
       {
         "message": "casts Badass Zap",
-        "damage": 15,
-        "damageMin": 13,
-        "damageMax": 17
+        "damage": 17,
+        "damageMin": 15,
+        "damageMax": 19
       },
       {
         "message": "surges with fully powered appliance hatred",
-        "damage": 15,
-        "damageMin": 13,
-        "damageMax": 17
+        "damage": 17,
+        "damageMin": 15,
+        "damageMax": 19
       },
       {
         "message": "throws live current like it pays the mortgage",
-        "damage": 15,
-        "damageMin": 13,
-        "damageMax": 17
+        "damage": 17,
+        "damageMin": 15,
+        "damageMax": 19
       }
     ],
     "actionResponses": {
@@ -242,21 +242,21 @@
         "attackPattern": [
           {
             "message": "casts Static Shock of a Random Sock",
-            "damage": 8,
-            "damageMin": 7,
-            "damageMax": 10
+            "damage": 10,
+            "damageMin": 9,
+            "damageMax": 12
           },
           {
             "message": "crackles with low-power spite",
-            "damage": 8,
-            "damageMin": 7,
-            "damageMax": 10
+            "damage": 10,
+            "damageMin": 9,
+            "damageMax": 12
           },
           {
             "message": "snaps with unplugged-but-still-angry static",
-            "damage": 8,
-            "damageMin": 7,
-            "damageMax": 10
+            "damage": 10,
+            "damageMin": 9,
+            "damageMax": 12
           }
         ],
         "runChance": 0.65,
@@ -281,15 +281,15 @@
     "attackPattern": [
       {
         "message": "Unspools dramatically and gets everywhere",
-        "damage": 6
+        "damage": 9
       },
       {
         "message": "Disintegrates ominously mid-fight, which is somehow worse",
-        "damage": 7
+        "damage": 10
       },
       {
         "message": "Rolls under the cabinet, daring Dad to chase it",
-        "damage": 5
+        "damage": 8
       }
     ],
     "actionResponses": {
@@ -333,15 +333,15 @@
     "attackPattern": [
       {
         "message": "Vanishes in a cloud of pure offense",
-        "damage": 8
+        "damage": 11
       },
       {
         "message": "Deploys a silent-but-deadly smoke bomb",
-        "damage": 10
+        "damage": 13
       },
       {
         "message": "Strikes from the shadows of the exhaust fan",
-        "damage": 7
+        "damage": 10
       }
     ],
     "actionResponses": {
@@ -385,15 +385,15 @@
     "attackPattern": [
       {
         "message": "Oozes onto Dad's shoe with minty menace",
-        "damage": 7
+        "damage": 10
       },
       {
         "message": "Sticks Dad's fingers together in a show of dominance",
-        "damage": 8
+        "damage": 11
       },
       {
         "message": "Sprays a fine mist of fluoride-scented contempt",
-        "damage": 6
+        "damage": 9
       }
     ],
     "actionResponses": {
@@ -437,15 +437,15 @@
     "attackPattern": [
       {
         "message": "Spreads slightly, somehow making the grout worse",
-        "damage": 8
+        "damage": 11
       },
       {
         "message": "Releases a spore cloud of pure landlord-deposit dread",
-        "damage": 9
+        "damage": 12
       },
       {
         "message": "Just sits there, multiplying, judging",
-        "damage": 7
+        "damage": 10
       }
     ],
     "actionResponses": {
@@ -489,21 +489,21 @@
     "attackPattern": [
       {
         "message": "Gurgles with rising, deeply concerning pressure",
-        "damage": 11,
-        "damageMin": 9,
-        "damageMax": 13
+        "damage": 14,
+        "damageMin": 12,
+        "damageMax": 16
       },
       {
         "message": "Threatens to overflow with biblical confidence",
-        "damage": 13,
-        "damageMin": 11,
-        "damageMax": 15
+        "damage": 16,
+        "damageMin": 14,
+        "damageMax": 18
       },
       {
         "message": "Backs up in a way that voids several warranties",
-        "damage": 10,
-        "damageMin": 8,
-        "damageMax": 12
+        "damage": 13,
+        "damageMin": 11,
+        "damageMax": 15
       }
     ],
     "actionResponses": {
@@ -556,15 +556,15 @@
     "attackPattern": [
       {
         "message": "releases a defensive odor of overwhelming confidence",
-        "damage": 3
+        "damage": 4
       },
       {
         "message": "bonks into Dad's forehead on purpose",
-        "damage": 3
+        "damage": 4
       },
       {
         "message": "clings to Dad's shirt and refuses to leave",
-        "damage": 4
+        "damage": 5
       }
     ],
     "actionResponses": {
@@ -612,15 +612,15 @@
     "attackPattern": [
       {
         "message": "bites with tetanus-adjacent energy",
-        "damage": 4
-      },
-      {
-        "message": "rappels down and lands on Dad's face",
         "damage": 5
       },
       {
+        "message": "rappels down and lands on Dad's face",
+        "damage": 6
+      },
+      {
         "message": "stares with eight disappointed eyes",
-        "damage": 3
+        "damage": 4
       }
     ],
     "actionResponses": {
@@ -665,15 +665,15 @@
     "attackPattern": [
       {
         "message": "drips on Dad from directly above",
-        "damage": 4
+        "damage": 6
       },
       {
         "message": "scuttles up Dad's pant leg",
-        "damage": 5
+        "damage": 7
       },
       {
         "message": "weaves a web across the only light switch",
-        "damage": 3
+        "damage": 5
       }
     ],
     "actionResponses": {
@@ -724,15 +724,15 @@
     "attackPattern": [
       {
         "message": "smothers Dad in a fluffy gray tide",
-        "damage": 5
+        "damage": 7
       },
       {
         "message": "summons the lint of a thousand socks",
-        "damage": 6
+        "damage": 8
       },
       {
         "message": "radiates a dry, static resentment",
-        "damage": 4
+        "damage": 6
       }
     ],
     "actionResponses": {
@@ -778,15 +778,15 @@
     "attackPattern": [
       {
         "message": "gurgles a wave of mystery water at Dad's socks",
-        "damage": 6
+        "damage": 8
       },
       {
         "message": "splashes a smell that will follow Dad upstairs",
-        "damage": 7
+        "damage": 9
       },
       {
         "message": "engulfs one of Dad's slippers forever",
-        "damage": 5
+        "damage": 7
       }
     ],
     "actionResponses": {
@@ -833,15 +833,15 @@
     "attackPattern": [
       {
         "message": "releases spores of quiet dread",
-        "damage": 10
+        "damage": 13
       },
       {
         "message": "spreads across Dad's confidence",
-        "damage": 12
+        "damage": 15
       },
       {
         "message": "whispers about the cost of remediation",
-        "damage": 9
+        "damage": 12
       }
     ],
     "actionResponses": {
@@ -888,11 +888,11 @@
     "attackPattern": [
       {
         "message": "unrolls a single quilted sheet of pure condescension",
-        "damage": 2
+        "damage": 5
       },
       {
         "message": "rolls just out of reach, smugly",
-        "damage": 2
+        "damage": 5
       }
     ],
     "actionResponses": {
