@@ -11,7 +11,10 @@
  * ──────────
  *  W = 1  solid wall
  *  F = 2  floor (walkable)
- *  X = 3  exit tile, returns to NeighborhoodScene upstairs
+ *  X = 3  exit tile (stairs), returns to the house
+ *
+ * Art: original tiles from scripts/art/bathroom_art.py (bathroom-tiles sheet).
+ * Fixtures (tub, vanity, shelves) are listed in src/game/maps/bathroom.ts.
  */
 
 import Phaser from "phaser";
@@ -20,33 +23,24 @@ import { CharacterSprite } from "../game/CharacterSprite";
 import { DAD_DEF } from "../game/characterDefs";
 import { FieldKit } from "../game/FieldKit";
 import { GridMover } from "../game/GridMover";
-import { F, MAP, W, X } from "../game/maps/bathroom";
-import { addPixelText } from "../game/uiText";
+import { BATH } from "../game/bathroomTiles";
+import { F, FIXTURES, isGrimy, MAP, PIPE_ROW, W, X } from "../game/maps/bathroom";
 
 const TILE = 16;
-const WALL_FRAME = 140; // warm cream plaster — matches the house interior
 
 const ROWS    = MAP.length;
 const COLS    = MAP[0].length;
 const WORLD_W = COLS * TILE;
 const WORLD_H = ROWS * TILE;
 
-const px = (c: number, r: number) => ({ x: c * TILE + TILE / 2, y: r * TILE + TILE / 2 });
-
-// ── Side quest spots ─────────────────────────────────────────────────────
-const LINEN_PX = px(3, 5);
-
-const DUCK_PX = px(18, 6);
-
-const SINK_PX = px(11, 5);
-
-// ── Boss ─────────────────────────────────────────────────────────────────
-const TOILET_PX = px(11, 13);
+// Boss tile (the toilet hotspot in src/data/areas/bathroom.json)
+const TOILET_PX = { col: 11, row: 13 };
 
 export class BathroomScene extends Phaser.Scene {
   private mover!: GridMover;
   private kit!: FieldKit;
   private toiletSprite!: Phaser.GameObjects.Image;
+  private readonly solid = new Set<string>();
 
   constructor() { super("BathroomScene"); }
 
@@ -92,54 +86,46 @@ export class BathroomScene extends Phaser.Scene {
 
   // ── Tile rendering ───────────────────────────────────────────────────────
 
+  private tile(col: number, row: number, frame: number): Phaser.GameObjects.Image {
+    return this.add.image(col * TILE + TILE / 2, row * TILE + TILE / 2, "bathroom-tiles", frame);
+  }
+
+  private isFloor(col: number, row: number): boolean {
+    const t = MAP[row]?.[col];
+    return t === F || t === X;
+  }
+
   private drawTiles(): void {
     for (let r = 0; r < ROWS; r++) {
       for (let c = 0; c < COLS; c++) {
         const t = MAP[r][c];
         if (t === 0) continue;
-        const cx = c * TILE + TILE / 2;
-        const cy = r * TILE + TILE / 2;
-        if (t === W || t === X) {
-          this.add.image(cx, cy, "full-set-int-a4")
-            .setFrame(WALL_FRAME)
-            .setDisplaySize(TILE, TILE);
+        if (t === X) {
+          this.tile(c, r, BATH.stairs);
+        } else if (t === W) {
+          const pipe = r === PIPE_ROW.row && c >= PIPE_ROW.from && c <= PIPE_ROW.to;
+          const face = this.isFloor(c, r + 1);
+          this.tile(c, r, face ? (pipe ? BATH.wallPipe : BATH.wallFace) : BATH.wallTop);
         } else {
-          this.add.image(cx, cy, "full-set-int-a2")
-            .setFrame(7)
-            .setDisplaySize(TILE, TILE);
+          this.tile(c, r, isGrimy(c, r) ? BATH.grimyFloor : BATH.floor);
         }
       }
     }
   }
 
   private placeDecorations(): void {
-    const propB = (col: number, row: number, frame: number, size = TILE) =>
-      this.add.image(col * TILE + TILE / 2, row * TILE + TILE / 2, "full-set-int-b")
-        .setFrame(frame).setDisplaySize(size, size);
-
-    // Linen closet — shelving
-    propB(2, 4, 40); propB(2, 6, 40);
-    addPixelText(this, LINEN_PX.x - 22, LINEN_PX.y - TILE, "LINEN CLOSET", 6).setTint(0xfacc15);
-
-    // Vanity / sink
-    propB(11, 5, 162);
-    addPixelText(this, SINK_PX.x - 12, SINK_PX.y - TILE, "SINK", 6).setTint(0xfacc15);
-
-    // Shower stall with curtain
-    propB(17, 4, 178, TILE * 2);
-    addPixelText(this, DUCK_PX.x - 26, DUCK_PX.y - TILE, "SHOWER CURTAIN", 6).setTint(0xfacc15);
+    for (const f of FIXTURES) {
+      this.tile(f.col, f.row, BATH[f.frame as keyof typeof BATH]);
+      if (f.solid) this.solid.add(`${f.col},${f.row}`);
+    }
   }
 
   private placeToilet(): void {
-    this.toiletSprite = this.add.image(TOILET_PX.x, TOILET_PX.y, "clogged-toilet-battle")
-      .setOrigin(0.5, 0.7)
-      .setDisplaySize(28, 28);
-    addPixelText(this, TOILET_PX.x - 14, TOILET_PX.y - TILE * 1.6, "TOILET", 6).setTint(0xfacc15);
+    this.toiletSprite = this.tile(TOILET_PX.col, TOILET_PX.row, BATH.toiletClogged);
   }
 
   private syncToilet(): void {
-    this.toiletSprite.setTexture(this.kit.state.flags.clogBossDefeated ? "dryer-fixed" : "clogged-toilet-battle")
-      .setDisplaySize(28, 28);
+    this.toiletSprite.setFrame(this.kit.state.flags.clogBossDefeated ? BATH.toiletClean : BATH.toiletClogged);
   }
 
   private placePlayer(): void {
@@ -152,6 +138,7 @@ export class BathroomScene extends Phaser.Scene {
   private canWalkTo(col: number, row: number): boolean {
     if (col < 0 || col >= COLS || row < 0 || row >= ROWS) return false;
     if (this.kit.isBlocked(col, row)) return false;
+    if (this.solid.has(`${col},${row}`)) return false;
     const t = MAP[row][col];
     return t === F || t === X;
   }
