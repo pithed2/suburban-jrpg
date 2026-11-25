@@ -22,3 +22,4 @@ Confirm and expand license/source notes before wider distribution.
 - `public/assets-active/enemies/Olfactory_Ninja.png`: by Andy.
 - `public/assets-active/enemies/Mold_Patch.png`: by Andy.
 - `public/assets-active/enemies/Icky_Spider_Slime.png`: by Andy.
+- `public/assets-active/enemies/Stink_Bug.png`: by Andy.

@@ -596,9 +596,10 @@
       "ambushMessage": "A Stink Bug drops from the light fixture onto Dad's neck."
     },
     "battleView": {
-      "width": 40,
-      "height": 42,
-      "y": 92
+      "width": 46,
+      "height": 46,
+      "y": 94,
+      "backdrop": "#1c2630"
     },
     "drops": [
       {
