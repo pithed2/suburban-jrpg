@@ -50,15 +50,44 @@
         },
         "do": [
           {
+            "startQuest": "reclaim-lawn"
+          },
+          {
             "say": [
               [
+                "NARRATOR",
+                "The phone rings. Dad's wife answers it. She listens for a long time."
+              ],
+              [
                 "WIFE",
-                "The bathroom is still working. I'm choosing to believe this is also permanent."
+                "That was my mother. She says she's going to 'do the walk around the property, like always.'"
+              ],
+              [
+                "DAD",
+                "The walk around."
+              ],
+              [
+                "WIFE",
+                "Have you looked at the backyard lately?"
+              ],
+              [
+                "NARRATOR",
+                "Dad has not. Dad has been avoiding it. Something has been happening out there."
+              ],
+              [
+                "DAD'S BRAIN",
+                "Back door. Kitchen. Brace yourself."
               ]
             ]
           },
           {
-            "checkIn": true
+            "complete": "talk-to-wife-lawn"
+          },
+          {
+            "step": "inspect-lawn"
+          },
+          {
+            "save": true
           }
         ]
       },
@@ -123,6 +152,46 @@
           },
           {
             "completeQuest": "fix-bathroom"
+          },
+          {
+            "startQuest": "reclaim-lawn"
+          },
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The phone rings. Dad's wife answers it. She listens for a long time."
+              ],
+              [
+                "WIFE",
+                "That was my mother. She says she's going to 'do the walk around the property, like always.'"
+              ],
+              [
+                "DAD",
+                "The walk around."
+              ],
+              [
+                "WIFE",
+                "Have you looked at the backyard lately?"
+              ],
+              [
+                "NARRATOR",
+                "Dad has not. Dad has been avoiding it. Something has been happening out there."
+              ],
+              [
+                "DAD'S BRAIN",
+                "Back door. Kitchen. Brace yourself."
+              ]
+            ]
+          },
+          {
+            "complete": "talk-to-wife-lawn"
+          },
+          {
+            "step": "inspect-lawn"
+          },
+          {
+            "save": true
           }
         ]
       },

@@ -159,9 +159,9 @@
     "battleStartMood": "spider",
     "battleView": {
       "backdrop": "#1a0a2e",
-      "width": 60,
-      "height": 52,
-      "y": 88
+      "width": 54,
+      "height": 41,
+      "y": 95
     }
   },
   {
@@ -368,6 +368,11 @@
       "levelAdvantageBonus": 0.03,
       "maxAmbushChance": 0.38,
       "ambushMessage": "The Olfactory Ninja strikes before Dad even registers the smell."
+    },
+    "battleView": {
+      "width": 44,
+      "height": 44,
+      "y": 93
     }
   },
   {
@@ -472,6 +477,11 @@
       "levelAdvantageBonus": 0.02,
       "maxAmbushChance": 0.14,
       "ambushMessage": "The Mold Patch has been waiting behind the shower curtain the entire time."
+    },
+    "battleView": {
+      "width": 48,
+      "height": 48,
+      "y": 93
     }
   },
   {
@@ -586,9 +596,10 @@
       "ambushMessage": "A Stink Bug drops from the light fixture onto Dad's neck."
     },
     "battleView": {
-      "width": 40,
-      "height": 42,
-      "y": 92
+      "width": 46,
+      "height": 46,
+      "y": 94,
+      "backdrop": "#1c2630"
     },
     "drops": [
       {
@@ -643,9 +654,9 @@
     },
     "battleView": {
       "backdrop": "#1a0a2e",
-      "width": 60,
-      "height": 52,
-      "y": 88,
+      "width": 54,
+      "height": 41,
+      "y": 95,
       "tint": "#e07b39"
     },
     "battleStartMood": "spider"
@@ -696,10 +707,10 @@
     },
     "battleView": {
       "backdrop": "#1a0a2e",
-      "width": 60,
-      "height": 52,
-      "y": 88,
-      "tint": "#6fa8dc"
+      "width": 54,
+      "height": 41,
+      "y": 95,
+      "tint": "#a8d0f5"
     },
     "drops": [
       {
@@ -863,8 +874,11 @@
       "ambushMessage": "The dark corner of the tub was never grout. It was waiting."
     },
     "battleView": {
-      "tint": "#455a64",
-      "backdrop": "#0f172a"
+      "tint": "#b8c4cc",
+      "backdrop": "#3a3f45",
+      "width": 48,
+      "height": 48,
+      "y": 93
     },
     "drops": [
       {
@@ -916,6 +930,476 @@
     "battleView": {
       "tint": "#ffd54a",
       "backdrop": "#3b2f0b"
+    }
+  },
+  {
+    "id": "crabgrass-creeper",
+    "name": "Crabgrass Creeper",
+    "battleTexture": "crabgrass-creeper",
+    "level": 8,
+    "hp": 60,
+    "attack": 18,
+    "agility": 12,
+    "dodgeChance": 0.03,
+    "xpReward": 30,
+    "cashReward": 14,
+    "emotionalMeaning": "It was here before the house. It will be here after.",
+    "attackPattern": [
+      {
+        "message": "spreads one more inch while Dad watches",
+        "damage": 15
+      },
+      {
+        "message": "roots itself in Dad's sock",
+        "damage": 16
+      },
+      {
+        "message": "chokes out a perfectly good patch of fescue",
+        "damage": 17
+      }
+    ],
+    "actionResponses": {
+      "fight": {
+        "damage": 16,
+        "damageByWeapon": {
+          "flat-edge-spade": 22
+        },
+        "message": "Dad yanks a fistful of it. Some of it lets go.",
+        "effectLabel": "pulled"
+      },
+      "dadSkill": {
+        "damage": 10,
+        "message": "Crabgrass does not respond to tone of voice.",
+        "effectLabel": "resisted"
+      }
+    },
+    "initiative": {
+      "baseAmbushChance": 0.05,
+      "levelAdvantageBonus": 0.03,
+      "maxAmbushChance": 0.15,
+      "ambushMessage": "Crabgrass Creeper was already here. It was always already here."
+    },
+    "battleView": {
+      "width": 40,
+      "height": 40,
+      "y": 95,
+      "backdrop": "#1f4d1a"
+    }
+  },
+  {
+    "id": "dandelion-puff",
+    "name": "Dandelion Puff",
+    "battleTexture": "dandelion-puff",
+    "level": 8,
+    "hp": 40,
+    "attack": 16,
+    "agility": 30,
+    "dodgeChance": 0.1,
+    "xpReward": 32,
+    "cashReward": 12,
+    "emotionalMeaning": "Every wish ever made on it was for more dandelions",
+    "attackPattern": [
+      {
+        "message": "releases fifty tiny parachutes of doom",
+        "damage": 14
+      },
+      {
+        "message": "goes to seed directly in Dad's face",
+        "damage": 15
+      },
+      {
+        "message": "smiles, which is somehow worse",
+        "damage": 16
+      }
+    ],
+    "actionResponses": {
+      "fight": {
+        "damage": 14,
+        "damageByWeapon": {
+          "flat-edge-spade": 18
+        },
+        "message": "Dad swings. Half of it floats away and lands somewhere worse.",
+        "effectLabel": "scattered"
+      },
+      "dadSkill": {
+        "damage": 12,
+        "message": "Dad sighs. The puff loses three seeds to the breeze.",
+        "effectLabel": "wafted"
+      }
+    },
+    "initiative": {
+      "baseAmbushChance": 0.06,
+      "levelAdvantageBonus": 0.03,
+      "maxAmbushChance": 0.16,
+      "ambushMessage": "A Dandelion Puff drifts into Dad's path on purpose."
+    },
+    "battleView": {
+      "width": 44,
+      "height": 44,
+      "y": 92,
+      "backdrop": "#1f4d1a"
+    }
+  },
+  {
+    "id": "lawn-grub",
+    "name": "Lawn Grub",
+    "battleTexture": "lawn-grub",
+    "level": 9,
+    "hp": 90,
+    "attack": 18,
+    "agility": 8,
+    "dodgeChance": 0.02,
+    "xpReward": 36,
+    "cashReward": 16,
+    "emotionalMeaning": "The reason the moles came. The root of the root problem.",
+    "attackPattern": [
+      {
+        "message": "curls up and eats a root, loudly",
+        "damage": 16
+      },
+      {
+        "message": "wriggles in a way Dad will see when he closes his eyes",
+        "damage": 17
+      },
+      {
+        "message": "burps up thatch",
+        "damage": 15
+      }
+    ],
+    "actionResponses": {
+      "fight": {
+        "damage": 18,
+        "damageByWeapon": {
+          "flat-edge-spade": 24
+        },
+        "message": "Dad digs it out. It is bigger than it looked. They always are.",
+        "effectLabel": "unearthed"
+      },
+      "dadSkill": {
+        "damage": 10,
+        "message": "The grub does not know what a Dad is.",
+        "effectLabel": "oblivious"
+      }
+    },
+    "initiative": {
+      "baseAmbushChance": 0.04,
+      "levelAdvantageBonus": 0.03,
+      "maxAmbushChance": 0.12,
+      "ambushMessage": "The soil heaves. A Lawn Grub surfaces like a bad thought."
+    },
+    "battleView": {
+      "width": 44,
+      "height": 44,
+      "y": 93,
+      "backdrop": "#2b1a0e"
+    },
+    "drops": [
+      {
+        "item": "leftover-pizza",
+        "chance": 0.12
+      }
+    ]
+  },
+  {
+    "id": "fire-ant-mound",
+    "name": "Fire Ant Mound",
+    "battleTexture": "fire-ant-mound",
+    "level": 10,
+    "hp": 70,
+    "attack": 22,
+    "agility": 20,
+    "dodgeChance": 0.04,
+    "xpReward": 40,
+    "cashReward": 18,
+    "emotionalMeaning": "A thousand small problems acting as one big one",
+    "attackPattern": [
+      {
+        "message": "sends a scout up Dad's pant leg",
+        "damage": 19
+      },
+      {
+        "message": "swarms with grim efficiency",
+        "damage": 20
+      },
+      {
+        "message": "bites in a coordinated union action",
+        "damage": 18
+      }
+    ],
+    "actionResponses": {
+      "fight": {
+        "damage": 20,
+        "damageByWeapon": {
+          "flat-edge-spade": 26
+        },
+        "message": "Dad flattens the mound. The mound reorganizes.",
+        "effectLabel": "flattened"
+      },
+      "dadSkill": {
+        "damage": 12,
+        "message": "The ants have a queen. She outranks Dad.",
+        "effectLabel": "outranked"
+      }
+    },
+    "initiative": {
+      "baseAmbushChance": 0.08,
+      "levelAdvantageBonus": 0.03,
+      "maxAmbushChance": 0.2,
+      "ambushMessage": "Dad stepped on it. Of course Dad stepped on it."
+    },
+    "battleView": {
+      "width": 44,
+      "height": 44,
+      "y": 93,
+      "backdrop": "#2b1a0e"
+    }
+  },
+  {
+    "id": "rogue-sprinkler",
+    "name": "Rogue Sprinkler Head",
+    "battleTexture": "rogue-sprinkler",
+    "level": 10,
+    "hp": 80,
+    "attack": 22,
+    "agility": 18,
+    "dodgeChance": 0.04,
+    "xpReward": 42,
+    "cashReward": 20,
+    "emotionalMeaning": "Waters the driveway at 5 AM and nothing else",
+    "attackPattern": [
+      {
+        "message": "pops up and hoses Dad at point-blank range",
+        "damage": 20
+      },
+      {
+        "message": "hisses like a disappointed father-in-law",
+        "damage": 19
+      },
+      {
+        "message": "sprays everywhere except the lawn",
+        "damage": 21
+      }
+    ],
+    "actionResponses": {
+      "fight": {
+        "damage": 20,
+        "damageByWeapon": {
+          "flat-edge-spade": 26
+        },
+        "message": "Dad whacks the nozzle. It spins faster out of spite.",
+        "effectLabel": "adjusted"
+      },
+      "dadSkill": {
+        "damage": 12,
+        "message": "Dad tries to reason with the timer. The timer has no menu.",
+        "effectLabel": "unprogrammable"
+      }
+    },
+    "initiative": {
+      "baseAmbushChance": 0.07,
+      "levelAdvantageBonus": 0.03,
+      "maxAmbushChance": 0.18,
+      "ambushMessage": "Click. Tick-tick-tick. The Rogue Sprinkler Head rises."
+    },
+    "battleView": {
+      "width": 44,
+      "height": 44,
+      "y": 93,
+      "backdrop": "#2b1a0e"
+    },
+    "drops": [
+      {
+        "item": "cold-coffee",
+        "chance": 0.1
+      }
+    ]
+  },
+  {
+    "id": "vole-lieutenant",
+    "name": "Vole Lieutenant",
+    "battleTexture": "vole-lieutenant",
+    "level": 11,
+    "hp": 120,
+    "attack": 26,
+    "agility": 24,
+    "dodgeChance": 0.05,
+    "xpReward": 58,
+    "cashReward": 26,
+    "emotionalMeaning": "Middle management of the underground",
+    "attackPattern": [
+      {
+        "message": "salutes, then bites",
+        "damage": 21
+      },
+      {
+        "message": "calls in a tunnel collapse",
+        "damage": 23
+      },
+      {
+        "message": "cites the Mole King's standing orders",
+        "damage": 20
+      }
+    ],
+    "actionResponses": {
+      "fight": {
+        "damage": 24,
+        "damageByWeapon": {
+          "flat-edge-spade": 30
+        },
+        "message": "Dad shovels at the lieutenant. It files a complaint.",
+        "effectLabel": "demoted"
+      },
+      "dadSkill": {
+        "damage": 14,
+        "message": "Dad pulls rank. The vole has a hat. The hat wins.",
+        "effectLabel": "outranked"
+      }
+    },
+    "initiative": {
+      "baseAmbushChance": 0.08,
+      "levelAdvantageBonus": 0.03,
+      "maxAmbushChance": 0.2,
+      "ambushMessage": "A Vole Lieutenant steps out of the dark and checks a tiny clipboard."
+    },
+    "battleView": {
+      "width": 46,
+      "height": 46,
+      "y": 93,
+      "backdrop": "#2b1a0e"
+    },
+    "drops": [
+      {
+        "item": "grilled-bratwurst",
+        "chance": 0.1
+      }
+    ]
+  },
+  {
+    "id": "lucky-clover",
+    "name": "Lucky Clover",
+    "battleTexture": "lucky-clover",
+    "level": 9,
+    "hp": 12,
+    "attack": 6,
+    "agility": 46,
+    "dodgeChance": 0.55,
+    "xpReward": 160,
+    "cashReward": 60,
+    "emotionalMeaning": "One in ten thousand. It knows.",
+    "attackPattern": [
+      {
+        "message": "rustles smugly",
+        "damage": 8
+      },
+      {
+        "message": "is lucky at Dad",
+        "damage": 8
+      }
+    ],
+    "actionResponses": {
+      "fight": {
+        "damage": 10,
+        "message": "Dad grabs for it. Somehow, contact.",
+        "effectLabel": "lucky"
+      },
+      "dadSkill": {
+        "damage": 8,
+        "message": "The clover is too lucky for that.",
+        "effectLabel": "lucky"
+      }
+    },
+    "initiative": {
+      "baseAmbushChance": 0.02,
+      "levelAdvantageBonus": 0.03,
+      "maxAmbushChance": 0.05,
+      "ambushMessage": "Four leaves. Dad has never seen four leaves. It sees Dad back."
+    },
+    "battleView": {
+      "width": 44,
+      "height": 44,
+      "y": 93,
+      "backdrop": "#122b0f"
+    }
+  },
+  {
+    "id": "mole-king",
+    "name": "The Mole King",
+    "battleTexture": "mole-king",
+    "level": 12,
+    "hp": 264,
+    "attack": 28,
+    "agility": 28,
+    "dodgeChance": 0.12,
+    "xpReward": 300,
+    "cashReward": 160,
+    "emotionalMeaning": "Violated suburban pride, wearing a crown",
+    "attackPattern": [
+      {
+        "message": "rakes the floor with royal claws",
+        "damage": 25,
+        "damageMin": 23,
+        "damageMax": 27
+      },
+      {
+        "message": "collapses a tunnel onto Dad's position",
+        "damage": 28,
+        "damageMin": 26,
+        "damageMax": 30
+      },
+      {
+        "message": "burrows away and bursts up behind Dad",
+        "damage": 26,
+        "damageMin": 24,
+        "damageMax": 28
+      }
+    ],
+    "actionResponses": {
+      "fight": {
+        "damage": 14,
+        "damageByWeapon": {
+          "two-hands": 4,
+          "adjustable-wrench": 8,
+          "rubber-mallet": 10,
+          "plumbing-snake": 10,
+          "plunger-of-the-gods": 14,
+          "flat-edge-spade": 24
+        },
+        "message": "Dad swings at the King. The King sinks into the soil.",
+        "effectLabel": "burrowed"
+      },
+      "dadSkill": {
+        "damage": 14,
+        "message": "The Mole King cannot see Dad's glare. He is a mole.",
+        "effectLabel": "unseen"
+      }
+    },
+    "initiative": {
+      "baseAmbushChance": 0.03,
+      "levelAdvantageBonus": 0.03,
+      "maxAmbushChance": 0.12,
+      "ambushMessage": "The floor of the throne room bulges. The Mole King rises."
+    },
+    "boss": true,
+    "music": "mini-boss",
+    "banter": "moleKing",
+    "modifiers": [
+      {
+        "when": {
+          "flags": [
+            "hasCastorOil"
+          ]
+        },
+        "startMessage": "The Mole King smells the castor oil. His whiskers droop.",
+        "defenseScale": 0.6,
+        "attackScale": 0.8,
+        "banter": "moleKingOiled"
+      }
+    ],
+    "battleView": {
+      "width": 48,
+      "height": 48,
+      "y": 93,
+      "backdrop": "#1a0f08"
     }
   }
 ]

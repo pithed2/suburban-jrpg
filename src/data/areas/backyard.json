@@ -1,0 +1,474 @@
+{
+  "id": "backyard",
+  "label": "Backyard",
+  "hud": "BACKYARD",
+  "returnTo": {
+    "scene": "NeighborhoodScene",
+    "spawn": "backyard"
+  },
+  "backdrop": "#1f4d1a",
+  "randomEncounters": {
+    "enabled": true,
+    "stepDistance": 96,
+    "baseChance": 0.18,
+    "cooldownRolls": 3,
+    "introMessages": [
+      "The lawn shifts under Dad's feet.",
+      "Something in the grass has opinions."
+    ],
+    "entries": [
+      {
+        "enemyId": "crabgrass-creeper",
+        "weight": 3,
+        "introMessages": [
+          "A patch of crabgrass stands up.",
+          "The crabgrass by the patio has been planning this."
+        ]
+      },
+      {
+        "enemyId": "dandelion-puff",
+        "weight": 2,
+        "introMessages": [
+          "A Dandelion Puff drifts over the fence.",
+          "One dandelion. Then, suddenly, a dandelion with a face."
+        ]
+      },
+      {
+        "enemyId": "lucky-clover",
+        "weight": 1,
+        "minPlayerLevel": 8,
+        "regions": [
+          [
+            20,
+            12,
+            34,
+            22
+          ]
+        ]
+      }
+    ]
+  },
+  "hotspots": [
+    {
+      "id": "okafor",
+      "col": 33,
+      "row": 11,
+      "radius": 1.8
+    },
+    {
+      "id": "shed",
+      "col": 5,
+      "row": 6,
+      "radius": 1.6
+    },
+    {
+      "id": "gnome",
+      "col": 29,
+      "row": 3,
+      "radius": 1.5,
+      "solid": true
+    },
+    {
+      "id": "sign",
+      "col": 15,
+      "row": 16,
+      "radius": 1.4,
+      "solid": true
+    },
+    {
+      "id": "molehill",
+      "col": 12,
+      "row": 14,
+      "radius": 1.2
+    }
+  ],
+  "events": {
+    "enter": [
+      {
+        "when": {
+          "quest": "fix-bathroom"
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The lawn is a field of holes. Dad decides not to look at it yet."
+              ],
+              [
+                "DAD'S BRAIN",
+                "Your wife was looking for you. Something about her mother. Go talk to her first."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "when": {
+          "step": "inspect-lawn"
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Dad steps onto the back patio and looks at the lawn."
+              ],
+              [
+                "NARRATOR",
+                "The lawn looks back. It is mostly holes."
+              ],
+              [
+                "DAD",
+                "Oh, come ON."
+              ],
+              [
+                "DAD'S BRAIN",
+                "Count them. No, don't count them. There are too many."
+              ],
+              [
+                "NARRATOR",
+                "In the middle of the yard, one hole is bigger than the others. Much bigger. It has a doorway shape."
+              ],
+              [
+                "DAD'S BRAIN",
+                "That is not a mole hole. That is a mole FOYER."
+              ]
+            ]
+          },
+          {
+            "complete": "inspect-lawn"
+          },
+          {
+            "if": {
+              "flags": [
+                "ownsSpade"
+              ]
+            },
+            "then": [
+              {
+                "step": "plug-burrows"
+              }
+            ],
+            "else": [
+              {
+                "step": "find-spade"
+              },
+              {
+                "say": [
+                  [
+                    "DAD",
+                    "I will need a real shovel. Not the one from the Incident."
+                  ],
+                  [
+                    "DAD'S BRAIN",
+                    "We do not talk about the Incident. Dome Hepot. Garden aisle."
+                  ]
+                ]
+              }
+            ]
+          },
+          {
+            "save": true
+          }
+        ]
+      },
+      {
+        "when": {
+          "quest": "reclaim-lawn",
+          "notFlags": [
+            "moleKingDefeated"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The lawn waits, lumpy and smug."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "The backyard. Green, mostly. Dad stands and appreciates it."
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "default": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Grass. Some of it is the kind Dad paid for."
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "shed": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Dad's shed. A lawn chair, a broken shovel, a gas can with a mystery mix."
+              ],
+              [
+                "NARRATOR",
+                "Dad sits in the lawn chair for four minutes and stares at the wall."
+              ],
+              [
+                "SYSTEM",
+                "Dad's HP and DP are restored."
+              ]
+            ]
+          },
+          {
+            "heal": "all"
+          },
+          {
+            "if": {
+              "notFlags": [
+                "ownsSpade"
+              ]
+            },
+            "then": [
+              {
+                "say": [
+                  [
+                    "DAD'S BRAIN",
+                    "The broken shovel is still here. We keep it as a warning."
+                  ]
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "gnome": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "A garden gnome. It came with the house."
+              ],
+              [
+                "NARRATOR",
+                "It has watched every mole go by. It has told no one."
+              ],
+              [
+                "DAD",
+                "Snitches get stitches, I guess."
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "sign": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "A sign, hand-painted by the previous owner: MIND THE HOLES."
+              ],
+              [
+                "DAD'S BRAIN",
+                "He knew. He KNEW. And he still took our offer."
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "molehill": [
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "A molehill. Dad steps on it. It rises again behind him, slowly, like a sigh."
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "okafor": [
+      {
+        "when": {
+          "flags": [
+            "biscuitReturned"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "MRS. OKAFOR",
+                "Biscuit is asleep on the dryer. My dryer, not yours. Yours I hear is fixed."
+              ],
+              [
+                "MRS. OKAFOR",
+                "Use those pellets. Put them where it hurts."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "when": {
+          "flags": [
+            "foundBiscuit"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Dad holds Biscuit up over the fence. Biscuit hangs there like a wet coat."
+              ],
+              [
+                "MRS. OKAFOR",
+                "BISCUIT! Oh, you terrible animal. Where was he?"
+              ],
+              [
+                "DAD",
+                "In the Mole King's irrigation vault. A vole had him. It's a long story. Military."
+              ],
+              [
+                "MRS. OKAFOR",
+                "Of course. Here. My late husband swore by these. He also swore at the moles."
+              ],
+              [
+                "SYSTEM",
+                "YOU RECEIVED CASTOR OIL PELLETS!"
+              ],
+              [
+                "MRS. OKAFOR",
+                "Throw a handful down when you see the big one. They hate the smell. So will you."
+              ],
+              [
+                "DAD'S BRAIN",
+                "This is the item. This is the boss item. We are doing a side quest correctly."
+              ]
+            ]
+          },
+          {
+            "give": "castor-oil-pellets"
+          },
+          {
+            "set": {
+              "biscuitReturned": true,
+              "hasCastorOil": true
+            }
+          },
+          {
+            "xp": 80
+          },
+          {
+            "say": [
+              [
+                "SYSTEM",
+                "Dad gained 80 XP. {levelUp}"
+              ]
+            ]
+          },
+          {
+            "save": true
+          }
+        ]
+      },
+      {
+        "when": {
+          "flags": [
+            "okaforAsked"
+          ]
+        },
+        "do": [
+          {
+            "say": [
+              [
+                "MRS. OKAFOR",
+                "Any sign of Biscuit? Orange, rude, answers to nothing."
+              ],
+              [
+                "DAD",
+                "Still looking."
+              ],
+              [
+                "MRS. OKAFOR",
+                "Try down the holes. He loves a hole. He's like my late husband that way."
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "do": [
+          {
+            "say": [
+              [
+                "NARRATOR",
+                "Mrs. Okafor from next door leans over the fence. She has been there the whole time."
+              ],
+              [
+                "MRS. OKAFOR",
+                "Your lawn looks like the moon, dear."
+              ],
+              [
+                "DAD",
+                "Thank you, Mrs. Okafor. I'm aware."
+              ],
+              [
+                "MRS. OKAFOR",
+                "Have you seen Biscuit? My cat. He went down one of your holes on Sunday and did not come back up."
+              ],
+              [
+                "DAD",
+                "My holes?"
+              ],
+              [
+                "MRS. OKAFOR",
+                "Your lawn, your holes. Bring him back and I'll give you something for those moles. Something my husband used."
+              ],
+              [
+                "DAD'S BRAIN",
+                "Side quest. Cat in a hole. Reward for the moles. Do it."
+              ]
+            ]
+          },
+          {
+            "set": {
+              "okaforAsked": true
+            }
+          },
+          {
+            "save": true
+          }
+        ]
+      }
+    ]
+  }
+}

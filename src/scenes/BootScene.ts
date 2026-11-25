@@ -43,13 +43,23 @@ export class BootScene extends Phaser.Scene {
     this.load.image("dryer-fixed", "/assets-active/props/Happy_Dryer.png");
     this.load.image("dust-bunny", "/assets-active/enemies/Dust_Bunny.png");
     this.load.image("angry-dust-bunny", "/assets-active/enemies/Angry_Dust_Bunny_battle.png");
-    this.load.image("icky-spider", "/assets-active/enemies/Icky_Spider_2.png"); // 74×64, pre-transparent
+    this.load.image("icky-spider", "/assets-active/enemies/Icky_Spider_Slime.png");
     this.load.image("single-ply-sam", "/assets-active/enemies/Single_Ply_Sam_battle.png");
-    this.load.image("olfactory-ninja", "/assets-active/enemies/olfactory-ninja.png");
+    this.load.image("olfactory-ninja", "/assets-active/enemies/Olfactory_Ninja.png");
     this.load.image("toothpaste-slime", "/assets-active/enemies/toothpaste_slime.png");
-    this.load.image("mold-patch", "/assets-active/enemies/mold-patch.png");
+    this.load.image("mold-patch", "/assets-active/enemies/Mold_Patch.png");
     this.load.image("clogged-toilet-battle", "/assets-active/enemies/clogged_toilet_boss.png");
-    this.load.image("stink-bug", "/assets-active/enemies/stink_bug_battle.png");
+    this.load.image("stink-bug", "/assets-active/enemies/Stink_Bug.png");
+    // Quest 3 (original art, made by scripts/art/quest3_art.py)
+    this.load.image("crabgrass-creeper", "/assets-active/enemies/Crabgrass_Creeper.png");
+    this.load.image("dandelion-puff", "/assets-active/enemies/Dandelion_Puff.png");
+    this.load.image("lawn-grub", "/assets-active/enemies/Lawn_Grub.png");
+    this.load.image("fire-ant-mound", "/assets-active/enemies/Fire_Ant_Mound.png");
+    this.load.image("rogue-sprinkler", "/assets-active/enemies/Rogue_Sprinkler.png");
+    this.load.image("vole-lieutenant", "/assets-active/enemies/Vole_Lieutenant.png");
+    this.load.image("lucky-clover", "/assets-active/enemies/Lucky_Clover.png");
+    this.load.image("mole-king", "/assets-active/enemies/Mole_King.png");
+    this.load.spritesheet("lawn-tiles", "/assets-active/tilesets/lawn_16x16.png", { frameWidth: 16, frameHeight: 16 });
     this.load.audio("dramatic-bg", "/assets-active/audio/dramatic-bg.mp3");
     this.load.audio("home-bg", "/assets-active/audio/home-bg.mp3");
     this.load.audio("comfort-bg", "/assets-active/audio/comfort-bg.mp3");

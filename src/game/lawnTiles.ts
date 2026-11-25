@@ -1,0 +1,22 @@
+/** Frame numbers in the "lawn-tiles" sheet (public/assets-active/tilesets/lawn_16x16.png). */
+export const LAWN = {
+  grass: 0,
+  flowers: 1,
+  path: 2,
+  fence: 3,
+  shed: 4,
+  siding: 5,
+  door: 6,
+  molehill: 7,
+  tunnelFloor: 8,
+  tunnelWall: 9,
+  roots: 10,
+  water: 11,
+  burrow: 12,
+  plugged: 13,
+  bigHole: 14,
+  ladder: 15,
+  cat: 16,
+  gnome: 17,
+  sign: 18,
+} as const;
