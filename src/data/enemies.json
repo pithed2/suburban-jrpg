@@ -1248,9 +1248,9 @@
       "ambushMessage": "A Vole Lieutenant steps out of the dark and checks a tiny clipboard."
     },
     "battleView": {
-      "width": 40,
-      "height": 40,
-      "y": 95,
+      "width": 46,
+      "height": 46,
+      "y": 93,
       "backdrop": "#2b1a0e"
     },
     "drops": [
