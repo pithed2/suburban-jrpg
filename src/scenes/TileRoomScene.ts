@@ -4,6 +4,7 @@ import { CharacterSprite } from "../game/CharacterSprite";
 import { DAD_DEF } from "../game/characterDefs";
 import { installDevShortcuts } from "../game/devShortcuts";
 import { GridMover } from "../game/GridMover";
+import { UTIL } from "../game/utilityTiles";
 import { DialogueBox } from "../game/DialogueBox";
 import { DialogueRunner, type DialogueInput, type DialogueLine } from "../game/DialogueRunner";
 import { GameMenu } from "../game/GameMenu";
@@ -19,12 +20,7 @@ const FLOOR = 0;
 const WALL  = 1;
 const STAIR = 2; // walkable, triggers exit
 
-// Int-A4 (512×512, 32px tiles = 16 cols × 16 rows)
-// Frame 17 = row 1, col 1 — solid dark-stone fill inside the iron/stone border set
-const WALL_FRAME  = 17;
-// Int-A2 (512×384, 32px tiles = 16 cols × 12 rows)
-// Frame 7 = row 0, col 7 — gray stone floor
-const FLOOR_FRAME = 7;
+// Art: original tiles from scripts/art/utility_store_art.py ("utility-tiles").
 
 // ── Room layout: 24 cols × 16 rows ───────────────────────────────────────────
 // Walls ring the perimeter. Stair tile at top-center lets player exit.
@@ -83,10 +79,8 @@ interface RoomProp {
   blockW: number;
   blockH: number;
   activateRadius: number;
-  // Int-B frame for the top sprite overlay (32×32 grid, 16 cols)
-  // null = render label-only placeholder
-  frame: number | null;
-  tint?: number;
+  // Frames in the "utility-tiles" sheet covering the footprint, row by row
+  art: number[];
   lines: string[];
 }
 
@@ -98,8 +92,7 @@ const PROPS: RoomProp[] = [
     label: "WORKBENCH",
     ...tp(1, 1, 3, 1),
     activateRadius: 3 * TILE,
-    frame: 192,
-    tint: 0x8B5E3C,
+    art: [5, 6, 7],
     lines: [
       "Three half-finished birdhouses. A router Dad bought in April 2020.",
       "He watched eleven tutorials and built one wall.",
@@ -111,8 +104,7 @@ const PROPS: RoomProp[] = [
     label: "SHELVES",
     ...tp(20, 1, 3, 1),
     activateRadius: 3 * TILE,
-    frame: 32,
-    tint: 0x607080,
+    art: [8, 9, 10],
     lines: [
       "Holiday decorations. A box labeled TAXES 2017.",
       "Dad's college textbooks. He never sold them.",
@@ -124,8 +116,7 @@ const PROPS: RoomProp[] = [
     label: "OLD TV",
     ...tp(1, 8, 2, 2),
     activateRadius: 3 * TILE,
-    frame: 224,
-    tint: 0x2a2a2a,
+    art: [11, 12, 13, 14],
     lines: [
       "A 27-inch Trinitron CRT. Circa 2001.",
       "Dad insists it has better blacks than any OLED.",
@@ -137,8 +128,7 @@ const PROPS: RoomProp[] = [
     label: "MINI-FRIDGE",
     ...tp(21, 8, 2, 2),
     activateRadius: 3 * TILE,
-    frame: 162,
-    tint: 0xCCCCCC,
+    art: [15, 16, 17, 18],
     lines: [
       "It's padlocked.",
       "The kids respect this boundary.",
@@ -150,8 +140,7 @@ const PROPS: RoomProp[] = [
     label: "DAD'S BOX",
     ...tp(11, 12, 2, 1),
     activateRadius: 3 * TILE,
-    frame: 128,
-    tint: 0xD2A679,
+    art: [19, 20],
     lines: [
       "A cardboard box labeled \"DAD'S STUFF\" in permanent marker.",
       "Inside: a bowling trophy, a mix CD labeled \"Jamz 2004\",",
@@ -164,8 +153,7 @@ const PROPS: RoomProp[] = [
     label: "WATER HEATER",
     ...tp(2, 13, 1, 2),
     activateRadius: 3 * TILE,
-    frame: null,
-    tint: 0x888888,
+    art: [21, 22],
     lines: [
       "The water heater hums ominously.",
       "Dad read a forum post about sediment flushing.",
@@ -178,8 +166,7 @@ const PROPS: RoomProp[] = [
     label: "WEIGHT BENCH",
     ...tp(20, 13, 2, 1),
     activateRadius: 3 * TILE,
-    frame: null,
-    tint: 0x555555,
+    art: [23, 24],
     lines: [
       "The weight bench has not been used for weights.",
       "It currently holds: one fleece vest, a foam roller, and a broken oscillating fan.",
@@ -275,32 +262,28 @@ export class TileRoomScene extends Phaser.Scene {
 
   // ── Tile rendering ──────────────────────────────────────────────────────────
 
+  private tile(col: number, row: number, frame: number): Phaser.GameObjects.Image {
+    return this.add.image(col * TILE + TILE / 2, row * TILE + TILE / 2, "utility-tiles", frame);
+  }
+
   private drawTiles(): void {
     for (let row = 0; row < ROWS; row++) {
       for (let col = 0; col < COLS; col++) {
         const tileId = MAP[row][col];
-        const cx = col * TILE + TILE / 2;
-        const cy = row * TILE + TILE / 2;
-
         if (tileId === WALL) {
-          this.add.image(cx, cy, "full-set-int-a4")
-            .setFrame(WALL_FRAME)
-            .setDisplaySize(TILE, TILE);
+          const face = MAP[row + 1]?.[col] === FLOOR || MAP[row + 1]?.[col] === STAIR;
+          this.tile(col, row, face ? UTIL.wallFace : UTIL.wallTop);
+        } else if (tileId === STAIR) {
+          this.stairWorldX = col * TILE + TILE / 2;
+          this.stairWorldY = row * TILE + TILE / 2;
+          this.tile(col, row, UTIL.stairsUp);
         } else {
-          // Floor tile for both FLOOR and STAIR positions
-          this.add.image(cx, cy, "full-set-int-a2")
-            .setFrame(FLOOR_FRAME)
-            .setDisplaySize(TILE, TILE);
-
-          if (tileId === STAIR) {
-            this.stairWorldX = cx;
-            this.stairWorldY = cy;
-            // Overlay stair indicator
-            addPixelText(this, cx - 12, cy - 5, "^UP^", 6).setTint(0xfacc15);
-          }
+          const rug = col >= 7 && col <= 16 && row >= 5 && row <= 10;
+          this.tile(col, row, rug ? UTIL.oldCarpet : UTIL.concrete);
         }
       }
     }
+    this.tile(17, 12, UTIL.drain);
   }
 
   // ── Prop placement ──────────────────────────────────────────────────────────
@@ -322,28 +305,13 @@ export class TileRoomScene extends Phaser.Scene {
 
   private drawPropSprite(prop: RoomProp): void {
     const tileW = Math.max(1, Math.round(prop.blockW / TILE));
-    const tileH = Math.max(1, Math.round(prop.blockH / TILE));
-    const px = prop.worldX;
-    const py = prop.worldY;
-
-    if (prop.frame !== null) {
-      // Use the Int-B spritesheet tile, scaled to the prop footprint
-      this.add.image(px, py, "full-set-int-b")
-        .setFrame(prop.frame)
-        .setDisplaySize(prop.blockW, prop.blockH)
-        .setTint(prop.tint ?? 0xffffff);
-    } else {
-      // Fallback: a tinted rectangle
-      this.add.rectangle(px, py, prop.blockW, prop.blockH, prop.tint ?? 0x444444)
-        .setStrokeStyle(1, 0x888888);
-    }
-
-    // Label floated above
-    addPixelText(this, px - prop.label.length * 3.5, py - prop.blockH / 2 - 10, prop.label, 6)
-      .setTint(0xfacc15);
-
-    // Subtle floor shadow beneath prop
-    this.add.rectangle(px, py + prop.blockH / 2 + 2, prop.blockW - 4, 4, 0x000000, 0.3);
+    const left = prop.worldX - prop.blockW / 2;
+    const top = prop.worldY - prop.blockH / 2;
+    prop.art.forEach((frame, i) => {
+      const col = Math.round(left / TILE) + (i % tileW);
+      const row = Math.round(top / TILE) + Math.floor(i / tileW);
+      this.tile(col, row, frame);
+    });
   }
 
   // ── Player ──────────────────────────────────────────────────────────────────
@@ -354,7 +322,6 @@ export class TileRoomScene extends Phaser.Scene {
     const SPAWN_ROW = 2;
     const char = new CharacterSprite(this, 0, 0, DAD_DEF);
     this.mover = new GridMover(this, char, TILE, SPAWN_COL, SPAWN_ROW);
-    addPixelText(this, SPAWN_COL * TILE + 7, SPAWN_ROW * TILE - 6, "DAD", 6);
   }
 
   // ── Collision (GridMover callback) ──────────────────────────────────────────

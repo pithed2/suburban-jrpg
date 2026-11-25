@@ -27,3 +27,6 @@ Confirm and expand license/source notes before wider distribution.
 - Source: `scripts/art/bathroom_art.py` (ASCII pixel grids).
 - `public/assets-active/tilesets/house_16x16.png`
 - Source: `scripts/art/house_art.py` (ASCII pixel grids).
+- `public/assets-active/tilesets/utility_16x16.png`
+- `public/assets-active/tilesets/store_16x16.png`
+- Source: `scripts/art/utility_store_art.py` (ASCII pixel grids).

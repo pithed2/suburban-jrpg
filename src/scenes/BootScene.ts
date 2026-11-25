@@ -59,6 +59,8 @@ export class BootScene extends Phaser.Scene {
     this.load.image("vole-lieutenant", "/assets-active/enemies/Vole_Lieutenant.png");
     this.load.image("lucky-clover", "/assets-active/enemies/Lucky_Clover.png");
     this.load.image("mole-king", "/assets-active/enemies/Mole_King.png");
+    this.load.spritesheet("utility-tiles", "/assets-active/tilesets/utility_16x16.png", { frameWidth: 16, frameHeight: 16 });
+    this.load.spritesheet("store-tiles", "/assets-active/tilesets/store_16x16.png", { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet("house-tiles", "/assets-active/tilesets/house_16x16.png", { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet("bathroom-tiles", "/assets-active/tilesets/bathroom_16x16.png", { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet("lawn-tiles", "/assets-active/tilesets/lawn_16x16.png", { frameWidth: 16, frameHeight: 16 });
