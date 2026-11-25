@@ -1020,9 +1020,9 @@
       "ambushMessage": "A Dandelion Puff drifts into Dad's path on purpose."
     },
     "battleView": {
-      "width": 40,
-      "height": 40,
-      "y": 95,
+      "width": 44,
+      "height": 44,
+      "y": 92,
       "backdrop": "#1f4d1a"
     }
   },
