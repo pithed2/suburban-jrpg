@@ -54,7 +54,7 @@ export class BootScene extends Phaser.Scene {
     this.load.image("crabgrass-creeper", "/assets-active/enemies/Crabgrass_Creeper.png");
     this.load.image("dandelion-puff", "/assets-active/enemies/Dandelion_Puff.png");
     this.load.image("lawn-grub", "/assets-active/enemies/Lawn_Grub.png");
-    this.load.image("fire-ant-mound", "/assets-active/enemies/fire_ant_mound.png");
+    this.load.image("fire-ant-mound", "/assets-active/enemies/Fire_Ant_Mound.png");
     this.load.image("rogue-sprinkler", "/assets-active/enemies/rogue_sprinkler.png");
     this.load.image("vole-lieutenant", "/assets-active/enemies/Vole_Lieutenant.png");
     this.load.image("lucky-clover", "/assets-active/enemies/lucky_clover.png");

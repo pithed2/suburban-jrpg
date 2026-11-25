@@ -9,7 +9,7 @@ Confirm and expand license/source notes before wider distribution.
 
 ## Original art (this project)
 
-- `public/assets-active/enemies/fire_ant_mound.png`, `rogue_sprinkler.png`, `lucky_clover.png`
+- `public/assets-active/enemies/rogue_sprinkler.png`, `lucky_clover.png`
 - `public/assets-active/tilesets/lawn_16x16.png`
 - Source: `scripts/art/quest3_art.py` (ASCII pixel grids). Edit the grids and run the script to change the art.
 - `public/assets-active/enemies/Mole_King.png`: by Andy.
@@ -17,3 +17,4 @@ Confirm and expand license/source notes before wider distribution.
 - `public/assets-active/enemies/Crabgrass_Creeper.png`: by Andy.
 - `public/assets-active/enemies/Dandelion_Puff.png`: by Andy.
 - `public/assets-active/enemies/Lawn_Grub.png`: by Andy.
+- `public/assets-active/enemies/Fire_Ant_Mound.png`: by Andy.
