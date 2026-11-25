@@ -19,3 +19,4 @@ Confirm and expand license/source notes before wider distribution.
 - `public/assets-active/enemies/Fire_Ant_Mound.png`: by Andy.
 - `public/assets-active/enemies/Rogue_Sprinkler.png`: by Andy.
 - `public/assets-active/enemies/Lucky_Clover.png`: by Andy.
+- `public/assets-active/enemies/Olfactory_Ninja.png`: by Andy.

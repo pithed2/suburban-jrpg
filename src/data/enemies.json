@@ -368,6 +368,12 @@
       "levelAdvantageBonus": 0.03,
       "maxAmbushChance": 0.38,
       "ambushMessage": "The Olfactory Ninja strikes before Dad even registers the smell."
+    },
+    "battleView": {
+      "width": 44,
+      "height": 44,
+      "y": 93,
+      "backdrop": "#1c2630"
     }
   },
   {
