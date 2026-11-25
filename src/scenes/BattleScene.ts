@@ -34,7 +34,7 @@ type Command = "FIGHT" | "SKILL" | "ITEM" | "RUN";
 const COMMANDS: Command[] = ["FIGHT", "SKILL", "ITEM", "RUN"];
 type Phase = "idle" | "say" | "command" | "item";
 
-const DEFAULT_BACKDROP = "#65a30d";
+const DEFAULT_BACKDROP = "#1c2630";
 const DEPTH = 40; // under the DialogueBox (70+) so its speaker label stays visible
 
 export class BattleScene extends Phaser.Scene {

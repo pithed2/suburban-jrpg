@@ -39,3 +39,44 @@ export const MAP: number[][] = growMap(BASE_MAP, 36, 26, W, F, ({ room, h, v }) 
   room(2, 19, 10, 23);     // old tub room
   h(21, 11, 21);           // tub room ↔ cavern
 });
+
+/** Deep wings (grind rooms) get the grimy floor. */
+export const isGrimy = (col: number, row: number): boolean => col >= 21 || row >= 17;
+
+/**
+ * Fixtures drawn on top of the floor. `solid` ones block walking, so keep them
+ * against walls and out of doorways. Frame names are keys of BATH in
+ * src/game/bathroomTiles.ts.
+ */
+export const FIXTURES: { col: number; row: number; frame: string; solid?: boolean }[] = [
+  // Linen closet shelves along the west wall
+  { col: 2, row: 4, frame: "linen", solid: true },
+  { col: 2, row: 5, frame: "linen", solid: true },
+  { col: 2, row: 6, frame: "linen", solid: true },
+  // Vanity across the top of the sink corridor
+  { col: 10, row: 4, frame: "counter", solid: true },
+  { col: 11, row: 4, frame: "sink", solid: true },
+  { col: 12, row: 4, frame: "counter", solid: true },
+  // Shower: tub along the south wall, mat in front
+  { col: 17, row: 7, frame: "tubLeft", solid: true },
+  { col: 18, row: 7, frame: "tubRight", solid: true },
+  { col: 19, row: 6, frame: "bathMat" },
+  // Toilet corridor
+  { col: 11, row: 9, frame: "drain" },
+  { col: 10, row: 14, frame: "puddle" },
+  // Hamper hall
+  { col: 32, row: 9, frame: "hamper", solid: true },
+  { col: 33, row: 9, frame: "hamper", solid: true },
+  { col: 29, row: 5, frame: "puddle" },
+  // Under-sink cavern
+  { col: 25, row: 21, frame: "puddle" },
+  { col: 28, row: 22, frame: "puddle" },
+  { col: 31, row: 21, frame: "drain" },
+  // Old tub room
+  { col: 5, row: 21, frame: "oldTubLeft", solid: true },
+  { col: 6, row: 21, frame: "oldTubRight", solid: true },
+  { col: 8, row: 22, frame: "puddle" },
+];
+
+/** Wall tiles above the cavern that show a pipe run. */
+export const PIPE_ROW = { row: 18, from: 22, to: 33 };

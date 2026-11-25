@@ -598,8 +598,7 @@
     "battleView": {
       "width": 46,
       "height": 46,
-      "y": 94,
-      "backdrop": "#1c2630"
+      "y": 94
     },
     "drops": [
       {

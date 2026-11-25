@@ -1,0 +1,22 @@
+/** Frame numbers in the "bathroom-tiles" sheet (public/assets-active/tilesets/bathroom_16x16.png). */
+export const BATH = {
+  floor: 0,
+  grimyFloor: 1,
+  wallFace: 2,
+  wallTop: 3,
+  stairs: 4,
+  bathMat: 5,
+  puddle: 6,
+  drain: 7,
+  toiletClogged: 8,
+  toiletClean: 9,
+  sink: 10,
+  counter: 11,
+  linen: 12,
+  tubLeft: 13,
+  tubRight: 14,
+  oldTubLeft: 15,
+  oldTubRight: 16,
+  wallPipe: 17,
+  hamper: 18,
+} as const;
